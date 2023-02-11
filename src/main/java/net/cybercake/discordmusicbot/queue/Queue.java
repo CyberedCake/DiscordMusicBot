@@ -6,11 +6,13 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 public class Queue {
@@ -19,35 +21,33 @@ public class Queue {
     private final VoiceChannel voiceChannel;
     private final AudioPlayerManager audioPlayerManager;
     private final AudioManager audioManager;
-    public final AudioPlayer player;
-    public final TrackScheduler scheduler;
+    private final AudioPlayer audioPlayer;
+    private final TrackScheduler trackScheduler;
 
     protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, VoiceChannel voiceChannel) {
         this.guild = guild;
         this.voiceChannel = voiceChannel;
 
-        this.audioManager = Main.guild.getAudioManager();
+        this.audioManager = guild.getAudioManager();
         this.audioManager.openAudioConnection(voiceChannel);
 
         this.audioPlayerManager = audioPlayerManager;
-        this.player = audioPlayerManager.createPlayer();
+        this.audioPlayer = audioPlayerManager.createPlayer();
 
-        this.scheduler = new TrackScheduler(this.player);
+        this.trackScheduler = new TrackScheduler(this.audioPlayer);
 
-        this.player.addListener(this.scheduler);
+        this.audioPlayer.addListener(this.trackScheduler);
     }
 
     public Guild getGuild() { return this.guild; }
+    public AudioPlayer getAudioPlayer() { return this.audioPlayer; }
 
-    public AudioPlayerSendHandler getSendHandler() { return new AudioPlayerSendHandler(this.player); }
-
-    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, final String trackUrl) {
+    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, final String trackUrl, final SlashCommandInteractionEvent event) {
         this.audioPlayerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                textChannel.sendMessage("Adding to queue " + track.getInfo().title).queue();
-
                 play(track);
+                Embeds.sendSongPlayingStatus(event, track, this);
             }
 
             @Override
@@ -75,12 +75,11 @@ public class Queue {
 
     private void play(AudioTrack track) {
         connectFirst();
-        this.scheduler.queue(track);
-        this.scheduler.nextTrack();
+        this.trackScheduler.queue(track);
     }
 
     private void skipTrack(TextChannel channel) {
-        this.scheduler.nextTrack();
+        this.trackScheduler.nextTrack();
         channel.sendMessage("Skipped to next track.").queue();
     }
 

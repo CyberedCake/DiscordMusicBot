@@ -33,7 +33,7 @@ public abstract class Command {
                 Log.error("An error occurred whilst registering commands: " + noSuchMethodException, noSuchMethodException);
             }
         }
-        Main.guild.updateCommands().addCommands(
+        Main.JDA.updateCommands().addCommands(
                 commandsData
         ).queue();
     }

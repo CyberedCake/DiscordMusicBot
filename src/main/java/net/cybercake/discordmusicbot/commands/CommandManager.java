@@ -16,8 +16,6 @@ public class CommandManager extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if(event.getChannel().getIdLong() != Main.MUSIC_CHANNEL_ID) return;
-
         try {
             Log.info(event.getUser().getName() + "#" + event.getUser().getDiscriminator() + " (" + event.getUser().getIdLong() + "): " + event.getCommandString());
             Command command = Command.getCommandFromName(event.getName(), true);

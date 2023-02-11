@@ -8,13 +8,14 @@ mainClassName = 'net.cybercake.discordmusicbot.Main'
 group 'net.cybercake.discordmusicbot'
 version '1.0.0'
 
-sourceCompatibility = targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = 17
 
 repositories {
     mavenCentral()
     maven {
         url 'https://m2.dv8tion.net/releases'
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -25,6 +26,7 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.9'
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'com.sedmelluq:lavaplayer:1.3.77'
+    implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
 }
 
 shadowJar {

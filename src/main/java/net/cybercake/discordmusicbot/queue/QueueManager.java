@@ -3,6 +3,7 @@ package net.cybercake.discordmusicbot.queue;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,7 +43,7 @@ public class QueueManager {
             if(voiceChannel == null) throw new IllegalArgumentException("Failed to find a queue for the guild " + guildId + " (" + guild.getName() + ")");
         }
 
-        guild.getAudioManager().setSendingHandler(queue.getSendHandler());
+        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(queue.getAudioPlayer()));
 
         return queue;
     }

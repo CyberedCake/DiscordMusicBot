@@ -38,7 +38,7 @@ public class Play extends Command {
 
         try {
             Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
-                    event.getChannel().asTextChannel(), user, Objects.requireNonNull(event.getOption("song")).getAsString()
+                    event.getChannel().asTextChannel(), user, Objects.requireNonNull(event.getOption("song")).getAsString(), event
             );
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);

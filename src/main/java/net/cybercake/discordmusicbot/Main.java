@@ -1,5 +1,7 @@
 package net.cybercake.discordmusicbot;
 
+import com.jagrosh.jlyrics.Lyrics;
+import com.jagrosh.jlyrics.LyricsClient;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
 import net.cybercake.discordmusicbot.generalutils.Log;
@@ -15,12 +17,9 @@ public class Main {
 
     public static final String TOKEN = System.getenv("TOKEN");
 
-    public static final long MUSIC_CHANNEL_ID = 1061402397378887761L;
-    public static final long GUILD_ID = 1060022039311818752L;
-
     public static JDA JDA;
-    public static Guild guild;
     public static QueueManager queueManager;
+    public static LyricsClient lyricsClient;
 
     public static void main(String[] args) throws InterruptedException {
         long mss = System.currentTimeMillis();
@@ -38,8 +37,8 @@ public class Main {
                 .awaitReady();
 
         Log.info("Setting needed variables...");
-        guild = JDA.getGuildById(GUILD_ID);
         queueManager = new QueueManager();
+        lyricsClient = new LyricsClient();
 
         Log.info("Registering commands...");
         Command.registerAll();
