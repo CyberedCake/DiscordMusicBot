@@ -7,15 +7,15 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class QueueManager {
 
     private final Map<Long, Queue> musicManagers;
-    private AudioPlayerManager audioPlayerManager;
+    private final AudioPlayerManager audioPlayerManager;
 
     public QueueManager() {
         this.musicManagers = new HashMap<>();
@@ -27,29 +27,34 @@ public class QueueManager {
         Log.info("Queue manager has been created!");
     }
 
-    public Queue createQueue(Guild guild, VoiceChannel voiceChannel) {
-        Log.info("Created a new queue for guild " + guild.getId() + " (" + guild.getName() + ")" + " in voice channel " + voiceChannel.getId() + " (" + voiceChannel.getName() + ")");
-        Queue queue = new Queue(audioPlayerManager, guild, voiceChannel);
-        musicManagers.put(Long.parseLong(guild.getId()), queue);
-        return queue;
-    }
-
     public AudioPlayerManager getAudioPlayerManager() { return audioPlayerManager; }
 
-    public Queue getQueueFor(Guild guild) { return getQueueFor(Long.parseLong(guild.getId())); }
-    public Queue getQueueFor(long guildId) { return this.musicManagers.get(guildId); }
+    public synchronized boolean checkQueueExists(Guild guild) {
+        return this.musicManagers.get(Long.parseLong(guild.getId())) != null;
+    }
 
-    private synchronized Queue getGuildAudioPlayer(Guild guild, VoiceChannel voiceChannel) {
+    public synchronized Queue getGuildQueue(Guild guild, @Nullable VoiceChannel voiceChannel) {
         long guildId = Long.parseLong(guild.getId());
         Queue queue = this.musicManagers.get(guildId);
 
-        if(queue == null) {
-            queue = Main.queueManager.createQueue(guild, voiceChannel);
-            musicManagers.put(Long.valueOf(guild.getId()), queue);
+        if(!checkQueueExists(guild)) {
+            if(voiceChannel != null) queue = createQueue(guild, voiceChannel);
+            if(voiceChannel == null) throw new IllegalArgumentException("Failed to find a queue for the guild " + guildId + " (" + guild.getName() + ")");
         }
 
         guild.getAudioManager().setSendingHandler(queue.getSendHandler());
 
+        return queue;
+    }
+
+    public synchronized Queue getGuildQueue(Guild guild) {
+        return getGuildQueue(guild, null);
+    }
+
+    public synchronized Queue createQueue(Guild guild, VoiceChannel voiceChannel) {
+        Log.info("Created a new queue for guild " + guild.getId() + " (" + guild.getName() + ")" + " in voice channel " + voiceChannel.getId() + " (" + voiceChannel.getName() + ")");
+        Queue queue = new Queue(audioPlayerManager, guild, voiceChannel);
+        musicManagers.put(Long.valueOf(guild.getId()), queue);
         return queue;
     }
 

@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot;
+package net.cybercake.discordmusicbot.queue;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;

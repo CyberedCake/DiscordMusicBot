@@ -35,8 +35,10 @@ public class CommandManager extends ListenerAdapter {
             embed.addField("**Exact Exception**", "||`" + exception + "`||", false);
             embed.setTimestamp(new Date().toInstant());
             embed.setColor(new Color(186, 24, 19));
-            event.replyEmbeds(embed.build()).queue();
             Log.error("A critical error occurred at " + new SimpleDateFormat("MMM d, yyyy HH:mm:ss z"), exception);
+
+            if(event.isAcknowledged()) event.getHook().editOriginalEmbeds(embed.build()).queue();
+            else event.replyEmbeds(embed.build()).queue();
         }
     }
 

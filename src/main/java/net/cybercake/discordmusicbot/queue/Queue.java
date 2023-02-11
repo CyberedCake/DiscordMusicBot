@@ -6,7 +6,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.cybercake.discordmusicbot.AudioPlayerSendHandler;
 import net.cybercake.discordmusicbot.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -14,18 +13,14 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Queue {
 
     private final Guild guild;
     private final VoiceChannel voiceChannel;
     private final AudioPlayerManager audioPlayerManager;
     private final AudioManager audioManager;
-    private final AudioPlayer audioPlayer;
-    private final TrackScheduler trackScheduler;
-    private final List<Song> playList;
+    public final AudioPlayer player;
+    public final TrackScheduler scheduler;
 
     protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, VoiceChannel voiceChannel) {
         this.guild = guild;
@@ -34,55 +29,20 @@ public class Queue {
         this.audioManager = Main.guild.getAudioManager();
         this.audioManager.openAudioConnection(voiceChannel);
 
-        this.playList = new ArrayList<>();
         this.audioPlayerManager = audioPlayerManager;
-        this.audioPlayer = audioPlayerManager.createPlayer();
+        this.player = audioPlayerManager.createPlayer();
 
-        this.trackScheduler = new TrackScheduler(this.audioPlayer);
+        this.scheduler = new TrackScheduler(this.player);
 
-        this.audioPlayer.addListener(this.trackScheduler);
+        this.player.addListener(this.scheduler);
     }
 
     public Guild getGuild() { return this.guild; }
-    public VoiceChannel getVoiceChannel() { return this.voiceChannel; }
-    public AudioPlayerManager getAudioPlayerManager() { return this.audioPlayerManager; }
-    public AudioManager getAudioManager() { return this.audioManager; }
-    public AudioPlayer getAudioPlayer() { return this.audioPlayer; }
-    public TrackScheduler getTrackScheduler() { return this.trackScheduler; }
-    public AudioPlayerSendHandler getSendHandler() { return new AudioPlayerSendHandler(this.audioPlayer); }
 
-    public void addSong(String identifier, User requestedBy) {
-        Song song = new Song(this, identifier);
+    public AudioPlayerSendHandler getSendHandler() { return new AudioPlayerSendHandler(this.player); }
 
-        this.playList.add(song);
-        this.audioPlayerManager.loadItem(identifier, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                getAudioPlayer().playTrack(track);
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-
-            }
-
-            @Override
-            public void noMatches() {
-
-            }
-
-            @Override
-            public void loadFailed(FriendlyException exception) {
-
-            }
-        });
-
-    }
-
-    public void loadAndPlay(final TextChannel textChannel, final String trackUrl) {
-        Queue queue = Main.queueManager.getQueueFor(textChannel.getGuild());
-
-        this.audioPlayerManager.loadItemOrdered(this, trackUrl, new AudioLoadResultHandler() {
+    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, final String trackUrl) {
+        this.audioPlayerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 textChannel.sendMessage("Adding to queue " + track.getInfo().title).queue();
@@ -115,11 +75,12 @@ public class Queue {
 
     private void play(AudioTrack track) {
         connectFirst();
-        this.trackScheduler.queue(track);
+        this.scheduler.queue(track);
+        this.scheduler.nextTrack();
     }
 
     private void skipTrack(TextChannel channel) {
-        this.trackScheduler.nextTrack();
+        this.scheduler.nextTrack();
         channel.sendMessage("Skipped to next track.").queue();
     }
 

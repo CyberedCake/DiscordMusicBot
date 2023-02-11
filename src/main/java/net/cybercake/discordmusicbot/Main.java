@@ -1,12 +1,8 @@
 package net.cybercake.discordmusicbot;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
 import net.cybercake.discordmusicbot.generalutils.Log;
-import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.queue.QueueManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -14,9 +10,6 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
@@ -27,7 +20,6 @@ public class Main {
 
     public static JDA JDA;
     public static Guild guild;
-    public static PlayStatus playStatus;
     public static QueueManager queueManager;
 
     public static void main(String[] args) throws InterruptedException {
@@ -47,7 +39,6 @@ public class Main {
 
         Log.info("Setting needed variables...");
         guild = JDA.getGuildById(GUILD_ID);
-        playStatus = PlayStatus.INACTIVE;
         queueManager = new QueueManager();
 
         Log.info("Registering commands...");

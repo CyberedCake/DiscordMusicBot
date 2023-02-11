@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.util.Objects;
+
 public class Play extends Command {
 
     public Play() {
@@ -31,12 +33,12 @@ public class Play extends Command {
             Embeds.throwError(event, user, "You must be in a voice channel to continue.", null); return;
         }
 
-        if(Main.queueManager.getQueueFor(member.getGuild()) == null)
-            Main.queueManager.createQueue(member.getGuild(), member.getVoiceState().getChannel().asVoiceChannel());
+        if(!Main.queueManager.checkQueueExists(member.getGuild()))
+            Main.queueManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel().asVoiceChannel());
 
         try {
-            Main.queueManager.getQueueFor(member.getGuild()).addSong(
-                    event.getOption("song").getAsString(), user
+            Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
+                    event.getChannel().asTextChannel(), user, Objects.requireNonNull(event.getOption("song")).getAsString()
             );
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);
