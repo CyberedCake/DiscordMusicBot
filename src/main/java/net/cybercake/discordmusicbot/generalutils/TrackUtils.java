@@ -1,17 +1,12 @@
 package net.cybercake.discordmusicbot.generalutils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 public class TrackUtils {
 
     public static String getDuration(long current, long max) {
         StringBuilder bar = new StringBuilder();
         float currentLoop = 0;
         while (currentLoop < 1) {
-            if(Math.abs(currentLoop-(Float.parseFloat(String.valueOf(current/max)))) <= 0.1)
+            if(Math.abs(currentLoop-(Float.parseFloat(String.valueOf(current))/Float.parseFloat(String.valueOf(max)))+0.05) <= 0.05)
                 bar.append(":radio_button:");
             else
                 bar.append("▬");

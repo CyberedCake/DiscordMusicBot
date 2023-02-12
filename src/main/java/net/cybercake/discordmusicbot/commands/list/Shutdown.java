@@ -3,18 +3,15 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.awt.*;
 
 public class Shutdown extends Command {
 
     public Shutdown() {
-        super("shutdown-bot", "Completely powers off the bot.", null, (OptionData[]) null);
+        super("shutdown-bot", "Completely powers off the bot.");
     }
 
     @Override

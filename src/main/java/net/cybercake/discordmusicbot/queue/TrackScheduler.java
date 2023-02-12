@@ -5,6 +5,8 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.cybercake.discordmusicbot.Embeds;
+import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.generalutils.Pair;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -35,9 +37,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @SuppressWarnings({"all"})
     public void queue(AudioTrack track) {
-        if(!audioPlayer.startTrack(track, true)) {
+        if(!audioPlayer.startTrack(track, true))
             queue.offer(track);
-        }
     }
 
     public void nextTrack() {
@@ -46,14 +47,28 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        if(this.message != null) { // delete previous message if it exists
-            this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
+        try {
+            Thread sendNowPlayingMessage = new Thread(() -> {
+                try {
+                    Thread.sleep(600L); // delay because information that is set after this method finishes is required inside the embed
+                    this.message = Embeds.sendSongPlayingStatus(track, this.guild);
+                } catch (Exception exception) {
+                    throw new IllegalStateException("Failed to send now playing message to guild " + guild.getId() + " (" + guild.getName() + ")", exception);
+                }
+            });
+            sendNowPlayingMessage.start();
+        } catch (Exception exception) {
+            Log.error("Failed to start track for guild " + guild.getId() + " (" + guild.getName() + ")", exception);
         }
-        this.message.setPair(Embeds.sendSongPlayingStatus(track, this.guild));
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        if(this.message != null) { // delete previous message if it exists
+            this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
+            this.message = null;
+        }
+        Main.queueManager.getGuildQueue(this.guild).clearSkipVoteQueue();
         if(endReason.mayStartNext) {
             switch(this.repeating) {
                 case REPEATING_SONG -> player.startTrack(track.makeClone(), false);

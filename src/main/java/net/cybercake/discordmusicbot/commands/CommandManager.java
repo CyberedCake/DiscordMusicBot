@@ -1,7 +1,6 @@
 package net.cybercake.discordmusicbot.commands;
 
 import net.cybercake.discordmusicbot.Embeds;
-import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

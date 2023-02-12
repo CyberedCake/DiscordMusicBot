@@ -1,12 +1,10 @@
 package net.cybercake.discordmusicbot;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.generalutils.Pair;
 import net.cybercake.discordmusicbot.generalutils.TrackUtils;
-import net.cybercake.discordmusicbot.queue.QueueManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,32 +12,35 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.net.URL;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Embeds {
 
-    public static void executeEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder) { executeEmbed(event, builder.build()); }
+    public static void executeEmbed(IReplyCallback event, EmbedBuilder builder, boolean ephemeral) { executeEmbed(event, builder.build(), ephemeral); }
 
-    public static void executeEmbed(SlashCommandInteractionEvent event, MessageEmbed embed) {
+    public static void executeEmbed(IReplyCallback event, MessageEmbed embed, boolean ephemeral) {
         if(event.isAcknowledged())
             event.getHook().editOriginalEmbeds(embed).queue();
         else
-            event.replyEmbeds(embed).queue();
+            event.replyEmbeds(embed).setEphemeral(ephemeral).queue();
     }
 
 
 
-    public static void throwError(SlashCommandInteractionEvent event, @Nullable User user, String errorMessage, @Nullable Exception exception) {
-        executeEmbed(event, getErrorEmbed0(user, errorMessage));
+    public static void throwError(IReplyCallback event, @Nullable User user, String errorMessage, boolean ephemeral, @Nullable Exception exception) {
+        executeEmbed(event, getErrorEmbed0(user, errorMessage), ephemeral);
 
         if(exception != null)
             Log.error(errorMessage, exception);
+    }
+
+    public static void throwError(IReplyCallback event, @Nullable User user, String errorMessage, @Nullable Exception exception) {
+        throwError(event, user, errorMessage, false, exception);
     }
 
     public static EmbedBuilder getErrorEmbed(@Nullable User user, String errorMessage) {
@@ -74,21 +75,22 @@ public class Embeds {
         EmbedBuilder builder = new EmbedBuilder();
         if(image != null)
             builder.setThumbnail(image);
-        builder.setAuthor(track.getInfo().author);
+        builder.setAuthor("\uD83C\uDFB6 Now Playing");
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
-        builder.addField("Requested By", "null", true);
+        if(track.getUserData() != null)
+            builder.addField("Requested By", "<@" + track.getUserData(User.class).getId() + ">", true);
         builder.setTimestamp(new Date().toInstant());
-        AtomicReference<Message> message = new AtomicReference<>(null);
-        Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).queue(
-                message::set
-        );
-        if(message.get() == null)
-            throw new IllegalStateException("Message wasn't sent or an error occurred");
-        return new Pair<>(message.get().getChannel().asTextChannel(), message.get().getIdLong());
+        Message message;
+        try {
+            message = Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).addActionRow(Button.danger("skip-track-" + track.getIdentifier(), "Skip Track")).complete();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to send now playing status in text channel for " + guild.getId() + " (" + guild.getName() + ")", exception);
+        }
+        return new Pair<>(message.getChannel().asTextChannel(), message.getIdLong());
     }
 
-    public static Message sendNowPlayingStatus(AudioTrack track, Guild guild) {
+    public static void sendNowPlayingStatus(SlashCommandInteractionEvent event, AudioTrack track, Guild guild) {
         @Nullable String image = null;
         if(track.getInfo().uri.contains("youtube.com"))
             image = "https://i3.ytimg.com/vi/" + track.getIdentifier() + "/maxresdefault.jpg";
@@ -100,13 +102,14 @@ public class Embeds {
         builder.setAuthor(track.getInfo().author);
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()));
-        builder.addField("Requested By", "null", false);
+        if(track.getUserData() != null)
+            builder.addField("Requested By", "<@" + track.getUserData(User.class).getId() + ">", false);
         builder.setTimestamp(new Date().toInstant());
-        AtomicReference<Message> message = new AtomicReference<>(null);
-        Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).queue(
-                message::set
-        );
-        return message.get();
+
+        if(event.isAcknowledged())
+            event.getHook().editOriginalEmbeds(builder.build()).queue();
+        else
+            event.replyEmbeds(builder.build()).setEphemeral(true).queue();
     }
 
 

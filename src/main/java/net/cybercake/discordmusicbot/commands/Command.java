@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.reflections.Reflections;
 
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Locale;
 
 public abstract class Command {
 
@@ -26,12 +27,13 @@ public abstract class Command {
         for(Class<? extends Command> clazz : new Reflections(COMMANDS_PACKAGE).getSubTypesOf(Command.class)) {
             try {
                 Command newInstance = clazz.getDeclaredConstructor().newInstance();
+                Log.info("Registering command: /" + newInstance.getName() + " (class: " + clazz.getCanonicalName() + ")");
                 commands.add(newInstance);
-                commandsData.add(
-                        Commands.slash(newInstance.getName(), newInstance.getDescription())
-                                .addOptions(newInstance.getOptionData())
-                );
-                Log.info("Registered new command: /" + newInstance.getName() + " (class: " + clazz.getCanonicalName() + ")");
+                commandsData.add(addNewCommand(newInstance.getName(), newInstance));
+                if(newInstance.getAliases() != null) {
+                    for(String alias : newInstance.getAliases())
+                        commandsData.add(addNewCommand(alias, newInstance));
+                }
 
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException noSuchMethodException) {
                 Log.error("An error occurred whilst registering commands: " + noSuchMethodException, noSuchMethodException);
@@ -40,6 +42,13 @@ public abstract class Command {
         Main.JDA.updateCommands().addCommands(
                 commandsData
         ).queue();
+    }
+
+    private static SlashCommandData addNewCommand(String name, Command command) { // require name because aliases exist
+        if(command.getOptionData() == null || Arrays.stream(command.getOptionData()).toList().contains(null))
+            return Commands.slash(name, command.getDescription());
+        return Commands.slash(name, command.getDescription())
+                .addOptions(command.getOptionData());
     }
 
     public static List<Command> getCommands() { return commands; }
@@ -55,9 +64,9 @@ public abstract class Command {
                 .stream()
                 .filter(command -> {
                     if(ignoreCase)
-                        return command.getName().equalsIgnoreCase(name);
+                        return command.getName().equalsIgnoreCase(name) || (command.getAliases() != null && Arrays.stream(command.getAliases()).map(String::toLowerCase).toList().contains(name.toLowerCase(Locale.ROOT)));
                     else
-                        return command.getName().equals(name);
+                        return command.getName().equals(name) || (command.getAliases() != null && Arrays.stream(command.getAliases()).toList().contains(name));
                 })
                 .findFirst()
                 .orElse(null);
@@ -66,13 +75,13 @@ public abstract class Command {
     private final String name;
     private final String description;
     private final @Nullable String[] aliases;
-    private final OptionData[] optionData;
+    private final @Nullable OptionData[] optionData;
 
     public Command(String name, String description, @Nullable String[] aliases, @Nullable OptionData... optionData) {
         this.name = name;
         this.description = description;
         this.aliases = aliases;
-        this.optionData = (optionData == null ? new OptionData[]{} : optionData);
+        this.optionData = optionData;
     }
 
     public Command(String name, String description, @Nullable String... aliases) {
@@ -83,10 +92,14 @@ public abstract class Command {
         this(name, description, null, optionData);
     }
 
+    public Command(String name, String description) {
+        this(name, description, null, (OptionData[]) null);
+    }
+
     public String getName() { return this.name; }
     public String getDescription() { return this.description; }
     public @Nullable String[] getAliases() { return this.aliases; }
-    public OptionData[] getOptionData() { return this.optionData; }
+    public @Nullable OptionData[] getOptionData() { return this.optionData; }
 
     public abstract void command(SlashCommandInteractionEvent event);
 }

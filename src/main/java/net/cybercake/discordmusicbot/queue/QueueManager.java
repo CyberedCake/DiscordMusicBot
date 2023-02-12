@@ -4,7 +4,6 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.entities.Guild;
@@ -34,7 +33,7 @@ public class QueueManager {
 
     public AudioPlayerManager getAudioPlayerManager() { return audioPlayerManager; }
 
-    public synchronized boolean checkQueueExists(Guild guild) {
+    public boolean checkQueueExists(Guild guild) {
         return this.musicManagers.get(Long.parseLong(guild.getId())) != null;
     }
 

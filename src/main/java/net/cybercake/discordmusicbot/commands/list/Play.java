@@ -2,6 +2,7 @@ package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -17,6 +18,7 @@ public class Play extends Command {
         super(
                 "play",
                 "Type a URL or the name of a video to play music.",
+                new String[]{"p"},
                 new OptionData(OptionType.STRING, "song", "The song URL or name of the song.", true)
         );
     }
@@ -26,11 +28,10 @@ public class Play extends Command {
         Member member = event.getMember();
         User user = event.getUser();
         event.deferReply().queue();
-        if(member == null) { // member doesn't exist for some reason
-            event.getHook().editOriginalEmbeds(Embeds.getTechnicalErrorEmbed(null, "member == null").build()).queue(); return;
-        }
+        if(PresetExceptions.memberNull(event)) return;
+        assert member != null;
         if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null) { // they are not in a voice chat
-            Embeds.throwError(event, user, "You must be in a voice channel to continue.", null); return;
+            Embeds.throwError(event, user, "You must be in a voice channel to continue.", false, null); return;
         }
 
         if(!Main.queueManager.checkQueueExists(member.getGuild()))
