@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'com.sedmelluq:lavaplayer:1.3.77'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
+    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:3.2.0"
 }
 
 shadowJar {

@@ -2,15 +2,25 @@ package net.cybercake.discordmusicbot;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.generalutils.Pair;
+import net.cybercake.discordmusicbot.generalutils.TrackUtils;
+import net.cybercake.discordmusicbot.queue.QueueManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Embeds {
 
@@ -51,18 +61,52 @@ public class Embeds {
         return getErrorEmbed(user, "`" + technicalInformation + "` -- That's all we know, please contact a staff member");
     }
 
-    public static void sendSongPlayingStatus(SlashCommandInteractionEvent event, AudioTrack track, AudioLoadResultHandler audioLoadResultHandler) {
+    private static String extractImage(AudioTrackInfo info) {
+        @Nullable String image = null;
+        if(info.uri.contains("youtube.com"))
+            image = "https://i3.ytimg.com/vi/" + info.identifier + "/maxresdefault.jpg";
+        return image;
+    }
+
+    public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild) {
+        String image = extractImage(track.getInfo());
+
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(new Color(137, 255, 108));
-        Log.info(track.getIdentifier());
-        builder.setTitle(track.getInfo().title, "https://www.youtube.com/watch?v=" + track.getIdentifier());
-        builder.setDescription("Length: " + track.getDuration());
+        if(image != null)
+            builder.setThumbnail(image);
+        builder.setAuthor(track.getInfo().author);
+        builder.setTitle(track.getInfo().title, track.getInfo().uri);
+        builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
+        builder.addField("Requested By", "null", true);
         builder.setTimestamp(new Date().toInstant());
-        builder.setFooter("Requested by *soon*");
-        if(event.isAcknowledged())
-            event.getHook().editOriginalEmbeds(builder.build()).queue();
-        else
-            event.replyEmbeds(builder.build()).queue();
+        AtomicReference<Message> message = new AtomicReference<>(null);
+        Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).queue(
+                message::set
+        );
+        if(message.get() == null)
+            throw new IllegalStateException("Message wasn't sent or an error occurred");
+        return new Pair<>(message.get().getChannel().asTextChannel(), message.get().getIdLong());
+    }
+
+    public static Message sendNowPlayingStatus(AudioTrack track, Guild guild) {
+        @Nullable String image = null;
+        if(track.getInfo().uri.contains("youtube.com"))
+            image = "https://i3.ytimg.com/vi/" + track.getIdentifier() + "/maxresdefault.jpg";
+
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(new Color(108, 221, 255));
+        if(image != null)
+            builder.setThumbnail(image);
+        builder.setAuthor(track.getInfo().author);
+        builder.setTitle(track.getInfo().title, track.getInfo().uri);
+        builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()));
+        builder.addField("Requested By", "null", false);
+        builder.setTimestamp(new Date().toInstant());
+        AtomicReference<Message> message = new AtomicReference<>(null);
+        Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).queue(
+                message::set
+        );
+        return message.get();
     }
 
 

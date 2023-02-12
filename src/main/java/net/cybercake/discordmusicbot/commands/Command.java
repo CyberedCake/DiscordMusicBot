@@ -11,7 +11,9 @@ import org.reflections.Reflections;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Command {
 
@@ -29,6 +31,8 @@ public abstract class Command {
                         Commands.slash(newInstance.getName(), newInstance.getDescription())
                                 .addOptions(newInstance.getOptionData())
                 );
+                Log.info("Registered new command: /" + newInstance.getName() + " (class: " + clazz.getCanonicalName() + ")");
+
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException noSuchMethodException) {
                 Log.error("An error occurred whilst registering commands: " + noSuchMethodException, noSuchMethodException);
             }
@@ -61,16 +65,27 @@ public abstract class Command {
 
     private final String name;
     private final String description;
+    private final @Nullable String[] aliases;
     private final OptionData[] optionData;
 
-    public Command(String name, String description, OptionData... optionData) {
+    public Command(String name, String description, @Nullable String[] aliases, @Nullable OptionData... optionData) {
         this.name = name;
         this.description = description;
-        this.optionData = optionData;
+        this.aliases = aliases;
+        this.optionData = (optionData == null ? new OptionData[]{} : optionData);
+    }
+
+    public Command(String name, String description, @Nullable String... aliases) {
+        this(name, description, aliases, (OptionData) null);
+    }
+
+    public Command(String name, String description, @Nullable OptionData... optionData) {
+        this(name, description, null, optionData);
     }
 
     public String getName() { return this.name; }
     public String getDescription() { return this.description; }
+    public @Nullable String[] getAliases() { return this.aliases; }
     public OptionData[] getOptionData() { return this.optionData; }
 
     public abstract void command(SlashCommandInteractionEvent event);

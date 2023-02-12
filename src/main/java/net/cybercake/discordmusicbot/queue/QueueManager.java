@@ -1,5 +1,6 @@
 package net.cybercake.discordmusicbot.queue;
 
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
@@ -7,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 import javax.annotation.Nullable;
@@ -25,6 +27,8 @@ public class QueueManager {
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
 
+        this.audioPlayerManager.registerSourceManager(new SpotifySourceManager(null, Main.SPOTIFY_CLIENT, Main.SPOTIFY_TOKEN, "US", this.audioPlayerManager));
+
         Log.info("Queue manager has been created!");
     }
 
@@ -34,12 +38,12 @@ public class QueueManager {
         return this.musicManagers.get(Long.parseLong(guild.getId())) != null;
     }
 
-    public synchronized Queue getGuildQueue(Guild guild, @Nullable VoiceChannel voiceChannel) {
+    public synchronized Queue getGuildQueue(Guild guild, @Nullable VoiceChannel voiceChannel, @Nullable TextChannel textChannel) {
         long guildId = Long.parseLong(guild.getId());
         Queue queue = this.musicManagers.get(guildId);
 
         if(!checkQueueExists(guild)) {
-            if(voiceChannel != null) queue = createQueue(guild, voiceChannel);
+            if(voiceChannel != null && textChannel != null) queue = createQueue(guild, voiceChannel, textChannel);
             if(voiceChannel == null) throw new IllegalArgumentException("Failed to find a queue for the guild " + guildId + " (" + guild.getName() + ")");
         }
 
@@ -49,12 +53,12 @@ public class QueueManager {
     }
 
     public synchronized Queue getGuildQueue(Guild guild) {
-        return getGuildQueue(guild, null);
+        return getGuildQueue(guild, null, null);
     }
 
-    public synchronized Queue createQueue(Guild guild, VoiceChannel voiceChannel) {
+    public synchronized Queue createQueue(Guild guild, VoiceChannel voiceChannel, TextChannel textChannel) {
         Log.info("Created a new queue for guild " + guild.getId() + " (" + guild.getName() + ")" + " in voice channel " + voiceChannel.getId() + " (" + voiceChannel.getName() + ")");
-        Queue queue = new Queue(audioPlayerManager, guild, voiceChannel);
+        Queue queue = new Queue(audioPlayerManager, guild, voiceChannel, textChannel);
         musicManagers.put(Long.valueOf(guild.getId()), queue);
         return queue;
     }

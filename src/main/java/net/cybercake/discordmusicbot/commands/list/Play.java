@@ -34,7 +34,7 @@ public class Play extends Command {
         }
 
         if(!Main.queueManager.checkQueueExists(member.getGuild()))
-            Main.queueManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel().asVoiceChannel());
+            Main.queueManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel().asVoiceChannel(), event.getChannel().asTextChannel());
 
         try {
             Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(

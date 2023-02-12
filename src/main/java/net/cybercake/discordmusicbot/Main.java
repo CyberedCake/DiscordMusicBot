@@ -5,6 +5,7 @@ import com.jagrosh.jlyrics.LyricsClient;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
 import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.listeners.BotDisconnectEvent;
 import net.cybercake.discordmusicbot.queue.QueueManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -16,6 +17,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 public class Main {
 
     public static final String TOKEN = System.getenv("TOKEN");
+    public static final String SPOTIFY_TOKEN = System.getenv("SPOTIFY_SECRET");
+    public static final String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
     public static JDA JDA;
     public static QueueManager queueManager;
@@ -32,7 +35,8 @@ public class Main {
                 .setActivity(Activity.watching("Cyberspace"))
                 .setStatus(OnlineStatus.ONLINE)
                 .setEnabledIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.values())
-                .addEventListeners(new CommandManager())
+                .setEventPassthrough(true)
+                .addEventListeners(new CommandManager(), new BotDisconnectEvent())
                 .build()
                 .awaitReady();
 

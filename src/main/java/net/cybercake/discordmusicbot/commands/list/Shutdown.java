@@ -7,17 +7,22 @@ import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.awt.*;
 
 public class Shutdown extends Command {
 
     public Shutdown() {
-        super("shutdown-bot", "Completely powers off the bot.");
+        super("shutdown-bot", "Completely powers off the bot.", null, (OptionData[]) null);
     }
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
+        if(event.getMember() == null) { // member doesn't exist for some reason
+            event.getHook().editOriginalEmbeds(Embeds.getTechnicalErrorEmbed(null, "member == null").build()).queue(); return;
+        }
+
         if(event.getMember().getIdLong() != 351410272256262145L) {
             event.replyEmbeds(new EmbedBuilder().setTitle("No permission!").setDescription("Only bot developers can execute this command.").setColor(new Color(255, 41, 41)).build()).setEphemeral(true).queue();
             return;

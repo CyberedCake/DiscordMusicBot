@@ -19,14 +19,16 @@ public class Queue {
 
     private final Guild guild;
     private final VoiceChannel voiceChannel;
+    private final TextChannel textChannel;
     private final AudioPlayerManager audioPlayerManager;
     private final AudioManager audioManager;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
 
-    protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, VoiceChannel voiceChannel) {
+    protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, VoiceChannel voiceChannel, TextChannel textChannel) {
         this.guild = guild;
         this.voiceChannel = voiceChannel;
+        this.textChannel = textChannel;
 
         this.audioManager = guild.getAudioManager();
         this.audioManager.openAudioConnection(voiceChannel);
@@ -34,7 +36,7 @@ public class Queue {
         this.audioPlayerManager = audioPlayerManager;
         this.audioPlayer = audioPlayerManager.createPlayer();
 
-        this.trackScheduler = new TrackScheduler(this.audioPlayer);
+        this.trackScheduler = new TrackScheduler(this.guild, this.audioPlayer);
 
         this.audioPlayer.addListener(this.trackScheduler);
     }
@@ -42,33 +44,39 @@ public class Queue {
     public Guild getGuild() { return this.guild; }
     public AudioPlayer getAudioPlayer() { return this.audioPlayer; }
 
+    public VoiceChannel getVoiceChannel() { return this.voiceChannel; }
+    public TextChannel getTextChannel() { return this.textChannel; }
+
     public void loadAndPlay(final TextChannel textChannel, final User requestedBy, final String trackUrl, final SlashCommandInteractionEvent event) {
         this.audioPlayerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 play(track);
-                Embeds.sendSongPlayingStatus(event, track, this);
+                event.getHook().editOriginal("Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "#" + requestedBy.getDiscriminator() + "`) in position `" + trackScheduler.getQueue().size() + "`").queue();
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-                AudioTrack firstTrack = playlist.getSelectedTrack();
+                if(event.getOption("song").getAsString().contains("search")) {
+                    trackLoaded(playlist.getTracks().get(0));
+                    return;
+                }
 
+                AudioTrack firstTrack = playlist.getSelectedTrack();
                 if(firstTrack == null) firstTrack = playlist.getTracks().get(0);
 
-                textChannel.sendMessage("Adding to queue " + firstTrack.getInfo().title + " (first track of playlist " + playlist.getName() + ")").queue();
-
                 play(firstTrack);
+                event.getHook().editOriginal("Added `" + playlist.getTracks().size() + "` tracks to the queue.").queue();
             }
 
             @Override
             public void noMatches() {
-                textChannel.sendMessage("Nothing found by " + trackUrl).queue();
+                event.getHook().editOriginal("Failed to find any track named `" + trackUrl + "`").queue();
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
-                textChannel.sendMessage("Could not play that track. Try again later! " + exception.getMessage()).queue();
+                event.getHook().editOriginal("Could not play that track. Try again later! `" + exception.getMessage() + "`").queue();
             }
         });
     }
