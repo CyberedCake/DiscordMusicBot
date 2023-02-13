@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class NowPlaying extends Command {
 
     public NowPlaying() {
-        super("nowplaying", "Check what song is currently playing.", "np");
+        super("nowplaying", "Check what song is currently playing.");
+        this.aliases = new String[]{"np"};
     }
 
     @Override

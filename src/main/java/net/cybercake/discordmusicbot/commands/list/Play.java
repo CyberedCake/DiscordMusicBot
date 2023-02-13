@@ -17,10 +17,10 @@ public class Play extends Command {
     public Play() {
         super(
                 "play",
-                "Type a URL or the name of a video to play music.",
-                new String[]{"p"},
-                new OptionData(OptionType.STRING, "song", "The song URL or name of the song.", true)
+                "Type a URL or the name of a video to play music."
         );
+        this.aliases = new String[]{"p"};
+        this.optionData = new OptionData[]{new OptionData(OptionType.STRING, "song", "The song URL or name of the song.", true)};
     }
 
     @Override

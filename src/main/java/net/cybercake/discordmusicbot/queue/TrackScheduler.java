@@ -68,7 +68,7 @@ public class TrackScheduler extends AudioEventAdapter {
             this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
             this.message = null;
         }
-        Main.queueManager.getGuildQueue(this.guild).clearSkipVoteQueue();
+        Main.queueManager.getGuildQueue(this.guild).getSkipSongManager().clearSkipVoteQueue();
         if(endReason.mayStartNext) {
             switch(this.repeating) {
                 case REPEATING_SONG -> player.startTrack(track.makeClone(), false);

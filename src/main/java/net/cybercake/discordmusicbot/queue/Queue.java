@@ -7,7 +7,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
-import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -112,43 +111,46 @@ public class Queue {
 //        );
 //    }
 
+    public SkipSongManager getSkipSongManager() { return new SkipSongManager(); }
 
-    protected void clearSkipVoteQueue() {
-        this.skipVotes.clear();
-    }
+    public class SkipSongManager {
+        protected void clearSkipVoteQueue() {
+            skipVotes.clear();
+        }
 
-    public boolean hasMemberSkipVoted(Member member) {
-        return this.skipVotes.stream().filter(vote -> vote.member().getIdLong() == member.getIdLong()).findFirst().orElse(null) != null;
-    }
+        public boolean hasMemberSkipVoted(Member member) {
+            return skipVotes.stream().filter(vote -> vote.member().getIdLong() == member.getIdLong()).findFirst().orElse(null) != null;
+        }
 
-    public void addMemberToSkipVote(Member member) {
-        if(hasMemberSkipVoted(member))
-            throw new IllegalArgumentException("That member has already voted to skip at some point in the past.");
-        this.skipVotes.add(new SkipVote(member, System.currentTimeMillis(), this.audioPlayer.getPlayingTrack()));
-    }
+        public void addMemberToSkipVote(Member member) {
+            if(hasMemberSkipVoted(member))
+                throw new IllegalArgumentException("That member has already voted to skip at some point in the past.");
+            skipVotes.add(new SkipVote(member, System.currentTimeMillis(), audioPlayer.getPlayingTrack()));
+        }
 
-    public List<Member> getHumanVCMembers() { return this.getVoiceChannel().getMembers()
-            .stream()
-            .filter(member -> !member.getUser().isBot())
-            .toList();
-    }
+        public List<Member> getHumanVCMembers() { return getVoiceChannel().getMembers()
+                .stream()
+                .filter(member -> !member.getUser().isBot())
+                .toList();
+        }
 
-    public int getMembersWantingSkip() { return this.skipVotes.size(); }
+        public int getMembersWantingSkip() { return skipVotes.size(); }
 
-    /**
-     * This percentage is already multiplied by 100
-     */
-    public int getMembersWantingSkipPercent() {
-        return Math.round(Float.parseFloat(String.valueOf(this.getMembersWantingSkip())) / Float.parseFloat(String.valueOf(this.getMaxNeededToSkip()))*100);
-    }
+        /**
+         * This percentage is already multiplied by 100
+         */
+        public int getMembersWantingSkipPercent() {
+            return Math.round(Float.parseFloat(String.valueOf(this.getMembersWantingSkip())) / Float.parseFloat(String.valueOf(this.getMaxNeededToSkip()))*100);
+        }
 
-    public int getMaxNeededToSkip() {
-        return Math.round((Float.parseFloat(String.valueOf(this.getHumanVCMembers().size()))* (Main.SKIP_VOTE_PERCENTAGE)));
-    }
+        public int getMaxNeededToSkip() {
+            return Math.round((Float.parseFloat(String.valueOf(this.getHumanVCMembers().size()))* (Main.SKIP_VOTE_PERCENTAGE)));
+        }
 
-    public void checkSkipProportion() {
-        if(getMembersWantingSkipPercent() < 100) return;
-        this.trackScheduler.nextTrack();
+        public void checkSkipProportion() {
+            if(getMembersWantingSkipPercent() < 100) return;
+            trackScheduler.nextTrack();
+        }
     }
 
 }

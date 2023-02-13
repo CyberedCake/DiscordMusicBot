@@ -3,6 +3,7 @@ package net.cybercake.discordmusicbot.commands;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -45,10 +46,12 @@ public abstract class Command {
     }
 
     private static SlashCommandData addNewCommand(String name, Command command) { // require name because aliases exist
-        if(command.getOptionData() == null || Arrays.stream(command.getOptionData()).toList().contains(null))
-            return Commands.slash(name, command.getDescription());
-        return Commands.slash(name, command.getDescription())
-                .addOptions(command.getOptionData());
+        SlashCommandData commandData = Commands.slash(name, command.getDescription());
+        if(command.getOptionData() != null && !Arrays.stream(command.getOptionData()).toList().contains(null))
+            commandData = commandData.addOptions(command.getOptionData());
+        if(command.getPermission() != null)
+            commandData = commandData.setDefaultPermissions(command.getPermission());
+        return commandData;
     }
 
     public static List<Command> getCommands() { return commands; }
@@ -74,32 +77,21 @@ public abstract class Command {
 
     private final String name;
     private final String description;
-    private final @Nullable String[] aliases;
-    private final @Nullable OptionData[] optionData;
 
-    public Command(String name, String description, @Nullable String[] aliases, @Nullable OptionData... optionData) {
-        this.name = name;
-        this.description = description;
-        this.aliases = aliases;
-        this.optionData = optionData;
-    }
-
-    public Command(String name, String description, @Nullable String... aliases) {
-        this(name, description, aliases, (OptionData) null);
-    }
-
-    public Command(String name, String description, @Nullable OptionData... optionData) {
-        this(name, description, null, optionData);
-    }
+    protected @Nullable String[] aliases;
+    protected @Nullable OptionData[] optionData;
+    protected @Nullable DefaultMemberPermissions permission;
 
     public Command(String name, String description) {
-        this(name, description, null, (OptionData[]) null);
+        this.name = name;
+        this.description = description;
     }
 
     public String getName() { return this.name; }
     public String getDescription() { return this.description; }
     public @Nullable String[] getAliases() { return this.aliases; }
     public @Nullable OptionData[] getOptionData() { return this.optionData; }
+    public @Nullable DefaultMemberPermissions getPermission() { return this.permission; }
 
     public abstract void command(SlashCommandInteractionEvent event);
 }
