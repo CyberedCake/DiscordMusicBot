@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +61,15 @@ public class QueueManager {
         Queue queue = new Queue(audioPlayerManager, guild, voiceChannel, textChannel);
         musicManagers.put(Long.valueOf(guild.getId()), queue);
         return queue;
+    }
+
+    protected void removeQueue(Queue queue) {
+        Log.info("Closing audio connection and deleting queue for guild " + queue.getGuild().getId() + " (" + queue.getGuild().getName() + ")...");
+        Map.Entry<Long, Queue> entry = this.musicManagers.entrySet().stream()
+                .filter((queueEntry) -> queueEntry.getValue().equals(queue))
+                .findFirst()
+                .orElseThrow(() -> { throw new IllegalArgumentException(Queue.class.getCanonicalName() + " provided in '" + QueueManager.class.getCanonicalName() + ".removeQueue' does not exist and is not stored by " + QueueManager.class.getCanonicalName() + "! Found these: " + this.musicManagers.toString()); });
+        this.musicManagers.remove(entry.getKey());
     }
 
 

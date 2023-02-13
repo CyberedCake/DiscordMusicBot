@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -15,10 +16,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Queue {
+public class Queue implements Serializable {
 
     private final Guild guild;
     private final VoiceChannel voiceChannel;
@@ -101,18 +103,16 @@ public class Queue {
         this.audioManager.openAudioConnection(this.voiceChannel);
     }
 
-//    public void removeSong(String title) {
-//        this.playList.remove(
-//                this.playList
-//                        .stream()
-//                        .filter(song -> song.getTitle().equalsIgnoreCase(title))
-//                        .findFirst()
-//                        .orElseThrow(() -> new IllegalArgumentException("Parameter 'title' is not a song in the queue!"))
-//        );
-//    }
+    public void destroy() {
+        Main.queueManager.removeQueue(this);
+        this.getAudioPlayer().stopTrack();
+        this.getTrackScheduler().getQueue().clear();
+        this.audioManager.closeAudioConnection();
+        this.audioPlayer.destroy();
+    }
+
 
     public SkipSongManager getSkipSongManager() { return new SkipSongManager(); }
-
     public class SkipSongManager {
         protected void clearSkipVoteQueue() {
             skipVotes.clear();
@@ -153,4 +153,17 @@ public class Queue {
         }
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "guild=" + guild +
+                ", voiceChannel=" + voiceChannel +
+                ", textChannel=" + textChannel +
+                ", audioPlayerManager=" + audioPlayerManager +
+                ", audioManager=" + audioManager +
+                ", audioPlayer=" + audioPlayer +
+                ", trackScheduler=" + trackScheduler +
+                ", skipVotes=" + skipVotes +
+                '}';
+    }
 }
