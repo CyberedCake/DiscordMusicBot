@@ -5,6 +5,7 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.awt.*;
 
@@ -27,6 +28,7 @@ public class Shutdown extends Command {
 
         try {
             event.replyEmbeds(new EmbedBuilder().setTitle("Goodbye!").setDescription("Shutting down the bot...").setColor(new Color(62, 137, 255)).build()).setEphemeral(true).queue();
+            Main.JDA.getAudioManagers().forEach(AudioManager::closeAudioConnection);
             Thread.sleep(1000L);
             Main.JDA.shutdown();
         } catch (Exception exception) {

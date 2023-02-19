@@ -8,6 +8,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.generalutils.Preconditions;
+import net.cybercake.discordmusicbot.generalutils.Sort;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -17,8 +19,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 
 public class Queue implements Serializable {
 
@@ -55,8 +60,14 @@ public class Queue implements Serializable {
     public VoiceChannel getVoiceChannel() { return this.voiceChannel; }
     public TextChannel getTextChannel() { return this.textChannel; }
 
-    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, final String trackUrl, final SlashCommandInteractionEvent event) {
-        this.audioPlayerManager.loadItem(trackUrl, new AudioLoadResultHandler() {
+    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event) {
+        String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
+        if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class)) {
+            trackUrl = "ytsearch:" + trackUrl;
+            Log.info("Corrected search to include 'ytsearch:' prefix");
+        }
+        final String searchQuery = trackUrl; // same deal here, needs effective final variable for some functions to work
+        this.audioPlayerManager.loadItem(searchQuery, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 play(track);
@@ -66,7 +77,7 @@ public class Queue implements Serializable {
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-                if(event.getOption("song").getAsString().contains("search")) {
+                if(searchQuery.contains("search")) {
                     trackLoaded(playlist.getTracks().get(0));
                     return;
                 }
@@ -74,15 +85,19 @@ public class Queue implements Serializable {
                 AudioTrack firstTrack = playlist.getSelectedTrack();
                 if(firstTrack == null) firstTrack = playlist.getTracks().get(0);
 
-                playlist.getTracks().forEach(track -> track.setUserData(requestedBy));
+                // play(firstTrack);
 
-                play(firstTrack);
+                Sort.reverseOrder(playlist.getTracks()).forEach(track -> {
+                    track.setUserData(requestedBy);
+                    trackScheduler.queue(track);
+                });
+
                 event.getHook().editOriginal("Added `" + playlist.getTracks().size() + "` tracks to the queue.").queue();
             }
 
             @Override
             public void noMatches() {
-                event.getHook().editOriginal("Failed to find any track named `" + trackUrl + "`").queue();
+                event.getHook().editOriginal("Failed to find any track named `" + searchQuery.replace("ytsearch:", "") + "`").queue();
             }
 
             @Override

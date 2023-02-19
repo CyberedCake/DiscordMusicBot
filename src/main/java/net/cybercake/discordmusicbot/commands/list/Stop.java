@@ -1,6 +1,5 @@
 package net.cybercake.discordmusicbot.commands.list;
 
-import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;

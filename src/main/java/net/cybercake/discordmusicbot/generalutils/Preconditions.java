@@ -7,4 +7,13 @@ public class Preconditions {
         throw new IllegalArgumentException(msg);
     }
 
+    public static boolean checkThrows(Executable executable, Class<? extends Throwable> checkThrows) {
+        try {
+            executable.execute();
+        } catch (Throwable throwable) {
+            return throwable.getClass().equals(checkThrows);
+        }
+        return false;
+    }
+
 }
