@@ -16,9 +16,11 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class Main {
 
-    public static final String TOKEN = System.getenv("TOKEN");
-    public static final String SPOTIFY_TOKEN = System.getenv("SPOTIFY_SECRET");
-    public static final String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
+    //public static String TOKEN = System.getenv("TOKEN");
+    public static String TOKEN = null;
+    //public static String SPOTIFY_TOKEN = System.getenv("SPOTIFY_SECRET");
+    public static String SPOTIFY_TOKEN = null;
+    public static String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
     public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
 
@@ -27,9 +29,22 @@ public class Main {
     public static LyricsClient lyricsClient;
 
     public static void main(String[] args) throws InterruptedException {
+        boolean nextToken = false;
+        boolean nextSpotify = true;
+        for(String str : args) {
+            if(nextToken) { TOKEN = str; nextToken = false;}
+            if(nextSpotify) { SPOTIFY_TOKEN = str; nextSpotify = false; }
+
+            if(str.equals("--token")) {
+                nextToken = true;
+            }else if(str.equals("--spotify")) {
+                nextSpotify = true;
+            }
+        }
+
         long mss = System.currentTimeMillis();
 
-        Log.info("Checking token existence...");
+        Log.info("Checking token existence... ");
         if(TOKEN == null) throw new RuntimeException("Cannot find token value on computer as env variable 'TOKEN'");
 
         Log.info("Building JDA...");

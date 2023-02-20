@@ -29,7 +29,11 @@ public class CommandManager extends ListenerAdapter {
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("A critical error occurred!");
             embed.addField("**The command failed, try again later.**", " ", true);
-            embed.addField("**Exact Exception**", "||`" + exception + "`||", false);
+            try {
+                embed.addField("**Exact Exception**", "||`" + exception + "`||", false);
+            } catch (IllegalArgumentException ignored) { // value is too long
+                embed.setDescription("**Exact Exception**: ||`" + exception + "`||");
+            }
             embed.setTimestamp(new Date().toInstant());
             embed.setColor(new Color(186, 24, 19));
             Log.error("A critical error occurred at " + new SimpleDateFormat("MMM d, yyyy HH:mm:ss z"), exception);

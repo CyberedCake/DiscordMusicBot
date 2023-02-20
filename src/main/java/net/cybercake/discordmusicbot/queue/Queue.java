@@ -62,10 +62,8 @@ public class Queue implements Serializable {
 
     public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event) {
         String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
-        if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class)) {
+        if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class))
             trackUrl = "ytsearch:" + trackUrl;
-            Log.info("Corrected search to include 'ytsearch:' prefix");
-        }
         final String searchQuery = trackUrl; // same deal here, needs effective final variable for some functions to work
         this.audioPlayerManager.loadItem(searchQuery, new AudioLoadResultHandler() {
             @Override

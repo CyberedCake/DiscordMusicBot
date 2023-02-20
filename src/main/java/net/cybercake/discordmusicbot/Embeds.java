@@ -21,6 +21,9 @@ import java.util.Date;
 
 public class Embeds {
 
+    public static Color ERROR_COLOR = new Color(186, 24, 19);
+
+
     public static void executeEmbed(IReplyCallback event, EmbedBuilder builder, boolean ephemeral) { executeEmbed(event, builder.build(), ephemeral); }
 
     public static void executeEmbed(IReplyCallback event, MessageEmbed embed, boolean ephemeral) {
@@ -45,7 +48,7 @@ public class Embeds {
 
     public static EmbedBuilder getErrorEmbed(@Nullable User user, String errorMessage) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(new Color(186, 24, 19));
+        builder.setColor(ERROR_COLOR);
         builder.setTitle("An error occurred!");
         builder.setDescription(errorMessage + "\n \r");
         builder.setTimestamp(new Date().toInstant());
@@ -80,6 +83,7 @@ public class Embeds {
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
         if(track.getUserData() != null)
             builder.addField("Requested By", "<@" + track.getUserData(User.class).getId() + ">", true);
+        builder.addField("Artist", track.getInfo().author, true);
         builder.setTimestamp(new Date().toInstant());
         Message message;
         try {
