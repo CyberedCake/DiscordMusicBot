@@ -33,6 +33,8 @@ public class QueueManager {
 
     public AudioPlayerManager getAudioPlayerManager() { return audioPlayerManager; }
 
+    public Map<Long, Queue> getAllQueues() { return this.musicManagers; }
+
     public boolean checkQueueExists(Guild guild) {
         return this.musicManagers.get(Long.parseLong(guild.getId())) != null;
     }
