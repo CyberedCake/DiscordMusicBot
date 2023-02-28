@@ -2,6 +2,7 @@ package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -9,7 +10,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Objects;
 
 public class LyricsCMD extends Command {
 
@@ -23,6 +26,11 @@ public class LyricsCMD extends Command {
     @Override
     public void command(SlashCommandInteractionEvent event) {
         event.deferReply().setEphemeral(true).queue();
+
+        if(event.getOption("song-title") == null && !Main.queueManager.checkQueueExists(Objects.requireNonNull(event.getGuild()))) {
+            PresetExceptions.trackIsNotPlaying(event, Objects.requireNonNull(event.getMember()), true);
+            return;
+        }
 
         String songTitle = (event.getOption("song-title") != null
                 ? event.getOption("song-title").getAsString()

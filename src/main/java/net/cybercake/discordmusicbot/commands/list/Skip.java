@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
+import java.util.Objects;
+
 public class Skip extends Command {
 
     public Skip() {
@@ -22,6 +24,10 @@ public class Skip extends Command {
     public static void handleSkip(Queue queue, Member member, IReplyCallback callback, String identifier) {
         if(!queue.getAudioPlayer().getPlayingTrack().getIdentifier().equalsIgnoreCase(identifier)) {
             Embeds.throwError(callback, member.getUser(), "That song is no longer playing.", true, null); return;
+        }
+
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())) {
+            Embeds.throwError(callback, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
         }
 
         if(queue.getSkipSongManager().hasMemberSkipVoted(member)) {

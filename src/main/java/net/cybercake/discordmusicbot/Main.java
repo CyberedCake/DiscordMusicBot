@@ -29,6 +29,8 @@ public class Main {
     public static LyricsClient lyricsClient;
 
     public static void main(String[] args) throws InterruptedException {
+        long mss = System.currentTimeMillis();
+
         boolean nextToken = false;
         boolean nextSpotify = true;
         for(String str : args) {
@@ -42,7 +44,12 @@ public class Main {
             }
         }
 
-        long mss = System.currentTimeMillis();
+        try {
+            if(TOKEN == null) TOKEN = System.getenv("TOKEN");
+            if(SPOTIFY_TOKEN == null) SPOTIFY_TOKEN = System.getenv("SPOTIFY_SECRET");
+        } catch (Exception exception) {
+            if(TOKEN == null && SPOTIFY_TOKEN == null) Log.error("Failed to get the bot token and spotify token from environmental variables! ", exception);
+        }
 
         Log.info("Checking token existence... ");
         if(TOKEN == null) throw new RuntimeException("Cannot find token value on computer as env variable 'TOKEN'");

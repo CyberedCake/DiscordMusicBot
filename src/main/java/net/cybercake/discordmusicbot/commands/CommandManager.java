@@ -1,6 +1,7 @@
 package net.cybercake.discordmusicbot.commands;
 
 import net.cybercake.discordmusicbot.Embeds;
+import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -9,9 +10,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
+
+    public final static List<Long> BOT_DEVELOPERS = new ArrayList<>(
+            List.of(351410272256262145L)
+    );
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
@@ -26,20 +33,7 @@ public class CommandManager extends ListenerAdapter {
             }
             command.command(event);
         } catch (Exception exception) {
-            EmbedBuilder embed = new EmbedBuilder();
-            embed.setTitle("A critical error occurred!");
-            embed.addField("**The command failed, try again later.**", " ", true);
-            try {
-                embed.addField("**Exact Exception**", "||`" + exception + "`||", false);
-            } catch (IllegalArgumentException ignored) { // value is too long
-                embed.setDescription("**Exact Exception**: ||`" + exception + "`||");
-            }
-            embed.setTimestamp(new Date().toInstant());
-            embed.setColor(new Color(186, 24, 19));
-            Log.error("A critical error occurred at " + new SimpleDateFormat("MMM d, yyyy HH:mm:ss z"), exception);
-
-            if(event.isAcknowledged()) event.getHook().editOriginalEmbeds(embed.build()).queue();
-            else event.replyEmbeds(embed.build()).queue();
+            PresetExceptions.criticalRare(exception, event, "**This command failed, try again later.**");
         }
     }
 

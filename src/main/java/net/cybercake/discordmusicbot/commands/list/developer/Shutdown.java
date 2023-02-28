@@ -1,8 +1,10 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.developer;
 
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.commands.CommandManager;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.queue.QueueManager;
@@ -13,6 +15,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -28,10 +31,7 @@ public class Shutdown extends Command {
             event.getHook().editOriginalEmbeds(Embeds.getTechnicalErrorEmbed(null, "member == null").build()).queue(); return;
         }
 
-        if(event.getMember().getIdLong() != 351410272256262145L) {
-            event.replyEmbeds(new EmbedBuilder().setTitle("No permission!").setDescription("Only bot developers can execute this command.").setColor(new Color(255, 41, 41)).build()).setEphemeral(true).queue();
-            return;
-        }
+        if(PresetExceptions.isNotBotDeveloper(event, event.getMember())) return;
 
         try {
             EmbedBuilder builder = new EmbedBuilder();
