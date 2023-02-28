@@ -2,6 +2,7 @@ package net.cybercake.discordmusicbot.commands;
 
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -12,10 +13,7 @@ import org.reflections.Reflections;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public abstract class Command {
 
@@ -94,4 +92,5 @@ public abstract class Command {
     public @Nullable DefaultMemberPermissions getPermission() { return this.permission; }
 
     public abstract void command(SlashCommandInteractionEvent event);
+    public <T> List<T> tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException(); }
 }

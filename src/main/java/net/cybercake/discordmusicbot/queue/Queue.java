@@ -85,7 +85,7 @@ public class Queue implements Serializable {
 
                 // play(firstTrack);
 
-                Sort.reverseOrder(playlist.getTracks()).forEach(track -> {
+                playlist.getTracks().forEach(track -> {
                     track.setUserData(requestedBy);
                     trackScheduler.queue(track);
                 });

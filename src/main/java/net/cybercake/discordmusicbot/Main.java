@@ -23,6 +23,7 @@ public class Main {
     public static String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
     public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
+    public final static boolean MAINTENANCE = true;
 
     public static JDA JDA;
     public static QueueManager queueManager;
@@ -63,6 +64,10 @@ public class Main {
                 .addEventListeners(new CommandManager(), new BotDisconnectEvent(), new ButtonInteraction())
                 .build()
                 .awaitReady();
+        if(MAINTENANCE) {
+            JDA.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+            JDA.getPresence().setActivity(Activity.playing("MAINTENANCE MODE"));
+        }
 
         Log.info("Setting needed variables...");
         queueManager = new QueueManager();

@@ -5,6 +5,7 @@ import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
@@ -59,6 +60,13 @@ public class PresetExceptions {
         if(!CommandManager.BOT_DEVELOPERS.contains(member.getIdLong())) {
             callback.replyEmbeds(new EmbedBuilder().setTitle("No permission!").setDescription("Only bot developers can execute this command.").setColor(new Color(255, 41, 41)).build()).setEphemeral(true).queue();
             return true;
+        }
+        return false;
+    }
+
+    public static boolean isNotInVoiceChat(IReplyCallback callback, Member member, VoiceChannel channel) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(channel)) {
+            Embeds.throwError(callback, member.getUser(), "You must be in the voice chat to continue.", true, null); return true;
         }
         return false;
     }

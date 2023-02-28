@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Stack;
@@ -59,6 +60,12 @@ public class TrackScheduler extends AudioEventAdapter {
             if(!illegalStateException.getMessage().contains("Cannot play the same instance")) return;
             endQueue(Main.queueManager.getGuildQueue(this.guild));
         }
+    }
+
+    public void shuffle() {
+        if(queue.size() < 1) throw new IllegalStateException("Cannot shuffle a queue that is less than one item.");
+
+        Collections.shuffle(queue);
     }
 
     @Override

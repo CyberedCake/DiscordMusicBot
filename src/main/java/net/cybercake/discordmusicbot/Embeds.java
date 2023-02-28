@@ -116,6 +116,14 @@ public class Embeds {
             event.replyEmbeds(builder.build()).setEphemeral(true).queue();
     }
 
+    public static void sendMaintenanceStatus(IReplyCallback callback, String initialMessage) {
+        callback.replyEmbeds(new EmbedBuilder().setTitle(":exclamation: Bot is under maintenance! :exclamation:")
+                        .setDescription(initialMessage + "Check again later when maintenance mode is off.\n\n*If you believe this to be in error, please contact **CyberedCake#9221** on Discord immediately!*")
+                        .setColor(new Color(255, 41, 41)).build())
+                .setEphemeral(true)
+                .queue();
+    }
+
 
 
 
