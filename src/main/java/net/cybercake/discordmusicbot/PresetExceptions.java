@@ -36,7 +36,7 @@ public class PresetExceptions {
         else event.replyEmbeds(embed.build()).queue();
     }
 
-    public static boolean memberNull(SlashCommandInteractionEvent event) {
+    public static boolean memberNull(IReplyCallback event) {
         if(event.getMember() == null) {
             event.getHook().editOriginalEmbeds(Embeds.getTechnicalErrorEmbed(null, "member == null").build()).queue();
             return true;

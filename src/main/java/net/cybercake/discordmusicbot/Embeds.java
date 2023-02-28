@@ -87,7 +87,13 @@ public class Embeds {
         builder.setTimestamp(new Date().toInstant());
         Message message;
         try {
-            message = Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).addActionRow(Button.danger("skip-track-" + track.getIdentifier(), "Skip Track")).complete();
+            message = Main.queueManager.getGuildQueue(guild).getTextChannel()
+                    .sendMessageEmbeds(builder.build())
+                    .addActionRow(
+                            Button.danger("skip-track-" + track.getIdentifier(), "Skip Track"),
+                            Button.secondary("view-queue", "View Queue")
+                    )
+                    .complete();
         } catch (Exception exception) {
             throw new IllegalStateException("Failed to send now playing status in text channel for " + guild.getId() + " (" + guild.getName() + ")", exception);
         }

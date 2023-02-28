@@ -4,6 +4,7 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -79,10 +80,12 @@ public abstract class Command {
     protected @Nullable String[] aliases;
     protected @Nullable OptionData[] optionData;
     protected @Nullable DefaultMemberPermissions permission;
+    protected boolean registerButtonInteraction;
 
     public Command(String name, String description) {
         this.name = name;
         this.description = description;
+        this.registerButtonInteraction = false;
     }
 
     public String getName() { return this.name; }
@@ -90,7 +93,9 @@ public abstract class Command {
     public @Nullable String[] getAliases() { return this.aliases; }
     public @Nullable OptionData[] getOptionData() { return this.optionData; }
     public @Nullable DefaultMemberPermissions getPermission() { return this.permission; }
+    public boolean sendButtonInteractionEvent() { return this.registerButtonInteraction; }
 
     public abstract void command(SlashCommandInteractionEvent event);
-    public <T> List<T> tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException(); }
+    public <T> List<T> tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }
+    public void button(ButtonInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }
 }

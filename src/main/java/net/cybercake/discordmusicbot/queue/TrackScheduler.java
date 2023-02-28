@@ -15,10 +15,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Stack;
+import java.util.*;
 
 public class TrackScheduler extends AudioEventAdapter {
 
@@ -65,7 +62,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void shuffle() {
         if(queue.size() < 1) throw new IllegalStateException("Cannot shuffle a queue that is less than one item.");
 
-        Collections.shuffle(queue);
+        Collections.shuffle(queue, new Random(System.currentTimeMillis()));
     }
 
     @Override

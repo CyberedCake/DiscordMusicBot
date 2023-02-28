@@ -8,6 +8,7 @@ import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.util.Objects;
@@ -19,6 +20,7 @@ public class Skip extends Command {
                 "skip", "Skips the current track to the next track via a vote."
         );
         this.aliases = new String[]{"s"};
+        this.registerButtonInteraction = true;
     }
 
     public static void handleSkip(Queue queue, Member member, IReplyCallback callback, String identifier) {
@@ -51,5 +53,11 @@ public class Skip extends Command {
         Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(queue == null) return;
         Skip.handleSkip(queue, event.getMember(), event, Main.queueManager.getGuildQueue(event.getGuild()).getAudioPlayer().getPlayingTrack().getIdentifier());
+    }
+
+    @Override
+    public void button(ButtonInteractionEvent event) {
+        if(!event.getComponentId().contains("skip-track-")) return;
+        Skip.handleSkip(Main.queueManager.getGuildQueue(event.getGuild()), event.getMember(), event, event.getComponentId().replace("skip-track-", ""));
     }
 }
