@@ -6,7 +6,7 @@ public class TrackUtils {
         StringBuilder bar = new StringBuilder();
         float currentLoop = 0;
         while (currentLoop < 1) {
-            if(Math.abs(currentLoop-(Float.parseFloat(String.valueOf(current))/Float.parseFloat(String.valueOf(max)))+0.05) <= 0.05)
+            if(Math.abs(currentLoop-((float)current/(float)max)+0.05) <= 0.05)
                 bar.append(":radio_button:");
             else
                 bar.append("▬");
