@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.io.Serializable;
@@ -28,12 +29,13 @@ import java.util.stream.Collector;
 public class Queue implements Serializable {
 
     private final Guild guild;
-    private final VoiceChannel voiceChannel;
-    private final TextChannel textChannel;
     private final AudioPlayerManager audioPlayerManager;
     private final AudioManager audioManager;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
+
+    private VoiceChannel voiceChannel;
+    private TextChannel textChannel;
 
     private final List<SkipVote> skipVotes = new ArrayList<>();
 
@@ -59,6 +61,23 @@ public class Queue implements Serializable {
 
     public VoiceChannel getVoiceChannel() { return this.voiceChannel; }
     public TextChannel getTextChannel() { return this.textChannel; }
+
+    public void setVoiceChannel(VoiceChannel voiceChannel, IReplyCallback callback) {
+        this.voiceChannel = voiceChannel;
+        this.audioManager.closeAudioConnection();
+        Thread minorDelay = new Thread(() -> {
+            try {
+                Thread.sleep(400L);
+                this.audioManager.openAudioConnection(voiceChannel);
+                Thread.sleep(200L);
+                callback.getHook().editOriginal("You moved the music bot into your voice channel, <#" + voiceChannel.getId() + ">!").queue();
+            } catch (Exception exception) {
+                throw new IllegalStateException("Failed to rejoin voice chat", exception);
+            }
+        });
+        minorDelay.start();
+    }
+    public void setTextChannel(TextChannel textChannel) { this.textChannel = textChannel; }
 
     public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event) {
         String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
