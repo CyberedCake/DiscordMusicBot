@@ -31,7 +31,7 @@ dependencies {
 }
 
 shadowJar {
-
+    setArchiveFileName("discord.jar")
 }
 
 compileJava.options.encoding = 'UTF-8'

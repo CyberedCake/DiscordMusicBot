@@ -26,7 +26,7 @@ public class Main {
     public static String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
     public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
-    public final static boolean MAINTENANCE = true;
+    public final static boolean MAINTENANCE = false;
 
     public static JDA JDA;
     public static QueueManager queueManager;
@@ -36,7 +36,7 @@ public class Main {
         long mss = System.currentTimeMillis();
 
         boolean nextToken = false;
-        boolean nextSpotify = true;
+        boolean nextSpotify = false;
         for(String str : args) {
             if(nextToken) { TOKEN = str; nextToken = false;}
             if(nextSpotify) { SPOTIFY_TOKEN = str; nextSpotify = false; }

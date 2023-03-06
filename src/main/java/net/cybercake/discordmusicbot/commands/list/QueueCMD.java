@@ -9,6 +9,7 @@ import net.cybercake.discordmusicbot.generalutils.NumberUtils;
 import net.cybercake.discordmusicbot.generalutils.Sort;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ public class QueueCMD extends Command {
         net.cybercake.discordmusicbot.queue.Queue queue = PresetExceptions.trackIsNotPlaying(callback, callback.getMember(), true);
         if(queue == null) return;
 
+        int maxPages = getMaxPages(callback.getGuild());
         List<String> items = new ArrayList<>();
         int fromIndex = (page*(ITEMS_PER_PAGE))-(ITEMS_PER_PAGE);
         int toIndex = (Math.min(page * (ITEMS_PER_PAGE), queue.getTrackScheduler().getQueue().size()));
@@ -58,7 +61,6 @@ public class QueueCMD extends Command {
             Embeds.throwError(callback, callback.getUser(), "Invalid queue page ('" + page + "'): " + indexOutOfBoundsException, indexOutOfBoundsException); return;
         }
 
-        int maxPages = getMaxPages(callback.getGuild());
         StringBuilder builder = new StringBuilder();
         builder.append("```glsl\nQueue Page ")
                 .append(page)
@@ -73,7 +75,11 @@ public class QueueCMD extends Command {
         buttons.add(Button.secondary("queue-previous-" + page, "◀️ Previous").withDisabled(page <= 1));
         buttons.add(Button.secondary("queue-next-" + page, "Next ▶️").withDisabled(page == maxPages));
         buttons.add(Button.secondary("queue-last-" + page, "Last ⏩").withDisabled(page == maxPages));
-        callback.getHook().editOriginal(builder.toString()).setActionRow(buttons).queue();
+
+        WebhookMessageEditAction<Message> hook = callback.getHook().editOriginal(builder.toString());
+        if(maxPages != 0)
+            hook.setActionRow(buttons);
+        hook.queue();
     }
 
     @Override
