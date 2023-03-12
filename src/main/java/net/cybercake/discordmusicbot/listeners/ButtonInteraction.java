@@ -5,16 +5,9 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
-import net.cybercake.discordmusicbot.commands.list.Skip;
-import net.cybercake.discordmusicbot.generalutils.Log;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-
-import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class ButtonInteraction extends ListenerAdapter {
 
