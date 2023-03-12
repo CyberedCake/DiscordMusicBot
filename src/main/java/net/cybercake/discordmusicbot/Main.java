@@ -26,11 +26,11 @@ public class Main {
     public static String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
     public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
-    public final static boolean MAINTENANCE = false;
 
     public static JDA JDA;
     public static QueueManager queueManager;
     public static LyricsClient lyricsClient;
+    public static boolean MAINTENANCE = false;
 
     public static void main(String[] args) throws InterruptedException {
         long mss = System.currentTimeMillis();
@@ -57,6 +57,14 @@ public class Main {
 
         Log.info("Checking token existence... ");
         if(TOKEN == null) throw new RuntimeException("Cannot find token value on computer as env variable 'TOKEN'");
+
+
+        if(System.getenv("MAINTENANCE").equalsIgnoreCase("TRUE")) {
+            Log.warn("------------------------------------------------------");
+            Log.warn("Environmental variable 'MAINTENANCE' set to 'TRUE'...");
+            Log.warn("------------------------------------------------------");
+            MAINTENANCE = true;
+        }
 
         Log.info("Building JDA...");
         JDA = JDABuilder.createDefault(TOKEN)
