@@ -43,6 +43,7 @@ public class Queue implements Serializable {
 
         this.audioManager = guild.getAudioManager();
         this.audioManager.openAudioConnection(voiceChannel);
+        this.audioManager.setSelfDeafened(true);
 
         this.audioPlayerManager = audioPlayerManager;
         this.audioPlayer = audioPlayerManager.createPlayer();
