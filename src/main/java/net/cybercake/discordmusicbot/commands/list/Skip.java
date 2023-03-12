@@ -41,7 +41,8 @@ public class Skip extends Command {
         callback.deferReply().setEphemeral(true).complete().deleteOriginal().queue();
 
         TextChannel channel = (TextChannel) callback.getMessageChannel();
-        channel.sendMessage(member.getAsMention() + " has requested to skip `" + queue.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + queue.getSkipSongManager().getMembersWantingSkip() + "/" + queue.getSkipSongManager().getMaxNeededToSkip() + " - " + (queue.getSkipSongManager().getMembersWantingSkipPercent()) + "%]**" + (queue.getSkipSongManager().getMembersWantingSkipPercent() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
+        if(member.getVoiceState().getChannel().asVoiceChannel().getMembers().size() > 2)
+            channel.sendMessage(member.getAsMention() + " has requested to skip `" + queue.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + queue.getSkipSongManager().getMembersWantingSkip() + "/" + queue.getSkipSongManager().getMaxNeededToSkip() + " - " + (queue.getSkipSongManager().getMembersWantingSkipPercent()) + "%]**" + (queue.getSkipSongManager().getMembersWantingSkipPercent() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
         queue.getSkipSongManager().checkSkipProportion();
     }
 
