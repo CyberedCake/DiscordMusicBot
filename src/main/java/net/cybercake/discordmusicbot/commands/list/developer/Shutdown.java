@@ -7,8 +7,10 @@ import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class Shutdown extends Command {
 
     public Shutdown() {
         super("shutdown-bot", "Completely powers off the bot.");
+        this.permission = DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR);
     }
 
     @Override

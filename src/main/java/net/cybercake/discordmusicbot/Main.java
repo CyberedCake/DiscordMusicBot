@@ -56,7 +56,7 @@ public class Main {
         if(TOKEN == null) throw new RuntimeException("Cannot find token value on computer as env variable 'TOKEN'");
 
 
-        if(System.getenv("MAINTENANCE").equalsIgnoreCase("TRUE")) {
+        if(System.getenv("MAINTENANCE") != null && System.getenv("MAINTENANCE").equalsIgnoreCase("TRUE")) {
             Log.warn("------------------------------------------------------");
             Log.warn("Environmental variable 'MAINTENANCE' set to 'TRUE'...");
             Log.warn("------------------------------------------------------");
