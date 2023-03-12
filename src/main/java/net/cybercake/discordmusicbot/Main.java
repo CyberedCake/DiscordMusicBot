@@ -32,22 +32,9 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         long mss = System.currentTimeMillis();
 
-        boolean nextToken = false;
-        boolean nextSpotify = false;
-        for(String str : args) {
-            if(nextToken) { TOKEN = str; nextToken = false;}
-            if(nextSpotify) { SPOTIFY_TOKEN = str; nextSpotify = false; }
-
-            if(str.equals("--token")) {
-                nextToken = true;
-            }else if(str.equals("--spotify")) {
-                nextSpotify = true;
-            }
-        }
-
         try {
-            if(TOKEN == null) TOKEN = System.getenv("TOKEN");
-            if(SPOTIFY_TOKEN == null) SPOTIFY_TOKEN = System.getenv("SPOTIFY_SECRET");
+            if(TOKEN == null) TOKEN = getExternalBotInfo("TOKEN");
+            if(SPOTIFY_TOKEN == null) SPOTIFY_TOKEN = getExternalBotInfo("SPOTIFY_SECRET");
         } catch (Exception exception) {
             if(TOKEN == null && SPOTIFY_TOKEN == null) Log.error("Failed to get the bot token and spotify token from environmental variables! ", exception);
         }
@@ -56,7 +43,7 @@ public class Main {
         if(TOKEN == null) throw new RuntimeException("Cannot find token value on computer as env variable 'TOKEN'");
 
 
-        if(System.getenv("MAINTENANCE") != null && System.getenv("MAINTENANCE").equalsIgnoreCase("TRUE")) {
+        if(getExternalBotInfo("MAINTENANCE") != null && getExternalBotInfo("MAINTENANCE").equalsIgnoreCase("TRUE")) {
             Log.warn("------------------------------------------------------");
             Log.warn("Environmental variable 'MAINTENANCE' set to 'TRUE'...");
             Log.warn("------------------------------------------------------");
@@ -88,6 +75,10 @@ public class Main {
         Command.registerAll();
 
         Log.info("Loaded the bot in " + (System.currentTimeMillis()-mss) + "ms!");
+    }
+
+    private static String getExternalBotInfo(String key) {
+        return (System.getenv().getOrDefault(key, System.getProperty(key)));
     }
 
 
