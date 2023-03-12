@@ -15,7 +15,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Random;
+import java.util.Stack;
 
 public class TrackScheduler extends AudioEventAdapter {
 

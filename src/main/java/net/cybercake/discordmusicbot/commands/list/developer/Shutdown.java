@@ -4,18 +4,14 @@ import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.commands.CommandManager;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
-import net.cybercake.discordmusicbot.queue.QueueManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

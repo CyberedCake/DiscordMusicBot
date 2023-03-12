@@ -5,9 +5,6 @@ import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.generalutils.NumberUtils;
-import net.cybercake.discordmusicbot.generalutils.Sort;
-import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -25,7 +22,6 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class QueueCMD extends Command {
