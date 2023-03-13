@@ -46,6 +46,9 @@ public class TrackScheduler extends AudioEventAdapter {
             queue.push(track);
     }
 
+    public void pause(boolean pause) { this.audioPlayer.setPaused(pause); }
+    public boolean pause() { return this.audioPlayer.isPaused(); }
+
     public void nextTrack() {
         if(queue.size() < 1) {
             endQueue(Main.queueManager.getGuildQueue(guild)); return;
@@ -68,9 +71,10 @@ public class TrackScheduler extends AudioEventAdapter {
         Collections.shuffle(queue, new Random(System.currentTimeMillis()));
     }
 
-    @Override
-    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+    public void sendNowPlayingStatus(AudioTrack track, boolean deleteOld) {
         try {
+            if(deleteOld)
+                deleteOldNowPlayingStatus();
             Thread sendNowPlayingMessage = new Thread(() -> {
                 try {
                     Thread.sleep(600L); // delay because information that is set after this method finishes is required inside the embed
@@ -86,12 +90,21 @@ public class TrackScheduler extends AudioEventAdapter {
         }
     }
 
-    @Override
-    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+    public void deleteOldNowPlayingStatus() {
         if(this.message != null) { // delete previous message if it exists
             this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
             this.message = null;
         }
+    }
+
+    @Override
+    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        sendNowPlayingStatus(track, false);
+    }
+
+    @Override
+    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        deleteOldNowPlayingStatus();
         if(!Main.queueManager.checkQueueExists(this.guild)) return;
         Queue queueMain = Main.queueManager.getGuildQueue(this.guild);
         queueMain.getSkipSongManager().clearSkipVoteQueue();

@@ -95,9 +95,9 @@ public class QueueCMD extends Command {
     }
 
     @Override
-    public void button(ButtonInteractionEvent event) {
-        if(event.getComponentId().equalsIgnoreCase("view-queue")) { viewQueue(event); return; }
-        if(!event.getComponentId().contains("queue-")) return;
+    public void button(ButtonInteractionEvent event, String buttonId) {
+        if(buttonId.equalsIgnoreCase("view-queue")) { viewQueue(event); return; }
+        if(!buttonId.contains("queue-")) return;
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 

@@ -1,9 +1,11 @@
 package net.cybercake.discordmusicbot.commands.list.developer;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.generalutils.TrackUtils;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -31,8 +33,31 @@ public class ListAllActiveServers extends Command {
         if(PresetExceptions.isNotBotDeveloper(event, Objects.requireNonNull(event.getMember()))) return;
 
         List<Guild> activeGuilds = Main.queueManager.getAllQueues().values().stream().map(Queue::getGuild).toList();
-        event.replyEmbeds(new EmbedBuilder().setTitle("All Active Servers").setDescription(
-                "The bot is active in (" + activeGuilds.size() + ") guild" + (activeGuilds.size() == 1 ? "" : "s") + ": " + String.join(", ", activeGuilds.stream().map(Guild::getName).toArray(String[]::new))
-        ).setColor(new Color(205, 255, 172)).build()).setEphemeral(true).queue();
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("All Active Servers");
+        builder.setDescription("The bot is active in (" + activeGuilds.size() + ") guild" + (activeGuilds.size() == 1 ? "" : "s"));
+        for(Guild guild : activeGuilds) {
+            try {
+                Queue queue = Main.queueManager.getGuildQueue(guild);
+                AudioTrack currentTrack = queue.getAudioPlayer().getPlayingTrack();
+                builder.addField("**" + guild.getName() + "**", // this is simply so I can guage whether or not I can restart the bot or if it may be a while before I can
+                        "URI: `" + currentTrack.getInfo().uri + "`" + "\n" +
+                                "Duration: `" + TrackUtils.getFormattedDuration(currentTrack.getPosition()) + "/" + TrackUtils.getFormattedDuration(currentTrack.getDuration()) + "`" + "\n" +
+                                "Queue Size: `" + queue.getTrackScheduler().getQueue().size() + "`" + "\n" +
+                                "Channel: `" + queue.getVoiceChannel().getName() + "`" + "\n" +
+                                "Active Users: `" + queue.getVoiceChannel().getMembers().stream().filter(member -> !member.getUser().isBot()).toList().size() + "`"
+                        ,
+                        false
+                );
+            } catch (Exception exception) {
+                builder.addField(guild.getName(),
+                        "**An error occurred in displaying:** `" + exception + "`",
+                        false
+                        );
+            }
+        }
+        builder.setColor(new Color(205, 255, 172));
+
+        event.replyEmbeds(builder.build()).setEphemeral(true).queue();
     }
 }

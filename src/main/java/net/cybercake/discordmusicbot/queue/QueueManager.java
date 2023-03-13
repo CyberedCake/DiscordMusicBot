@@ -48,7 +48,7 @@ public class QueueManager {
             if(voiceChannel == null) throw new IllegalArgumentException("Failed to find a queue for the guild " + guildId + " (" + guild.getName() + ")");
         }
 
-        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(queue.getAudioPlayer()));
+        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(queue.getAudioPlayer(), queue));
 
         return queue;
     }

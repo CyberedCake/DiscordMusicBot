@@ -100,5 +100,5 @@ public abstract class Command {
 
     public abstract void command(SlashCommandInteractionEvent event);
     public <T> List<T> tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }
-    public void button(ButtonInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }
+    public void button(ButtonInteractionEvent event, String buttonId) { throw new UnsupportedOperationException("Not implemented"); }
 }

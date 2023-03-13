@@ -1,6 +1,7 @@
 package net.cybercake.discordmusicbot.listeners;
 
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,7 +42,6 @@ public class BotDisconnectEvent extends ListenerAdapter {
     public void handleOtherDisconnect(Member member, VoiceChannel channel, Queue queue, GuildVoiceUpdateEvent event) {
 
     }
-
 
 
     @Override

@@ -19,7 +19,7 @@ public class ButtonInteraction extends ListenerAdapter {
                 return;
             }
 
-            Command.getCommands().stream().filter(Command::sendButtonInteractionEvent).forEach(cmd -> cmd.button(event));
+            Command.getCommands().stream().filter(Command::sendButtonInteractionEvent).forEach(cmd -> cmd.button(event, event.getComponentId()));
         } catch (Exception exception) {
             PresetExceptions.criticalRare(exception, event, "**This button interaction failed, try again later.**");
         }

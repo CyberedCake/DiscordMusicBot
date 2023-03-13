@@ -55,8 +55,8 @@ public class Skip extends Command {
     }
 
     @Override
-    public void button(ButtonInteractionEvent event) {
-        if(!event.getComponentId().contains("skip-track-")) return;
+    public void button(ButtonInteractionEvent event, String buttonId) {
+        if(!buttonId.contains("skip-track-")) return;
         Skip.handleSkip(Main.queueManager.getGuildQueue(event.getGuild()), event.getMember(), event, event.getComponentId().replace("skip-track-", ""));
     }
 }

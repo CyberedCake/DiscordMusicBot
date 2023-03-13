@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.generalutils.Pair;
 import net.cybercake.discordmusicbot.generalutils.TrackUtils;
+import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -74,11 +75,12 @@ public class Embeds {
 
     public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild) {
         String image = extractImage(track.getInfo());
+        Queue queue = Main.queueManager.getGuildQueue(guild);
 
         EmbedBuilder builder = new EmbedBuilder();
         if(image != null)
             builder.setThumbnail(image);
-        builder.setAuthor("\uD83C\uDFB6 Now Playing");
+        builder.setAuthor((queue.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB6 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
         if(track.getUserData() != null)
@@ -91,6 +93,7 @@ public class Embeds {
                     .sendMessageEmbeds(builder.build())
                     .addActionRow(
                             Button.danger("skip-track-" + track.getIdentifier(), "Skip Track"),
+                            (queue.getTrackScheduler().pause() ? Button.success("resume-nomsg", "Resume Track") : Button.primary("pause-nomsg", "Pause Track")),
                             Button.secondary("view-queue", "View Queue")
                     )
                     .complete();

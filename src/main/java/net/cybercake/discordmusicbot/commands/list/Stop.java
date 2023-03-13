@@ -1,9 +1,11 @@
 package net.cybercake.discordmusicbot.commands.list;
 
+import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -21,10 +23,15 @@ public class Stop extends Command {
     @Override
     public void command(SlashCommandInteractionEvent event) {
         if(PresetExceptions.memberNull(event)) return;
-        assert event.getMember() != null;
+        Member member = event.getMember();
+        assert member != null;
 
         Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(queue == null) return;
+
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())) {
+            Embeds.throwError(event, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
+        }
 
         event.deferReply().queue();
         queue.destroy();
