@@ -3,14 +3,12 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.concurrent.TimeUnit;
 

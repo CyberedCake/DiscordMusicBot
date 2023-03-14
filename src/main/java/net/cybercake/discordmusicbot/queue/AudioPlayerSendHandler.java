@@ -1,11 +1,8 @@
 package net.cybercake.discordmusicbot.queue;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
-import net.cybercake.discordmusicbot.generalutils.Log;
-import net.cybercake.discordmusicbot.generalutils.TrackUtils;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import org.jetbrains.annotations.Nullable;
 
