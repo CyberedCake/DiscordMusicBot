@@ -12,8 +12,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import javax.annotation.Nullable;
@@ -73,7 +75,7 @@ public class Embeds {
         return image;
     }
 
-    public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild) {
+    public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild, long edit) {
         String image = extractImage(track.getInfo());
         Queue queue = Main.queueManager.getGuildQueue(guild);
 
@@ -89,14 +91,19 @@ public class Embeds {
         builder.setTimestamp(new Date().toInstant());
         Message message;
         try {
-            message = Main.queueManager.getGuildQueue(guild).getTextChannel()
-                    .sendMessageEmbeds(builder.build())
-                    .addActionRow(
-                            Button.danger("skip-track-" + track.getIdentifier(), "Skip Track"),
-                            (queue.getTrackScheduler().pause() ? Button.success("resume-nomsg", "Resume Track") : Button.primary("pause-nomsg", "Pause Track")),
-                            Button.secondary("view-queue", "View Queue")
-                    )
-                    .complete();
+            ItemComponent[] buttons = new ItemComponent[]{
+                    Button.danger("skip-track-" + track.getIdentifier(), "Skip Track"),
+                    (queue.getTrackScheduler().pause() ? Button.success("resume-nomsg", "Resume Track") : Button.primary("pause-nomsg", "Pause Track")),
+                    Button.secondary("view-queue", "View Queue")
+            };
+            if(edit == -1L)
+                message = Main.queueManager.getGuildQueue(guild).getTextChannel()
+                        .sendMessageEmbeds(builder.build())
+                        .addActionRow(buttons)
+                        .complete();
+            else
+                message = queue.getTextChannel().editMessageEmbedsById(edit, builder.build()).setActionRow(buttons).complete();
+
         } catch (Exception exception) {
             throw new IllegalStateException("Failed to send now playing status in text channel for " + guild.getId() + " (" + guild.getName() + ")", exception);
         }

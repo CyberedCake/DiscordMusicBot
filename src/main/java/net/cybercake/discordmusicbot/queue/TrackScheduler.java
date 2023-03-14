@@ -15,10 +15,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 public class TrackScheduler extends AudioEventAdapter {
 
@@ -71,15 +68,24 @@ public class TrackScheduler extends AudioEventAdapter {
         Collections.shuffle(queue, new Random(System.currentTimeMillis()));
     }
 
-    public void sendNowPlayingStatus(AudioTrack track, boolean deleteOld) {
+    public enum ToDoWithOld {
+        NOTHING, DELETE, EDIT;
+    }
+
+    @SuppressWarnings({"all"})
+    public void sendNowPlayingStatus(AudioTrack track, ToDoWithOld toDoWithOld) {
         try {
-            if(deleteOld)
+            if(toDoWithOld == ToDoWithOld.DELETE)
                 deleteOldNowPlayingStatus();
             Thread sendNowPlayingMessage = new Thread(() -> {
                 try {
                     Thread.sleep(600L); // delay because information that is set after this method finishes is required inside the embed
                     if(!Main.queueManager.checkQueueExists(this.guild)) return;
-                    this.message = Embeds.sendSongPlayingStatus(track, this.guild);
+                    this.message = Embeds.sendSongPlayingStatus(
+                            track,
+                            this.guild,
+                            (toDoWithOld == ToDoWithOld.EDIT ? Objects.requireNonNullElse(this.message, new Pair<TextChannel, Long>(null, -1L)).getSecondItem() : -1L)
+                    );
                 } catch (Exception exception) {
                     throw new IllegalStateException("Failed to send now playing message to guild " + guild.getId() + " (" + guild.getName() + ")", exception);
                 }
@@ -99,7 +105,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        sendNowPlayingStatus(track, false);
+        sendNowPlayingStatus(track, ToDoWithOld.NOTHING);
     }
 
     @Override

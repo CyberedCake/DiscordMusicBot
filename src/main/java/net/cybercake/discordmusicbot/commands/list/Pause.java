@@ -5,11 +5,14 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
+import java.util.concurrent.TimeUnit;
 
 public class Pause extends Command {
 
@@ -40,11 +43,11 @@ public class Pause extends Command {
                 .setActionRow(Button.success("resume", "Resume the song"))
                 .queue();
         else
-            event.deferReply().setEphemeral(true).complete().deleteOriginal().queue();
+            event.reply(":pause_button: You paused the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
         Member selfMember = member.getGuild().getSelfMember();
         selfMember.modifyNickname(selfMember.getEffectiveName() + " ⏸").queue();
 
-        queue.getTrackScheduler().sendNowPlayingStatus(queue.getAudioPlayer().getPlayingTrack(), true);
+        queue.getTrackScheduler().sendNowPlayingStatus(queue.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
 
     }
 
