@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    id 'com.github.johnrengelman.shadow' version "8.1.0"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
 mainClassName = 'net.cybercake.discordmusicbot.Main'
@@ -22,8 +22,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 
-    implementation 'net.dv8tion:JDA:5.0.0-beta.5'
     implementation 'ch.qos.logback:logback-classic:1.4.6'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.6'
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'com.sedmelluq:lavaplayer:1.3.78'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
