@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class QueueCMD extends Command {
 
@@ -137,7 +137,7 @@ public class QueueCMD extends Command {
 
     @Override
     @SuppressWarnings({"all"})
-    public List<Integer> tab(CommandAutoCompleteInteractionEvent event) {
-        return IntStream.range(0, getMaxPages(event.getGuild())+1).boxed().toList();
+    public void tab(CommandAutoCompleteInteractionEvent event) {
+        event.replyChoiceLongs(LongStream.range(0L, getMaxPages(event.getGuild())+1L).boxed().toList()).queue();
     }
 }

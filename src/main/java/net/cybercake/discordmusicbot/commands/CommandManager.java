@@ -45,7 +45,7 @@ public class CommandManager extends ListenerAdapter {
         try {
             Command command = Command.getCommandFromName(event.getName(), true);
             if(command == null) return;
-            event.replyChoices(command.tab(event).stream().filter(word -> event.getFocusedOption().getValue().length() < 1 || String.valueOf(word).startsWith(event.getFocusedOption().getValue())).map(this::choiceOf).toList()).queue();
+            command.tab(event);
         } catch (Exception exception) {
             Log.warn("Failed to autocomplete command '" + event.getName() + "': " + exception);
         }

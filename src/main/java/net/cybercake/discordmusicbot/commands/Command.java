@@ -99,6 +99,6 @@ public abstract class Command {
     public boolean sendButtonInteractionEvent() { return this.registerButtonInteraction; }
 
     public abstract void command(SlashCommandInteractionEvent event);
-    public <T> List<T> tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }
+    public void tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }
     public void button(ButtonInteractionEvent event, String buttonId) { throw new UnsupportedOperationException("Not implemented"); }
 }

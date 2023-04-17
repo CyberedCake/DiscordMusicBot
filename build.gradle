@@ -28,6 +28,13 @@ dependencies {
     implementation 'com.sedmelluq:lavaplayer:1.3.78'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
     implementation "com.github.TopiSenpai.LavaSrc:lavasrc:3.2.0"
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.github.thelinmichael:spotify-web-api-java:master-SNAPSHOT'
+
+
+//    implementation 'com.google.api-client:google-api-client:1.23.0'
+//    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+//    implementation 'com.google.apis:google-api-services-youtube:v3-rev222-1.25.0'
 }
 
 shadowJar {

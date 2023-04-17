@@ -26,6 +26,10 @@ public class TrackScheduler extends AudioEventAdapter {
     public enum Repeating { FALSE, REPEATING_SONG, REPEATING_ALL }
     private Repeating repeating;
 
+    public int TRACK_EXCEPTION_MAXIMUM_REPEATS = 4;
+    private String trackExceptionId;
+    private int trackExceptionRepeats;
+
     private @Nullable Pair<TextChannel, Long> message;
 
     public TrackScheduler(Guild guild, AudioPlayer audioPlayer) {
@@ -55,6 +59,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
         try {
             audioPlayer.startTrack(nextTrack, false);
+            this.trackExceptionRepeats = 0;
         } catch (IllegalStateException illegalStateException) {
             Log.error("Failed in starting next track", illegalStateException);
             if(!illegalStateException.getMessage().contains("Cannot play the same instance")) return;
@@ -105,11 +110,18 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        Pair<Object, Exception> data = ((Pair<Object, Exception>)track.getUserData(Pair.class));
+        if(data != null && data.getSecondItem() != null) {
+            Log.info(">> SONG START DELAYED ... EXCEPTION FOUND <<");
+            return;
+        }
         sendNowPlayingStatus(track, ToDoWithOld.NOTHING);
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        if(endReason == AudioTrackEndReason.LOAD_FAILED && this.trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS)
+            return;
         deleteOldNowPlayingStatus();
         if(!Main.queueManager.checkQueueExists(this.guild)) return;
         Queue queueMain = Main.queueManager.getGuildQueue(this.guild);
@@ -119,7 +131,10 @@ public class TrackScheduler extends AudioEventAdapter {
         }
         if(endReason.mayStartNext) {
             switch(this.repeating) {
-                case REPEATING_SONG -> player.startTrack(track.makeClone(), false);
+                case REPEATING_SONG -> {
+                    player.startTrack(track.makeClone(), false);
+                    this.trackExceptionRepeats = 0;
+                }
                 case REPEATING_ALL, FALSE -> nextTrack();
             }
         }
@@ -128,6 +143,13 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         Log.error("An error occurred while playing a track", exception);
+        this.trackExceptionRepeats++;
+        if(trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS) {
+            AudioTrack newTrack = track.makeClone();
+            newTrack.setUserData(new Pair<Object, Exception>(track.getUserData(), exception));
+            audioPlayer.startTrack(newTrack, false);
+            return;
+        }
         if(this.message != null) { // delete previous message if it exists
             this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
             this.message = null;
