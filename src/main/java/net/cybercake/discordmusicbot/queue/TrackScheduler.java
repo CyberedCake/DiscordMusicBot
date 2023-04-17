@@ -7,10 +7,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.commands.list.Pause;
+import net.cybercake.discordmusicbot.commands.list.Resume;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.generalutils.Pair;
+import net.cybercake.discordmusicbot.generalutils.TrackUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import javax.annotation.Nullable;
@@ -110,7 +114,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        Pair<Object, Exception> data = ((Pair<Object, Exception>)track.getUserData(Pair.class));
+        Pair<User, Exception> data = TrackUtils.deserializeUserData(track.getUserData());
         if(data != null && data.getSecondItem() != null) {
             Log.info(">> SONG START DELAYED ... EXCEPTION FOUND <<");
             return;
@@ -122,6 +126,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if(endReason == AudioTrackEndReason.LOAD_FAILED && this.trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS)
             return;
+        Resume.removePauseNickname(this.guild);
         deleteOldNowPlayingStatus();
         if(!Main.queueManager.checkQueueExists(this.guild)) return;
         Queue queueMain = Main.queueManager.getGuildQueue(this.guild);
@@ -146,7 +151,7 @@ public class TrackScheduler extends AudioEventAdapter {
         this.trackExceptionRepeats++;
         if(trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS) {
             AudioTrack newTrack = track.makeClone();
-            newTrack.setUserData(new Pair<Object, Exception>(track.getUserData(), exception));
+            newTrack.setUserData(new Pair<User, Exception>(TrackUtils.deserializeUserData(track.getUserData()).getFirstItem(), exception));
             audioPlayer.startTrack(newTrack, false);
             return;
         }

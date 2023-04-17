@@ -2,6 +2,7 @@ package net.cybercake.discordmusicbot;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.cybercake.discordmusicbot.commands.list.Pause;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.generalutils.Pair;
 import net.cybercake.discordmusicbot.generalutils.TrackUtils;
@@ -84,8 +85,10 @@ public class Embeds {
         builder.setAuthor((queue.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB6 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
-        if(track.getUserData() != null)
-            builder.addField("Requested By", "<@" + track.getUserData(User.class).getId() + ">", true);
+        if(!queue.getTrackScheduler().pause() && track.getUserData() != null)
+            builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", true);
+        if(queue.getTrackScheduler().pause())
+            builder.addField("Paused By", "<@" + Pause.lastPauser.getId() + ">", true);
         builder.addField("Artist", track.getInfo().author, true);
         builder.setTimestamp(new Date().toInstant());
         Message message;
@@ -122,7 +125,7 @@ public class Embeds {
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()));
         if(track.getUserData() != null)
-            builder.addField("Requested By", "<@" + track.getUserData(User.class).getId() + ">", false);
+            builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", false);
         builder.setTimestamp(new Date().toInstant());
 
         if(event.isAcknowledged())

@@ -1,5 +1,7 @@
 package net.cybercake.discordmusicbot.generalutils;
 
+import net.dv8tion.jda.api.entities.User;
+
 public class TrackUtils {
 
     public static String getDuration(long current, long max) {
@@ -20,6 +22,16 @@ public class TrackUtils {
         long minutes = (duration / (1000 * 60)) % 60;
         long hours = (duration / (1000 * 60 * 60)) % 24;
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public static Pair<User, Exception> deserializeUserData(Object object) {
+        if(object instanceof User user) return new Pair<>(user, null);
+        if(object instanceof Pair<?,?> pair) {
+            if(!(pair.getFirstItem() instanceof User user)) throw new IllegalArgumentException("First item in Pair is not an instance of " + User.class.getCanonicalName());
+            if(!(pair.getSecondItem() instanceof Exception exception)) throw new IllegalArgumentException("First item in Pair is not an instance of " + Exception.class.getCanonicalName());
+            return new Pair<>(user, exception);
+        }
+        return null;
     }
 
 }

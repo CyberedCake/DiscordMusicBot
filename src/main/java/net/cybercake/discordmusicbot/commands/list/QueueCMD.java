@@ -5,6 +5,7 @@ import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.generalutils.TrackUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -120,7 +121,7 @@ public class QueueCMD extends Command {
     }
 
     private User checkUser(AudioTrack track) {
-        return (track.getUserData(User.class) == null ? null : track.getUserData(User.class));
+        return (track.getUserData() == null ? null : TrackUtils.deserializeUserData(track.getUserData()).getFirstItem());
     }
 
     private String nextLineFormatting(net.cybercake.discordmusicbot.queue.Queue queue, AudioTrack track, @Nullable User user) {
