@@ -69,12 +69,14 @@ public class Play extends Command {
     }
 
     private record QueryDataCached(List<String> autocompletions, long expiration) {
-
+        public boolean isExpired() {
+            return expiration < System.currentTimeMillis();
+        }
     }
 
     // first item: query
     // second item: autocompletions data, see QueryDataCached (record)
-    private static Map<String, QueryDataCached> queryCache = new HashMap<>();
+    private static final Map<String, QueryDataCached> queryCache = new HashMap<>();
 
     @Override
     @SuppressWarnings({"all"})
@@ -86,7 +88,7 @@ public class Play extends Command {
             if(queryCache.containsKey(option)) {
                 QueryDataCached data = queryCache.get(option);
                 event.replyChoiceStrings(data.autocompletions).queue();
-                if(data.expiration < System.currentTimeMillis()) queryCache.remove(option);
+                if(data.isExpired()) queryCache.remove(option);
                 return;
             }
             List<String> returnedSearchResults = new ArrayList<>();
