@@ -2,7 +2,6 @@ package net.cybercake.discordmusicbot.commands.list;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.specification.*;
@@ -13,6 +12,7 @@ import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.generalutils.Asserts;
 import net.cybercake.discordmusicbot.generalutils.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.entities.Member;
@@ -81,6 +81,7 @@ public class Play extends Command {
     public void tab(CommandAutoCompleteInteractionEvent event) {
         String option = event.getOption("query").getAsString();
         if(option == null || option.strip().isBlank()) { event.replyChoiceStrings().queue(); return; }
+        if(!Asserts.throwsError(() -> new URL(option), MalformedURLException.class)) { event.replyChoiceStrings().queue(); return; }
         try {
             if(queryCache.containsKey(option)) {
                 QueryDataCached data = queryCache.get(option);
@@ -156,7 +157,6 @@ public class Play extends Command {
 //        }
 //        return List.of("no", "spotify", "suggestions", "yet");
     }
-
     public List<String> youTubeSearchResults(String query) throws IOException {
         URL suggestQueries = new URL("https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
         URLConnection connection = suggestQueries.openConnection();
