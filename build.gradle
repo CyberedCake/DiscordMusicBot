@@ -23,7 +23,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 
     implementation 'ch.qos.logback:logback-classic:1.4.7'
-    implementation 'net.dv8tion:JDA:5.0.0-beta.6'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.8'
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'com.sedmelluq:lavaplayer:1.3.78'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
