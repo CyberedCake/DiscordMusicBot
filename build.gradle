@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'com.sedmelluq:lavaplayer:1.3.78'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
-    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:3.2.0"
+    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:3.2.2"
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.github.thelinmichael:spotify-web-api-java:6.5.4'
 
