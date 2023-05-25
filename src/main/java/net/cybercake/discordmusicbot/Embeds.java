@@ -96,7 +96,8 @@ public class Embeds {
             ItemComponent[] buttons = new ItemComponent[]{
                     Button.danger("skip-track-" + track.getIdentifier(), "Skip Track"),
                     (queue.getTrackScheduler().pause() ? Button.success("resume-nomsg", "Resume Track") : Button.primary("pause-nomsg", "Pause Track")),
-                    Button.secondary("view-queue", "View Queue")
+                    Button.secondary("view-queue", "View Queue"),
+                    Button.secondary("now-playing", "More Details")
             };
             if(edit == -1L)
                 message = Main.queueManager.getGuildQueue(guild).getTextChannel()
@@ -112,7 +113,7 @@ public class Embeds {
         return new Pair<>(message.getChannel().asTextChannel(), message.getIdLong());
     }
 
-    public static void sendNowPlayingStatus(SlashCommandInteractionEvent event, AudioTrack track, Guild guild) {
+    public static void sendNowPlayingStatus(IReplyCallback event, AudioTrack track, Guild guild) {
         @Nullable String image = null;
         if(track.getInfo().uri.contains("youtube.com"))
             image = "https://i3.ytimg.com/vi/" + track.getIdentifier() + "/maxresdefault.jpg";
