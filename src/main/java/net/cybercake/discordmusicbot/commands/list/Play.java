@@ -58,8 +58,8 @@ public class Play extends Command {
             Embeds.throwError(event, user, "You must be in a voice channel to continue.", true, null); return;
         }
 
-        Queue queue = Main.queueManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel().asVoiceChannel(), event.getChannel().asTextChannel());
-        if(queue != null && !member.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())) {
+        Queue queue = Main.queueManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel());
+        if(queue != null && !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
             Embeds.throwError(event, user, "You must be in the voice channel to continue.", true, null); return;
         }
 

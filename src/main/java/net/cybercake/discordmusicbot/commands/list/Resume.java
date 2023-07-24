@@ -28,7 +28,7 @@ public class Resume extends Command {
         Queue queue = PresetExceptions.trackIsNotPlaying(callback, callback.getMember(), true);
         if(queue == null) return;
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
             Embeds.throwError(callback, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
         }
 

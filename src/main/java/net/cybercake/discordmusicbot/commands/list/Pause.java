@@ -32,7 +32,7 @@ public class Pause extends Command {
         Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(queue == null) return;
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
             Embeds.throwError(event, member.getUser(), "You must be in the voice chat to pause the song", true, null); return;
         }
 

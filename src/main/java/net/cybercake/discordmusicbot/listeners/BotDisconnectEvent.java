@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -16,18 +18,12 @@ import java.util.Date;
 
 public class BotDisconnectEvent extends ListenerAdapter {
 
-    public void handleSelfDisconnect(Member member, VoiceChannel channel, Queue queue, GuildVoiceUpdateEvent event) {
+    public void handleSelfDisconnect(Member member, AudioChannelUnion channel, Queue queue, GuildVoiceUpdateEvent event) {
         TextChannel textChannel = queue.getTextChannel();
         if(
                 event.getVoiceState().getChannel() != null
-                && event.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())
+                && event.getVoiceState().getChannel().equals(queue.getVoiceChannel())
         ) return; // in case the bot was summoned using /summon
-
-        try {
-            queue.destroy();
-        } catch (Exception exception) {
-            return;
-        }
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Bot disconnected or moved.");
@@ -36,9 +32,18 @@ public class BotDisconnectEvent extends ListenerAdapter {
         builder.setColor(new Color(255, 152, 68));
         builder.setTimestamp(new Date().toInstant());
         textChannel.sendMessageEmbeds(builder.build()).queue();
+
+        Thread waitTime = new Thread(() -> {
+            try {
+                queue.getTrackScheduler().pause(true);
+                Thread.sleep(1000);
+                queue.destroy();
+            } catch (Exception ignored) { }
+        });
+        waitTime.start();
     }
 
-    public void handleOtherDisconnect(Member member, VoiceChannel channel, Queue queue, GuildVoiceUpdateEvent event) {
+    public void handleOtherDisconnect(Member member, AudioChannelUnion channel, Queue queue, GuildVoiceUpdateEvent event) {
 
     }
 
@@ -51,10 +56,10 @@ public class BotDisconnectEvent extends ListenerAdapter {
         if(!Main.queueManager.checkQueueExists(guild)) return;
 
         Queue queue = Main.queueManager.getGuildQueue(guild);
-        if(!queue.getVoiceChannel().equals(event.getChannelLeft().asVoiceChannel())) return;
+        if(!queue.getVoiceChannel().equals(event.getChannelLeft())) return;
 
         Member member = event.getMember();
-        VoiceChannel channel = event.getChannelLeft().asVoiceChannel();
+        AudioChannelUnion channel = event.getChannelLeft();
         if(event.getMember().getUser().equals(Main.JDA.getSelfUser()))
             handleSelfDisconnect(member, channel, queue, event);
         else

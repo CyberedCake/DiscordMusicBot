@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -32,12 +33,12 @@ public class Queue implements Serializable {
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
 
-    private VoiceChannel voiceChannel;
+    private AudioChannelUnion voiceChannel;
     private TextChannel textChannel;
 
     private final List<SkipVote> skipVotes = new ArrayList<>();
 
-    protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, VoiceChannel voiceChannel, TextChannel textChannel) {
+    protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
         this.guild = guild;
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
@@ -58,10 +59,10 @@ public class Queue implements Serializable {
     public AudioPlayer getAudioPlayer() { return this.audioPlayer; }
     public TrackScheduler getTrackScheduler() { return this.trackScheduler; }
 
-    public VoiceChannel getVoiceChannel() { return this.voiceChannel; }
+    public AudioChannelUnion getVoiceChannel() { return this.voiceChannel; }
     public TextChannel getTextChannel() { return this.textChannel; }
 
-    public void setVoiceChannel(VoiceChannel voiceChannel, IReplyCallback callback) {
+    public void setVoiceChannel(AudioChannelUnion voiceChannel, IReplyCallback callback) {
         this.voiceChannel = voiceChannel;
         this.audioManager.closeAudioConnection();
         Thread minorDelay = new Thread(() -> {
