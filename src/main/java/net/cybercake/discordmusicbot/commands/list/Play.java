@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.hc.core5.http.ParseException;
@@ -39,7 +40,10 @@ public class Play extends Command {
                 "Type a URL or the name of a video to play music."
         );
         this.aliases = new String[]{"p"};
-        this.optionData = new OptionData[]{new OptionData(OptionType.STRING, "query", "The song URL or name.", true, true)};
+        this.optionData = new OptionData[]{
+                new OptionData(OptionType.STRING, "query", "The song URL or name.", true, true),
+                new OptionData(OptionType.BOOLEAN, "priority", "Plays this song after the current song.", false)
+        };
     }
 
     @Override
@@ -60,8 +64,13 @@ public class Play extends Command {
         }
 
         try {
+            OptionMapping priority = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("priority")).findFirst().orElse(null);
             Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
-                    event.getChannel().asTextChannel(), user, Objects.requireNonNull(event.getOption("query")).getAsString(), event
+                    event.getChannel().asTextChannel(),
+                    user,
+                    Objects.requireNonNull(event.getOption("query")).getAsString(),
+                    event,
+                    priority != null && priority.getAsBoolean()
             );
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);

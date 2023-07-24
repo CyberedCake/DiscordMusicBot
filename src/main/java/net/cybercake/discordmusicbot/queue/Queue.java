@@ -79,6 +79,10 @@ public class Queue implements Serializable {
     public void setTextChannel(TextChannel textChannel) { this.textChannel = textChannel; }
 
     public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event) {
+        loadAndPlay(textChannel, requestedBy, trackUrl, event, false);
+    }
+
+    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, boolean startNow) {
         String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
         if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class))
             trackUrl = "ytsearch:" + trackUrl;
@@ -86,9 +90,18 @@ public class Queue implements Serializable {
         this.audioPlayerManager.loadItem(searchQuery, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                play(track);
+                if(startNow) playNow(track);
+                else play(track);
+
                 track.setUserData(requestedBy);
-                event.getHook().editOriginal("Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "#" + requestedBy.getDiscriminator() + "`) in position `" + trackScheduler.getQueue().size() + "`").queue();
+                StringBuilder text = new StringBuilder(
+                        "Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "#" + requestedBy.getDiscriminator() + "`) "
+                );
+
+                if(startNow) text.append("as next track");
+                else text.append("in position `").append(trackScheduler.getQueue().size()).append("`");
+
+                event.getHook().editOriginal(text.toString()).queue();
             }
 
             @Override
@@ -105,7 +118,8 @@ public class Queue implements Serializable {
 
                 playlist.getTracks().forEach(track -> {
                     track.setUserData(requestedBy);
-                    trackScheduler.queue(track);
+                    if(startNow) trackScheduler.queueTop(track);
+                    else trackScheduler.queue(track);
                 });
 
                 event.getHook().editOriginal("Added `" + playlist.getTracks().size() + "` tracks to the queue.").queue();
@@ -126,6 +140,11 @@ public class Queue implements Serializable {
     private void play(AudioTrack track) {
         connectFirst();
         this.trackScheduler.queue(track);
+    }
+
+    private void playNow(AudioTrack track) {
+        connectFirst();
+        this.trackScheduler.queueTop(track);
     }
 
     private void connectFirst() {
