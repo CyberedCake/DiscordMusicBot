@@ -20,12 +20,12 @@ repositories {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 
     implementation 'ch.qos.logback:logback-classic:1.4.8'
     implementation 'net.dv8tion:JDA:5.0.0-beta.12'
     implementation 'org.reflections:reflections:0.10.2'
-    implementation 'com.sedmelluq:lavaplayer:1.3.78'
+    implementation 'com.github.walkyst:lavaplayer-fork:1.4.2'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
     implementation "com.github.TopiSenpai.LavaSrc:lavasrc:3.2.5"
     implementation 'com.google.code.gson:gson:2.10.1'

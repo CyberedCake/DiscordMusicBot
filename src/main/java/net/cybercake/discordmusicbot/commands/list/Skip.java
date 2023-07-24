@@ -26,7 +26,7 @@ public class Skip extends Command {
             Embeds.throwError(callback, member.getUser(), "That song is no longer playing.", true, null); return;
         }
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
             Embeds.throwError(callback, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
         }
 
@@ -39,7 +39,7 @@ public class Skip extends Command {
         callback.deferReply().setEphemeral(true).complete().deleteOriginal().queue();
 
         TextChannel channel = (TextChannel) callback.getMessageChannel();
-        if(member.getVoiceState().getChannel().asVoiceChannel().getMembers().size() > 2)
+        if(member.getVoiceState().getChannel().getMembers().size() > 2)
             channel.sendMessage(member.getAsMention() + " has requested to skip `" + queue.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + queue.getSkipSongManager().getMembersWantingSkip() + "/" + queue.getSkipSongManager().getMaxNeededToSkip() + " - " + (queue.getSkipSongManager().getMembersWantingSkipPercent()) + "%]**" + (queue.getSkipSongManager().getMembersWantingSkipPercent() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
         queue.getSkipSongManager().checkSkipProportion();
     }

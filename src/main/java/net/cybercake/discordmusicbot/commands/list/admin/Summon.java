@@ -33,8 +33,6 @@ public class Summon extends Command {
             Embeds.throwError(event, member.getUser(), "You must be in a voice channel to continue.", true, null); return;
         }
 
-        VoiceChannel voiceChannel = member.getVoiceState().getChannel().asVoiceChannel();
-
-        queue.setVoiceChannel(voiceChannel, event);
+        queue.setVoiceChannel(member.getVoiceState().getChannel(), event);
     }
 }

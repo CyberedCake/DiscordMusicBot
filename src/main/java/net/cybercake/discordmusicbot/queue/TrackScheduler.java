@@ -51,6 +51,11 @@ public class TrackScheduler extends AudioEventAdapter {
             queue.push(track);
     }
 
+    public void queueTop(AudioTrack track) {
+        if(!audioPlayer.startTrack(track, true))
+            queue.add(0, track);
+    }
+
     public void pause(boolean pause) { this.audioPlayer.setPaused(pause); }
     public boolean pause() { return this.audioPlayer.isPaused(); }
 

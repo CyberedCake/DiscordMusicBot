@@ -6,6 +6,7 @@ import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import javax.annotation.Nullable;
@@ -63,8 +64,8 @@ public class PresetExceptions {
         return false;
     }
 
-    public static boolean isNotInVoiceChat(IReplyCallback callback, Member member, VoiceChannel channel) {
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().asVoiceChannel().equals(channel)) {
+    public static boolean isNotInVoiceChat(IReplyCallback callback, Member member, AudioChannelUnion channel) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(channel)) {
             Embeds.throwError(callback, member.getUser(), "You must be in the voice chat to continue.", true, null); return true;
         }
         return false;
