@@ -34,3 +34,33 @@ jobs:
         uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: shadowJar --stacktrace
+      - name: Obtain Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%s')"
+      - name: Delete Old Release
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          keep_latest: 1
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create New Release
+        uses: ncipollo/release-action@v1.10.0
+        with:
+          artifacts: "build/libs/*.jar"
+          name: "Latest Build"
+          tag: ${{ steps.date.outputs.date }}
+          commit: main
+          makeLatest: true
+          body: |
+            **Related Commit:**
+            ```
+            ${{ github.event.head_commit.message }}
+            ``` 
+            [click here to view!](https://github.com/${{ github.event.repository.full_name }}/commit/${{ github.event.head_commit.id }})
+          generateReleaseNotes: true
+      - name: Lower Case Head Commit Message
+        uses: ASzc/change-string-case-action@v5
+        id: commitmessagelower
+        with:
+          string: ${{ github.event.head_commit.message }}
