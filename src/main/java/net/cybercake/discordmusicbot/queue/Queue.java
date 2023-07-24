@@ -12,6 +12,7 @@ import net.cybercake.discordmusicbot.generalutils.Preconditions;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
@@ -24,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Queue implements Serializable {
 
@@ -152,6 +154,9 @@ public class Queue implements Serializable {
         if(audioManager.isConnected()) return;
 
         this.audioManager.openAudioConnection(this.voiceChannel);
+        if(this.voiceChannel instanceof StageChannel stage) {
+            stage.requestToSpeak().queueAfter(100, TimeUnit.MILLISECONDS);
+        }
     }
 
     public void destroy() {
