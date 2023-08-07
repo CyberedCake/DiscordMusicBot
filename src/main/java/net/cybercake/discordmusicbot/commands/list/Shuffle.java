@@ -23,7 +23,7 @@ public class Shuffle extends Command {
 
         if(PresetExceptions.isNotInVoiceChat(event, event.getMember(), queue.getVoiceChannel())) return;
 
-        if(queue.getTrackScheduler().getQueue().size() < 1) {
+        if(queue.getTrackScheduler().getQueue().isEmpty()) {
             Embeds.throwError(event, event.getUser(), "There aren't any items to shuffle.", true, null); return;
         }
 

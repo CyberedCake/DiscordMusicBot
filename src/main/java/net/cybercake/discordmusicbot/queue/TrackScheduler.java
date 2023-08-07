@@ -60,7 +60,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public boolean pause() { return this.audioPlayer.isPaused(); }
 
     public void nextTrack() {
-        if(queue.size() < 1) {
+        if(queue.isEmpty()) {
             endQueue(Main.queueManager.getGuildQueue(guild)); return;
         }
         AudioTrack nextTrack = queue.firstElement();
@@ -77,13 +77,13 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void shuffle() {
-        if(queue.size() < 1) throw new IllegalStateException("Cannot shuffle a queue that is less than one item.");
+        if(queue.isEmpty()) throw new IllegalStateException("Cannot shuffle a queue that is less than one item.");
 
         Collections.shuffle(queue, new Random(System.currentTimeMillis()));
     }
 
     public enum ToDoWithOld {
-        NOTHING, DELETE, EDIT;
+        NOTHING, DELETE, EDIT
     }
 
     @SuppressWarnings({"all"})
@@ -136,7 +136,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if(!Main.queueManager.checkQueueExists(this.guild)) return;
         Queue queueMain = Main.queueManager.getGuildQueue(this.guild);
         queueMain.getSkipSongManager().clearSkipVoteQueue();
-        if(queue.size() < 1) {
+        if(queue.isEmpty()) {
             endQueue(queueMain); return;
         }
         if(endReason.mayStartNext) {
@@ -155,9 +155,17 @@ public class TrackScheduler extends AudioEventAdapter {
         Log.error("An error occurred while playing a track", exception);
         this.trackExceptionRepeats++;
         if(trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS) {
-            AudioTrack newTrack = track.makeClone();
-            newTrack.setUserData(new Pair<User, Exception>(TrackUtils.deserializeUserData(track.getUserData()).getFirstItem(), exception));
-            audioPlayer.startTrack(newTrack, false);
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(3 * 1000);
+                    AudioTrack newTrack = track.makeClone();
+                    newTrack.setUserData(new Pair<User, Exception>(TrackUtils.deserializeUserData(track.getUserData()).getFirstItem(), exception));
+                    audioPlayer.startTrack(newTrack, false);
+                } catch (Exception exception1) {
+                    throw new IllegalStateException("Failed to rate-limit self", exception1);
+                }
+            });
+            thread.start();
             return;
         }
         if(this.message != null) { // delete previous message if it exists
@@ -168,8 +176,9 @@ public class TrackScheduler extends AudioEventAdapter {
         builder.setTitle("An error occurred playing `" + track.getInfo().title + "`");
         builder.setDescription("Skipping to the next song... try again later!");
         builder.addField("Exact Exception", "||`" + exception.toString() + "`||", true);
-        builder.addField("Exception Type", "||`" + exception.getClass().getCanonicalName() + "`||", true);
-        builder.addField("Time", "||`<t:" + (System.currentTimeMillis()/1000L) + ":R>`||", true);
+        builder.addField("Caused By", "||`" + exception.getCause().toString() + "`||", true);
+        builder.addField("Time", "||<t:" + (System.currentTimeMillis()/1000L) + ":R>||", true);
+        builder.setFooter("Please notify CyberedCake (@cyberedcake) or <@351410272256262145>");
         builder.setColor(Embeds.ERROR_COLOR);
         builder.setTimestamp(new Date().toInstant());
         Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).queue();

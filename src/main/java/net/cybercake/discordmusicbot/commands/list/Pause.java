@@ -1,6 +1,7 @@
 package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.Embeds;
+import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
@@ -62,6 +63,9 @@ public class Pause extends Command {
     @Override
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("pause")) return;
+        if(event.isAcknowledged()) return;
+        Queue queue = Main.queueManager.getGuildQueue(event.getGuild());
+        if(buttonId.contains("pauseresume") && (queue != null && queue.getTrackScheduler().pause())) return;
         handlePause(event, !buttonId.contains("-nomsg"));
     }
 

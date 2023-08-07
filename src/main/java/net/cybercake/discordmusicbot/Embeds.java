@@ -13,10 +13,18 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.utils.messages.MessageRequest;
+import net.dv8tion.jda.internal.entities.emoji.CustomEmojiImpl;
+import net.dv8tion.jda.internal.interactions.component.SelectMenuImpl;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -93,19 +101,29 @@ public class Embeds {
         builder.setTimestamp(new Date().toInstant());
         Message message;
         try {
-            ItemComponent[] buttons = new ItemComponent[]{
-                    Button.danger("skip-track-" + track.getIdentifier(), "Skip Track"),
-                    (queue.getTrackScheduler().pause() ? Button.success("resume-nomsg", "Resume Track") : Button.primary("pause-nomsg", "Pause Track")),
-                    Button.secondary("view-queue", "View Queue"),
-                    Button.secondary("now-playing", "More Details")
+            Button skipButton = Button.secondary("skip-track-" + track.getIdentifier(), Emoji.fromFormatted("⏭"));
+            if(queue.getTrackScheduler().getQueue().isEmpty())
+                skipButton = skipButton.asDisabled();
+            ItemComponent[][] buttons = new ItemComponent[][]{
+                    new ItemComponent[]{
+                            Button.secondary("previous-track", Emoji.fromFormatted("⏮")).asDisabled(),
+                            Button.secondary("pauseresume-nomsg", Emoji.fromFormatted("⏸")),
+                            skipButton
+                    },
+                    new ItemComponent[]{
+                            Button.secondary("view-queue", "View Queue"),
+                            Button.secondary("now-playing", "More Details")
+                    }
             };
-            if(edit == -1L)
-                message = Main.queueManager.getGuildQueue(guild).getTextChannel()
-                        .sendMessageEmbeds(builder.build())
-                        .addActionRow(buttons)
-                        .complete();
-            else
-                message = queue.getTextChannel().editMessageEmbedsById(edit, builder.build()).setActionRow(buttons).complete();
+
+            if(edit == -1L) {
+                MessageCreateAction create = Main.queueManager.getGuildQueue(guild).getTextChannel()
+                        .sendMessageEmbeds(builder.build());
+                for(ItemComponent[] component : buttons)
+                    create.addActionRow(component);
+                message = create.complete();
+            } else
+                message = queue.getTextChannel().editMessageEmbedsById(edit, builder.build()).complete();
 
         } catch (Exception exception) {
             throw new IllegalStateException("Failed to send now playing status in text channel for " + guild.getId() + " (" + guild.getName() + ")", exception);
