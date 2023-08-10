@@ -59,7 +59,9 @@ public class GuildSettings implements Serializable {
             write(settings);
             return settings;
         } catch (Exception exception) {
-            throw new IllegalStateException("Settings creation failed - method: create(" + guildId + ", \"" + guildName + "\")", exception);
+            throw new IllegalStateException("Settings creation failed - method: create(" + guildId + ", \"" + guildName + "\")"
+                    + " || If you are loading for the first time, consider adding the default '0.json' to local path 'servers'"
+                    , exception);
         }
     }
 
