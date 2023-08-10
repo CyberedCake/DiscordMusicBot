@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.generalutils;
+package net.cybercake.discordmusicbot.utilities;
 
 import net.dv8tion.jda.api.entities.User;
 

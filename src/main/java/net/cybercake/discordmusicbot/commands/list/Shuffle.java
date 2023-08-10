@@ -11,6 +11,7 @@ public class Shuffle extends Command {
     public Shuffle() {
         super("shuffle", "Mixes up the current playlist into a random order.");
         this.aliases = new String[]{"randomize"};
+        this.requireDjRole = true;
     }
 
     @Override

@@ -21,6 +21,7 @@ public class Pause extends Command {
     public Pause() {
         super("pause", "Pauses any music playing in the voice chat.");
         this.registerButtonInteraction = true;
+        this.requireDjRole = true;
     }
 
     public static User lastPauser;

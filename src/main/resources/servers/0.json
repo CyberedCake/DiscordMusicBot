@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "guild": null,
+    "name": null
+  },
+  "settings": {
+    "dj-role": null,
+    "channels": {
+      "allowed": [],
+      "disallowed": []
+    }
+  }
+}

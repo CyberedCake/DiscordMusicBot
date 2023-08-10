@@ -1,12 +1,13 @@
 package net.cybercake.discordmusicbot;
 
+import com.google.gson.Gson;
 import com.jagrosh.jlyrics.LyricsClient;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.SpotifyHttpManager;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
-import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.listeners.BotDisconnectEvent;
 import net.cybercake.discordmusicbot.listeners.ButtonInteraction;
 import net.cybercake.discordmusicbot.queue.QueueManager;
@@ -17,7 +18,9 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
-import java.net.URI;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
@@ -37,6 +40,8 @@ public class Main {
 //    public static YouTube youTubeService;
     public static SpotifyApi spotifyApi;
     public static boolean MAINTENANCE = false;
+
+    public static Map<Long, GuildSettings> settings = new HashMap<>();
 
     public static void main(String[] args) throws InterruptedException {
         long mss = System.currentTimeMillis();
@@ -90,11 +95,20 @@ public class Main {
             Log.error("Something went wrong when setting up needed variables: " + exception);
         }
 
+        Log.info("Loading JSON files...");
+        try {
+            Gson gson = new Gson();
+            GuildSettings settings = GuildSettings.create(0, "Default", true);
+            Log.warn("Found: " + settings.toString());
+        } catch (Exception exception) {
+            throw new IllegalStateException("Cannot load JSON", exception);
+        }
+
         Log.info("Cleaning up from last boot...");
         JDA.getAudioManagers().forEach(AudioManager::closeAudioConnection);
 
         Log.info("Registering commands...");
-        Command.registerAll();
+        Command.register();
 
         Log.info("Loaded the bot in " + (System.currentTimeMillis()-mss) + "ms!");
     }

@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.generalutils;
+package net.cybercake.discordmusicbot.utilities;
 
 import net.cybercake.discordmusicbot.Main;
 import org.slf4j.LoggerFactory;

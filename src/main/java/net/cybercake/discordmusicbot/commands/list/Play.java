@@ -12,8 +12,8 @@ import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.generalutils.Asserts;
-import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.utilities.Asserts;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -40,6 +40,7 @@ public class Play extends Command {
                 "Type a URL or the name of a video to play music."
         );
         this.aliases = new String[]{"p"};
+        this.requireDjRole = true;
         this.optionData = new OptionData[]{
                 new OptionData(OptionType.STRING, "query", "The song URL or name.", true, true),
                 new OptionData(OptionType.BOOLEAN, "priority", "Plays this song after the current song.", false)

@@ -23,6 +23,7 @@ public class Stop extends Command {
         this.permission = DefaultMemberPermissions.enabledFor( // need these permissions to execute
                 Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER, Permission.ADMINISTRATOR, Permission.VOICE_MOVE_OTHERS, Permission.VOICE_MUTE_OTHERS
         );
+        this.requireDjRole = true;
     }
 
     @Override

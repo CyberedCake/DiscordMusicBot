@@ -7,11 +7,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
-import net.cybercake.discordmusicbot.commands.list.Pause;
 import net.cybercake.discordmusicbot.commands.list.Resume;
-import net.cybercake.discordmusicbot.generalutils.Log;
-import net.cybercake.discordmusicbot.generalutils.Pair;
-import net.cybercake.discordmusicbot.generalutils.TrackUtils;
+import net.cybercake.discordmusicbot.utilities.Log;
+import net.cybercake.discordmusicbot.utilities.Pair;
+import net.cybercake.discordmusicbot.utilities.TrackUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -157,10 +156,13 @@ public class TrackScheduler extends AudioEventAdapter {
         if(trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS) {
             Thread thread = new Thread(() -> {
                 try {
-                    Thread.sleep(3 * 1000);
+                    int delay = 5 * 1000;
+                    Thread.sleep(delay);
                     AudioTrack newTrack = track.makeClone();
                     newTrack.setUserData(new Pair<User, Exception>(TrackUtils.deserializeUserData(track.getUserData()).getFirstItem(), exception));
                     audioPlayer.startTrack(newTrack, false);
+                    if(this.message != null)
+                        this.message.getFirstItem().editMessageById(this.message.getSecondItem(), "**Track failed.** Retrying <t:" + ((System.currentTimeMillis() + delay) / 1000) + ":R>. Tried " + trackExceptionRepeats + ", maximum " + TRACK_EXCEPTION_MAXIMUM_REPEATS + ".").queue();
                 } catch (Exception exception1) {
                     throw new IllegalStateException("Failed to rate-limit self", exception1);
                 }

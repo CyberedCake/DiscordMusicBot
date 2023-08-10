@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.generalutils;
+package net.cybercake.discordmusicbot.utilities;
 
 public interface Executable {
 

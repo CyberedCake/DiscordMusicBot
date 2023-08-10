@@ -19,6 +19,7 @@ public class Skip extends Command {
         );
         this.aliases = new String[]{"s"};
         this.registerButtonInteraction = true;
+        this.requireDjRole = true;
     }
 
     public static void handleSkip(Queue queue, Member member, IReplyCallback callback, String identifier) {

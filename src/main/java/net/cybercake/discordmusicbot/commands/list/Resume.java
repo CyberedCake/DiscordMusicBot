@@ -19,6 +19,7 @@ public class Resume extends Command {
     public Resume() {
         super("resume", "Resumes the bot to continue playing.");
         this.registerButtonInteraction = true;
+        this.requireDjRole = true;
     }
 
     public void handleResume(IReplyCallback event, boolean showMessage) {

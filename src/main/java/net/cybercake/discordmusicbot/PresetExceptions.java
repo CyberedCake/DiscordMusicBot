@@ -1,11 +1,10 @@
 package net.cybercake.discordmusicbot;
 
 import net.cybercake.discordmusicbot.commands.CommandManager;
-import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 

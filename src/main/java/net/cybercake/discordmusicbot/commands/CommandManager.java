@@ -3,7 +3,7 @@ package net.cybercake.discordmusicbot.commands;
 import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
-import net.cybercake.discordmusicbot.generalutils.Log;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -22,7 +22,7 @@ public class CommandManager extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
-            Log.info(event.getUser().getName() + "#" + event.getUser().getDiscriminator() + " (" + event.getUser().getIdLong() + "): " + event.getCommandString());
+            Log.info(event.getUser().getName() + " (" + event.getUser().getIdLong() + "): " + event.getCommandString());
             if(Main.MAINTENANCE && !BOT_DEVELOPERS.contains(event.getUser().getIdLong())) {
                 Embeds.sendMaintenanceStatus(event, "Only bot developers can execute this command at this moment. ");
                 return;
@@ -34,6 +34,8 @@ public class CommandManager extends ListenerAdapter {
                         .queue();
                 return;
             }
+            if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember()))
+                return;
             command.command(event);
         } catch (Exception exception) {
             PresetExceptions.criticalRare(exception, event, "**This command failed, try again later.**");
