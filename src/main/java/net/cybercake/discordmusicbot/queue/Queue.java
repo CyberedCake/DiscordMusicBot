@@ -96,7 +96,7 @@ public class Queue implements Serializable {
 
                 track.setUserData(requestedBy);
                 StringBuilder text = new StringBuilder(
-                        "Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "#" + requestedBy.getDiscriminator() + "`) "
+                        "Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "`) "
                 );
 
                 if(startNow) text.append("as next track");
