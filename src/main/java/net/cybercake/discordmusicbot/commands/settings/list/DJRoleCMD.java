@@ -36,10 +36,13 @@ public class DJRoleCMD extends SettingSubCommand {
         }
 
         Role role = optionMapping.getAsRole();
+        String newValue = role.getId();
+        if(role.getName().equalsIgnoreCase("@everyone"))
+            newValue = null;
 
         String oldValue = String.valueOf(settings.settings.djRole);
-        settings.settings.djRole = role.getIdLong();
+        settings.settings.djRole = newValue == null ? null : Long.parseLong(newValue);
         settings.expireAndReload(event.getGuild());
-        showSuccessEmbed(event, ShowSetting.DJ_ROLE, "<@&" + oldValue + ">", "<@&" + role.getId() +">");
+        showSuccessEmbed(event, ShowSetting.DJ_ROLE, "<@&" + oldValue + ">", "<@&" + newValue +">");
     }
 }

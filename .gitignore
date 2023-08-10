@@ -110,6 +110,8 @@ gradle-app.guildSettings
 
 **/build/
 
+servers/
+
 # Common working directory
 run/
 

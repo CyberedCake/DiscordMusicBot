@@ -161,6 +161,7 @@ public class TrackScheduler extends AudioEventAdapter {
                     AudioTrack newTrack = track.makeClone();
                     newTrack.setUserData(new Pair<User, Exception>(TrackUtils.deserializeUserData(track.getUserData()).getFirstItem(), exception));
                     audioPlayer.startTrack(newTrack, false);
+                    Log.info("Track failed, retrying in 5 seconds, tried " + trackExceptionRepeats + " out of " + TRACK_EXCEPTION_MAXIMUM_REPEATS);
                     if(this.message != null)
                         this.message.getFirstItem().editMessageById(this.message.getSecondItem(), "**Track failed.** Retrying <t:" + ((System.currentTimeMillis() + delay) / 1000) + ":R>. Tried " + trackExceptionRepeats + ", maximum " + TRACK_EXCEPTION_MAXIMUM_REPEATS + ".").queue();
                 } catch (Exception exception1) {
@@ -170,7 +171,9 @@ public class TrackScheduler extends AudioEventAdapter {
             thread.start();
             return;
         }
+        TextChannel channel = Main.queueManager.getGuildQueue(guild).getTextChannel();
         if(this.message != null) { // delete previous message if it exists
+            if(channel == null) channel = this.message.getFirstItem();
             this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
             this.message = null;
         }
@@ -183,7 +186,7 @@ public class TrackScheduler extends AudioEventAdapter {
         builder.setFooter("Please notify CyberedCake (@cyberedcake) or <@351410272256262145>");
         builder.setColor(Embeds.ERROR_COLOR);
         builder.setTimestamp(new Date().toInstant());
-        Main.queueManager.getGuildQueue(guild).getTextChannel().sendMessageEmbeds(builder.build()).queue();
+        channel.sendMessageEmbeds(builder.build()).queue();
     }
 
     public void endQueue(Queue queue) {

@@ -4,9 +4,11 @@ import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.Pair;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.reflections.Reflections;
 
@@ -41,6 +43,9 @@ public class SettingsManager extends Command {
     public SettingsManager() {
         super("settings", "Change settings relating to the music bot.");
         this.subCommands = new HashMap<>(registerSettings());
+        this.permission = DefaultMemberPermissions.enabledFor( // need these permissions to execute
+                Permission.MANAGE_SERVER, Permission.ADMINISTRATOR
+        );
         super.subCommands = subCommands.keySet().toArray(SubcommandData[]::new);
     }
 

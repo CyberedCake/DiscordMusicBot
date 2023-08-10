@@ -5,6 +5,7 @@ import net.cybercake.discordmusicbot.GuildSettings;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
@@ -88,12 +89,9 @@ public abstract class Command {
         Guild guild = member.getGuild();
         GuildSettings settings = GuildSettings.get(guild.getIdLong(), false);
         if(settings == null) return true;
-        long roleId = settings.settings.djRole;
-//        if(guild.getRoleById(roleId).getName().equalsIgnoreCase("everyone")) {
-//            Log.warn("is everyone");
-//            return true;
-//        }
-        return member.getRoles().stream().map(ISnowflake::getIdLong).anyMatch(standardRole -> roleId == standardRole);
+        if(settings.settings.djRole == null) return true;
+        if(member.getPermissions().contains(Permission.ADMINISTRATOR)) return true;
+        return member.getRoles().stream().map(ISnowflake::getIdLong).anyMatch(standardRole -> Objects.equals(settings.settings.djRole, standardRole));
     }
 
     public static boolean requireDjRole(IReplyCallback event, Member member) {
