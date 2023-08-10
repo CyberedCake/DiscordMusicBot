@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.cybercake.discordmusicbot.GuildSettings;
 import net.cybercake.discordmusicbot.utilities.Pair;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -20,30 +21,34 @@ import java.util.function.Supplier;
 public enum ShowSetting {
     DJ_ROLE("DJ Role",
             ((event, settings) -> "<@&" + settings.settings.djRole + ">"),
-            "Everyone"),
+            "Everyone");
 
-    CHANNELS_ALLOWED("Allowed Channels",
-            ((event, settings) -> String.join(", ",
-                    settings.settings.channels.allowed.stream()
-                            .map(channel -> "<#" + channel + ">")
-                            .toList()
-            )),
-            "All channels"),
-
-    CHANNELS_DISALLOWED("Disallowed Channels",
-            ((event, settings) -> String.join(", ",
-                    settings.settings.channels.disallowed.stream()
-                            .map(channel -> "<#" + channel + ">")
-                            .toList()
-            )),
-            "No channels"
-            );
+//    CHANNELS_ALLOWED("Allowed Channels",
+//            ((event, settings) -> String.join(", ",
+//                    settings.settings.channels.allowed.stream()
+//                            .map(channel -> "<#" + channel + ">")
+//                            .toList()
+//            )),
+//            "All channels"),
+//
+//    CHANNELS_DISALLOWED("Disallowed Channels",
+//            ((event, settings) -> String.join(", ",
+//                    settings.settings.channels.disallowed.stream()
+//                            .map(channel -> "<#" + channel + ">")
+//                            .toList()
+//            )),
+//            "No channels"
+//            );
 
     public static MessageEmbed getEmbed(IReplyCallback event, GuildSettings settings, @Nullable ShowSetting... filter) {
         EmbedBuilder builder = new EmbedBuilder()
                 .setColor(new Color(43, 255, 180))
                 .setTitle("__Settings for your server:__")
                 .setTimestamp(new Date().toInstant());
+        Guild guild = event.getGuild();
+        if(guild != null) 
+            builder = builder.setFooter("Guild: " + guild.getName() + " • ID: " + guild.getId());
+
         boolean filtersExist = filter != null && filter.length > 0;
         if(filtersExist) builder = builder.setAuthor("Filtered for " + String.join(", ", Arrays.stream(filter)
                 .map((setting) -> "'" + setting.getDisplayName() + "'").toList()
