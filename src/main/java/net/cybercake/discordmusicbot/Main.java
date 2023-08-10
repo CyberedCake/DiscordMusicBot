@@ -97,7 +97,6 @@ public class Main {
 
         Log.info("Loading JSON files...");
         try {
-            Gson gson = new Gson();
             GuildSettings settings = GuildSettings.create(0, "Default", true);
             Log.warn("Found: " + settings.toString());
         } catch (Exception exception) {

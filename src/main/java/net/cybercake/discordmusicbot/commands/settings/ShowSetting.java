@@ -46,7 +46,7 @@ public enum ShowSetting {
                 .setTitle("__Settings for your server:__")
                 .setTimestamp(new Date().toInstant());
         Guild guild = event.getGuild();
-        if(guild != null) 
+        if(guild != null)
             builder = builder.setFooter("Guild: " + guild.getName() + " • ID: " + guild.getId());
 
         boolean filtersExist = filter != null && filter.length > 0;

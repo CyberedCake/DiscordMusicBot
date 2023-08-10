@@ -2,6 +2,7 @@ package net.cybercake.discordmusicbot;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,6 +74,7 @@ public class GuildSettings implements Serializable {
             if(!file.getParentFile().exists() && !file.getParentFile().mkdir()) throw new FileSystemException(file.getAbsolutePath(), "[Directory] Does not exist", "Directory not created via mkdir() method.");
             if(!file.createNewFile()) throw new FileSystemException(file.getAbsolutePath(), "[File] Does not exist", "File not created via createNewFile() method.");
             File potentialReaderFile = isDefault ? new File(DEFAULT_RESOURCE.toURI()) : asDefault().file;
+            if(isDefault) Log.info("Default settings found, resource located at " + DEFAULT_RESOURCE.getFile());
             try (FileWriter writer = new FileWriter(file);
                  FileReader reader = new FileReader(potentialReaderFile)
             ){
