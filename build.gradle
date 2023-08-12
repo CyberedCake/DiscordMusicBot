@@ -27,7 +27,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'org.reflections:reflections:0.10.2'
-    implementation 'com.github.walkyst:lavaplayer-fork:1.4.2'
+    implementation 'dev.arbjerg:lavaplayer:2.0.0'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
     implementation "com.github.TopiSenpai.LavaSrc:lavasrc:3.2.6"
     implementation 'com.google.code.gson:gson:2.10.1'

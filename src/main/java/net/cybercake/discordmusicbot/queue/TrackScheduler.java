@@ -153,7 +153,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         Log.error("An error occurred while playing a track", exception);
         this.trackExceptionRepeats++;
-        if(trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS) {
+        if(trackExceptionRepeats <= TRACK_EXCEPTION_MAXIMUM_REPEATS) {
             Thread thread = new Thread(() -> {
                 try {
                     int delay = 5 * 1000;

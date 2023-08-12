@@ -24,12 +24,8 @@ import java.util.Map;
 
 public class Main {
 
-    //public static String TOKEN = System.getenv("TOKEN");
     public static String TOKEN = null;
-    //public static String SPOTIFY_TOKEN = System.getenv("SPOTIFY_SECRET");
     public static String SPOTIFY_TOKEN = null;
-    //public static String YOUTUBE_TOKEN = System.getenv("YOUTUBE_SECRET");
-//    public static String YOUTUBE_TOKEN = null;
     public static String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
     public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
@@ -37,11 +33,8 @@ public class Main {
     public static JDA JDA;
     public static QueueManager queueManager;
     public static LyricsClient lyricsClient;
-//    public static YouTube youTubeService;
     public static SpotifyApi spotifyApi;
     public static boolean MAINTENANCE = false;
-
-    public static Map<Long, GuildSettings> settings = new HashMap<>();
 
     public static void main(String[] args) throws InterruptedException {
         long mss = System.currentTimeMillis();
@@ -49,7 +42,6 @@ public class Main {
         try {
             if(TOKEN == null) TOKEN = getExternalBotInfo("TOKEN");
             if(SPOTIFY_TOKEN == null) SPOTIFY_TOKEN = getExternalBotInfo("SPOTIFY_SECRET");
-//            if(YOUTUBE_TOKEN == null) YOUTUBE_TOKEN = getExternalBotInfo("YOUTUBE_SECRET");
         } catch (Exception exception) {
             if(TOKEN == null && SPOTIFY_TOKEN == null) Log.error("Failed to get the bot token and spotify token from environmental variables! ", exception);
         }

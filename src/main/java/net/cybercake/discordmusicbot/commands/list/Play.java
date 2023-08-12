@@ -68,16 +68,14 @@ public class Play extends Command {
         try {
             OptionMapping priority = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("priority")).findFirst().orElse(null);
             OptionMapping shuffle = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("shuffle")).findFirst().orElse(null);
-            queue = Main.queueManager.getGuildQueue(member.getGuild());
-            queue.loadAndPlay(
+            Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
                     event.getChannel().asTextChannel(),
                     user,
                     Objects.requireNonNull(event.getOption("query")).getAsString(),
                     event,
-                    priority != null && priority.getAsBoolean()
+                    priority != null && priority.getAsBoolean(),
+                    shuffle != null && shuffle.getAsBoolean()
             );
-            if(shuffle != null && shuffle.getAsBoolean())
-                queue.getTrackScheduler().shuffle();
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);
         }

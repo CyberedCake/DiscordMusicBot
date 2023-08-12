@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -80,10 +81,10 @@ public class Queue implements Serializable {
     public void setTextChannel(TextChannel textChannel) { this.textChannel = textChannel; }
 
     public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event) {
-        loadAndPlay(textChannel, requestedBy, trackUrl, event, false);
+        loadAndPlay(textChannel, requestedBy, trackUrl, event, false, false);
     }
 
-    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, boolean startNow) {
+    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, boolean startNow, boolean shuffle) {
         String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
         if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class))
             trackUrl = "ytsearch:" + trackUrl;
@@ -112,18 +113,20 @@ public class Queue implements Serializable {
                     return;
                 }
 
-                AudioTrack firstTrack = playlist.getSelectedTrack();
-                if(firstTrack == null) firstTrack = playlist.getTracks().get(0);
-
-                // play(firstTrack);
-
-                playlist.getTracks().forEach(track -> {
+                List<AudioTrack> tracks = playlist.getTracks();
+                Collections.shuffle(tracks);
+                tracks.forEach(track -> {
                     track.setUserData(requestedBy);
                     if(startNow) trackScheduler.queueTop(track);
                     else trackScheduler.queue(track);
                 });
 
-                event.getHook().editOriginal("Added `" + playlist.getTracks().size() + "` tracks to the queue.").queue();
+                StringBuilder builder = new StringBuilder("Added `" + playlist.getTracks().size() + "` tracks to the queue");
+
+                if(shuffle) builder.append( " in a random order.");
+                else builder.append(".");
+
+                event.getHook().editOriginal(builder.toString()).queue();
             }
 
             @Override
