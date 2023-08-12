@@ -43,7 +43,8 @@ public class Play extends Command {
         this.requireDjRole = true;
         this.optionData = new OptionData[]{
                 new OptionData(OptionType.STRING, "query", "The song URL or name.", true, true),
-                new OptionData(OptionType.BOOLEAN, "priority", "Plays this song after the current song.", false)
+                new OptionData(OptionType.BOOLEAN, "priority", "Plays this song after the current song.", false),
+                new OptionData(OptionType.BOOLEAN, "shuffle", "Shuffles the playlist.", false)
         };
     }
 
@@ -66,13 +67,17 @@ public class Play extends Command {
 
         try {
             OptionMapping priority = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("priority")).findFirst().orElse(null);
-            Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
+            OptionMapping shuffle = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("shuffle")).findFirst().orElse(null);
+            queue = Main.queueManager.getGuildQueue(member.getGuild());
+            queue.loadAndPlay(
                     event.getChannel().asTextChannel(),
                     user,
                     Objects.requireNonNull(event.getOption("query")).getAsString(),
                     event,
                     priority != null && priority.getAsBoolean()
             );
+            if(shuffle != null && shuffle.getAsBoolean())
+                queue.getTrackScheduler().shuffle();
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);
         }
