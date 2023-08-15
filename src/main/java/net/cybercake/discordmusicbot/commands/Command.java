@@ -1,11 +1,9 @@
 package net.cybercake.discordmusicbot.commands;
 
-import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.GuildSettings;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
@@ -90,7 +88,7 @@ public abstract class Command {
         GuildSettings settings = GuildSettings.get(guild.getIdLong(), false);
         if(settings == null) return true;
         if(settings.settings.djRole == null) return true;
-        if(member.getPermissions().contains(Permission.ADMINISTRATOR)) return true;
+        // if(member.getPermissions().contains(Permission.ADMINISTRATOR)) return true;
         return member.getRoles().stream().map(ISnowflake::getIdLong).anyMatch(standardRole -> Objects.equals(settings.settings.djRole, standardRole));
     }
 
@@ -98,7 +96,7 @@ public abstract class Command {
         if(!hasDjRole(member)) {
             GuildSettings settings = GuildSettings.get(member.getGuild().getIdLong(), false);
             String additional = (settings == null ? "." : ": <@&" + settings.settings.djRole + ">");
-            Embeds.throwError(event, member.getUser(), "You can't use this command without the DJ role" + additional, true, null);
+            Embeds.throwError(event, member.getUser(), "You can't execute this action without the DJ role" + additional, true, null);
             return true;
         }
         return false;

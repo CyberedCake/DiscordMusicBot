@@ -1,7 +1,7 @@
 package net.cybercake.discordmusicbot.commands.settings;
 
-import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.GuildSettings;
+import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -13,9 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.Date;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public abstract class SettingSubCommand {
 
@@ -29,15 +26,20 @@ public abstract class SettingSubCommand {
         this.description = description;
     }
 
-    public GuildSettings doesExist_elseCreate(IReplyCallback event) {
-        @Nullable Guild guild = event.getGuild();
-        if(guild == null) {
-            Embeds.throwError(event, event.getUser(), "You must be in a server to use this command", true, null); return null;
-        }
+    public static GuildSettings doesExist_elseCreate(Guild guild) {
         GuildSettings settings = GuildSettings.get(guild.getIdLong(), false);
         if(settings == null)
             settings = GuildSettings.create(guild.getIdLong(), guild.getName());
         return settings;
+    }
+
+    public GuildSettings forEvent(IReplyCallback event) {
+        if(!event.isAcknowledged())
+            event.deferReply(true).queue();
+        if(event.getGuild() == null) {
+            Embeds.throwError(event, event.getUser(), "You must be in a server to use this command!", true, null); return null;
+        }
+        return doesExist_elseCreate(event.getGuild());
     }
 
     public void showSuccessEmbed(IReplyCallback event, ShowSetting setting, String oldValue, String newValue) {

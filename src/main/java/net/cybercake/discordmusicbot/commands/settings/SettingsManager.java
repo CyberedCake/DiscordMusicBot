@@ -1,7 +1,7 @@
 package net.cybercake.discordmusicbot.commands.settings;
 
-import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.Pair;
 import net.dv8tion.jda.api.Permission;
@@ -13,7 +13,10 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class SettingsManager extends Command {
 

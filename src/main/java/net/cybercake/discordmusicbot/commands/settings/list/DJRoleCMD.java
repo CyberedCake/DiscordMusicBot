@@ -3,16 +3,11 @@ package net.cybercake.discordmusicbot.commands.settings.list;
 import net.cybercake.discordmusicbot.GuildSettings;
 import net.cybercake.discordmusicbot.commands.settings.SettingSubCommand;
 import net.cybercake.discordmusicbot.commands.settings.ShowSetting;
-import net.cybercake.discordmusicbot.utilities.Log;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import java.awt.*;
-import java.util.Date;
 
 public class DJRoleCMD extends SettingSubCommand {
 
@@ -25,8 +20,7 @@ public class DJRoleCMD extends SettingSubCommand {
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
-        event.deferReply(true).queue();
-        GuildSettings settings = doesExist_elseCreate(event);
+        GuildSettings settings = forEvent(event);
         if(settings == null) return;
         if(event.getGuild() == null) return;
 

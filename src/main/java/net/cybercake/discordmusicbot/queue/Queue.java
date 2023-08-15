@@ -6,7 +6,10 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.cybercake.discordmusicbot.GuildSettings;
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.commands.settings.SettingSubCommand;
 import net.cybercake.discordmusicbot.utilities.Preconditions;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -33,6 +36,7 @@ public class Queue implements Serializable {
     private final AudioManager audioManager;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
+    private final GuildSettings settings;
 
     private AudioChannelUnion voiceChannel;
     private TextChannel textChannel;
@@ -40,6 +44,8 @@ public class Queue implements Serializable {
     private final List<SkipVote> skipVotes = new ArrayList<>();
 
     protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
+        this.settings = SettingSubCommand.doesExist_elseCreate(guild);
+
         this.guild = guild;
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
@@ -59,6 +65,7 @@ public class Queue implements Serializable {
     public Guild getGuild() { return this.guild; }
     public AudioPlayer getAudioPlayer() { return this.audioPlayer; }
     public TrackScheduler getTrackScheduler() { return this.trackScheduler; }
+    public GuildSettings getSettings() { return this.settings; }
 
     public AudioChannelUnion getVoiceChannel() { return this.voiceChannel; }
     public TextChannel getTextChannel() { return this.textChannel; }
@@ -80,11 +87,10 @@ public class Queue implements Serializable {
     }
     public void setTextChannel(TextChannel textChannel) { this.textChannel = textChannel; }
 
-    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event) {
-        loadAndPlay(textChannel, requestedBy, trackUrl, event, false, false);
-    }
+    public void loadAndPlay(final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, Command command, boolean startNow, boolean shuffle) {
+        if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember()))
+            return; // one last check for first usage reasons
 
-    public void loadAndPlay(final TextChannel textChannel, final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, boolean startNow, boolean shuffle) {
         String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
         if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class))
             trackUrl = "ytsearch:" + trackUrl;

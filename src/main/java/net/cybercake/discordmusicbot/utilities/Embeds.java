@@ -1,12 +1,11 @@
-package net.cybercake.discordmusicbot;
+package net.cybercake.discordmusicbot.utilities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.list.Pause;
-import net.cybercake.discordmusicbot.utilities.Log;
-import net.cybercake.discordmusicbot.utilities.Pair;
-import net.cybercake.discordmusicbot.utilities.TrackUtils;
 import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -90,6 +89,8 @@ public class Embeds {
             builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", true);
         if(queue.getTrackScheduler().pause())
             builder.addField("Paused By", "<@" + Pause.lastPauser.getId() + ">", true);
+        if(queue.getTrackScheduler().repeating() != TrackScheduler.Repeating.FALSE)
+            builder.addField("Looping", queue.getTrackScheduler().repeating().userFriendlyString(), true);
         builder.addField("Artist", track.getInfo().author, true);
         builder.setTimestamp(new Date().toInstant());
         Message message;
@@ -99,12 +100,13 @@ public class Embeds {
                 skipButton = skipButton.asDisabled();
             ItemComponent[][] buttons = new ItemComponent[][]{
                     new ItemComponent[]{
-                            Button.secondary("previous-track", Emoji.fromFormatted("⏮")).asDisabled(),
                             Button.secondary("pauseresume-nomsg", Emoji.fromFormatted("⏸")),
-                            skipButton
+                            skipButton,
+                            Button.secondary("view-queue", "View Queue")
                     },
                     new ItemComponent[]{
-                            Button.secondary("view-queue", "View Queue"),
+                            Button.secondary("loop-song", Emoji.fromFormatted("\uD83D\uDD02")),
+                            Button.danger("stop-queue", Emoji.fromFormatted("\uD83D\uDED1")),
                             Button.secondary("now-playing", "More Details")
                     }
             };

@@ -5,9 +5,9 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.list.Resume;
+import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.Pair;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
@@ -26,7 +26,15 @@ public class TrackScheduler extends AudioEventAdapter {
     private final AudioPlayer audioPlayer;
     private final Stack<AudioTrack> queue;
 
-    public enum Repeating { FALSE, REPEATING_SONG, REPEATING_ALL }
+    public enum Repeating {
+        FALSE("❌ Loop Disabled"),
+        REPEATING_SONG("\uD83D\uDD02 Song Looping"),
+        REPEATING_ALL("\uD83D\uDD01 Queue Looping");
+
+        private final String userFriendly;
+        Repeating(String userFriendly){  this.userFriendly = userFriendly; }
+        public String userFriendlyString() { return this.userFriendly; }
+    }
     private Repeating repeating;
 
     public int TRACK_EXCEPTION_MAXIMUM_REPEATS = 4;
@@ -86,10 +94,10 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     @SuppressWarnings({"all"})
-    public void sendNowPlayingStatus(AudioTrack track, ToDoWithOld toDoWithOld) {
+    public void sendSongPlayingStatus(AudioTrack track, ToDoWithOld toDoWithOld) {
         try {
             if(toDoWithOld == ToDoWithOld.DELETE)
-                deleteOldNowPlayingStatus();
+                deleteOldSongPlayingStatus();
             Thread sendNowPlayingMessage = new Thread(() -> {
                 try {
                     Thread.sleep(600L); // delay because information that is set after this method finishes is required inside the embed
@@ -109,7 +117,7 @@ public class TrackScheduler extends AudioEventAdapter {
         }
     }
 
-    public void deleteOldNowPlayingStatus() {
+    public void deleteOldSongPlayingStatus() {
         if(this.message != null) { // delete previous message if it exists
             this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
             this.message = null;
@@ -123,7 +131,7 @@ public class TrackScheduler extends AudioEventAdapter {
             Log.info(">> SONG START DELAYED ... EXCEPTION FOUND <<");
             return;
         }
-        sendNowPlayingStatus(track, ToDoWithOld.NOTHING);
+        sendSongPlayingStatus(track, ToDoWithOld.NOTHING);
     }
 
     @Override
@@ -131,7 +139,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if(endReason == AudioTrackEndReason.LOAD_FAILED && this.trackExceptionRepeats < TRACK_EXCEPTION_MAXIMUM_REPEATS)
             return;
         Resume.removePauseNickname(this.guild);
-        deleteOldNowPlayingStatus();
+        deleteOldSongPlayingStatus();
         if(!Main.queueManager.checkQueueExists(this.guild)) return;
         Queue queueMain = Main.queueManager.getGuildQueue(this.guild);
         queueMain.getSkipSongManager().clearSkipVoteQueue();
@@ -211,6 +219,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public Stack<AudioTrack> getQueue() { return this.queue; }
 
-    public Repeating isRepeating() { return this.repeating; }
-    public void setRepeating(Repeating repeating) { this.repeating = repeating; }
+    public Repeating repeating() { return this.repeating; }
+    public void repeating(Repeating repeating) {
+        this.repeating = repeating;
+        sendSongPlayingStatus(audioPlayer.getPlayingTrack(), ToDoWithOld.EDIT);
+    }
 }

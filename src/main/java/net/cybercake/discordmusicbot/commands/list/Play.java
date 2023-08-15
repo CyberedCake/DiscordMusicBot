@@ -4,17 +4,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
-import com.wrapper.spotify.model_objects.specification.*;
+import com.wrapper.spotify.model_objects.specification.AlbumSimplified;
+import com.wrapper.spotify.model_objects.specification.Paging;
+import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
+import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.requests.data.search.simplified.SearchAlbumsRequest;
 import com.wrapper.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
-import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.utilities.Asserts;
-import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.utilities.Asserts;
+import net.cybercake.discordmusicbot.utilities.Embeds;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -27,7 +30,10 @@ import org.apache.hc.core5.http.ParseException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -69,10 +75,10 @@ public class Play extends Command {
             OptionMapping priority = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("priority")).findFirst().orElse(null);
             OptionMapping shuffle = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("shuffle")).findFirst().orElse(null);
             Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
-                    event.getChannel().asTextChannel(),
                     user,
                     Objects.requireNonNull(event.getOption("query")).getAsString(),
                     event,
+                    this,
                     priority != null && priority.getAsBoolean(),
                     shuffle != null && shuffle.getAsBoolean()
             );

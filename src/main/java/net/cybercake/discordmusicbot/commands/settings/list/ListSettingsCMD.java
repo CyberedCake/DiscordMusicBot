@@ -13,8 +13,7 @@ public class ListSettingsCMD extends SettingSubCommand {
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
-        event.deferReply(true).queue();
-        GuildSettings settings = doesExist_elseCreate(event);
+        GuildSettings settings = forEvent(event);
         if(settings == null) return;
         if(event.getGuild() == null) return;
 

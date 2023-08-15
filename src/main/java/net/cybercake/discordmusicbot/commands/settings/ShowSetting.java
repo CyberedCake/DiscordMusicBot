@@ -1,22 +1,16 @@
 package net.cybercake.discordmusicbot.commands.settings;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.cybercake.discordmusicbot.GuildSettings;
-import net.cybercake.discordmusicbot.utilities.Pair;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public enum ShowSetting {
     DJ_ROLE("DJ Role",

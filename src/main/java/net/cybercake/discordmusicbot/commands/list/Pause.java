@@ -1,11 +1,11 @@
 package net.cybercake.discordmusicbot.commands.list;
 
-import net.cybercake.discordmusicbot.Embeds;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
+import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -52,7 +52,7 @@ public class Pause extends Command {
         addPauseNickname(member.getGuild());
         lastPauser = member.getUser();
 
-        queue.getTrackScheduler().sendNowPlayingStatus(queue.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
+        queue.getTrackScheduler().sendSongPlayingStatus(queue.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
 
     }
 

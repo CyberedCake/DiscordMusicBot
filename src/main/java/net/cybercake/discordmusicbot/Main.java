@@ -1,26 +1,21 @@
 package net.cybercake.discordmusicbot;
 
-import com.google.gson.Gson;
 import com.jagrosh.jlyrics.LyricsClient;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.SpotifyHttpManager;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
-import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.listeners.BotDisconnectEvent;
 import net.cybercake.discordmusicbot.listeners.ButtonInteraction;
 import net.cybercake.discordmusicbot.queue.QueueManager;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
