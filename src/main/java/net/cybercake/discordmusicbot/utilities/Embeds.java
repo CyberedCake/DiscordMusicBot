@@ -92,13 +92,17 @@ public class Embeds {
                 skipButton = skipButton.asDisabled();
             ItemComponent[][] buttons = new ItemComponent[][]{
                     new ItemComponent[]{
+                            Button.secondary("back-one-track", Emoji.fromFormatted("⏮")).asDisabled(),
                             Button.secondary("pauseresume-nomsg", Emoji.fromFormatted("⏸")),
-                            skipButton,
-                            Button.secondary("view-queue", "View Queue")
+                            skipButton
                     },
                     new ItemComponent[]{
                             Button.secondary("loop-song", Emoji.fromFormatted("\uD83D\uDD02")),
                             Button.danger("stop-queue", Emoji.fromFormatted("\uD83D\uDED1")),
+                            Button.secondary("shuffle-queue", Emoji.fromFormatted("\uD83D\uDD00"))
+                    },
+                    new ItemComponent[]{
+                            Button.secondary("view-queue", "View Queue"),
                             Button.secondary("now-playing", "More Details")
                     }
             };

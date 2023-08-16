@@ -72,7 +72,8 @@ public class QueueCMD extends Command {
 
         StringJoiner upNext = new StringJoiner("\n");
         items.stream().map(track -> nextLineFormatting(queue, track, checkUser(track))).forEach(upNext::add);
-        builder.addField("Up Next", upNext.toString(), false);
+        if(!upNext.toString().isEmpty())
+            builder.addField("Up Next", upNext.toString(), false);
 
         builder.setColor(new Color(0, 65, 59));
 
@@ -112,7 +113,7 @@ public class QueueCMD extends Command {
         String positionQuery = position == 0 ? "" : "&t=" + position;
         return (trackNumber == 0 ? "\t" : trackNumber + ". ") +
                 "[" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + positionQuery + ") " +
-                (user == null ? "" : "(Requested by: " + user.getName() + ")");
+                (user == null ? "" : "(Requested by **" + user.getName() + "**)");
 //        return " " +
 //                (trackNumber == 0 ? "Playing" : trackNumber) + ") " +
 //                track.getInfo().title +

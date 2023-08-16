@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.commands.list.admin;
+package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 
 import java.awt.*;
@@ -20,14 +22,22 @@ public class Stop extends Command {
                 "stop", "Removes the bot from the voice chat."
         );
         this.aliases = new String[]{"disconnect", "leave", "remove", "goodbye"};
-        this.permission = DefaultMemberPermissions.enabledFor( // need these permissions to execute
-                Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER, Permission.ADMINISTRATOR, Permission.VOICE_MOVE_OTHERS, Permission.VOICE_MUTE_OTHERS
-        );
         this.requireDjRole = true;
+        this.registerButtonInteraction = true;
     }
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
+        handleStopQueue(event);
+    }
+
+    @Override
+    public void button(ButtonInteractionEvent event, String buttonId) {
+        if(!buttonId.equalsIgnoreCase("stop-queue")) return;
+        handleStopQueue(event);
+    }
+
+    public void handleStopQueue(IReplyCallback event) {
         if(PresetExceptions.memberNull(event)) return;
         Member member = event.getMember();
         assert member != null;

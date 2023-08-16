@@ -5,6 +5,8 @@ import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 public class Shuffle extends Command {
 
@@ -12,10 +14,22 @@ public class Shuffle extends Command {
         super("shuffle", "Mixes up the current playlist into a random order.");
         this.aliases = new String[]{"randomize"};
         this.requireDjRole = true;
+        this.registerButtonInteraction = true;
     }
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
+        handleShuffle(event);
+    }
+
+    @Override
+    public void button(ButtonInteractionEvent event, String buttonId) {
+        if(!buttonId.equalsIgnoreCase("shuffle-queue")) return;
+
+        handleShuffle(event);
+    }
+
+    public void handleShuffle(IReplyCallback event) {
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 
