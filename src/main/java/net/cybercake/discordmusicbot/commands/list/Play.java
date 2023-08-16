@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.hc.core5.http.ParseException;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -56,6 +57,13 @@ public class Play extends Command {
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
+        String query = Objects.requireNonNull(event.getOption("query")).getAsString();
+        OptionMapping priority = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("priority")).findFirst().orElse(null);
+        OptionMapping shuffle = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("shuffle")).findFirst().orElse(null);
+        handlePlay(event, query, priority == null ? null : priority.getAsBoolean(), shuffle == null ? null : shuffle.getAsBoolean());
+    }
+
+    public void handlePlay(SlashCommandInteractionEvent event, String query, @Nullable Boolean priority, @Nullable Boolean shuffle) {
         Member member = event.getMember();
         User user = event.getUser();
         event.deferReply().queue();
@@ -72,15 +80,13 @@ public class Play extends Command {
         }
 
         try {
-            OptionMapping priority = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("priority")).findFirst().orElse(null);
-            OptionMapping shuffle = event.getOptions().stream().filter(option -> option.getName().equalsIgnoreCase("shuffle")).findFirst().orElse(null);
             Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
                     user,
-                    Objects.requireNonNull(event.getOption("query")).getAsString(),
+                    query,
                     event,
                     this,
-                    priority != null && priority.getAsBoolean(),
-                    shuffle != null && shuffle.getAsBoolean()
+                    priority != null && priority,
+                    shuffle != null && shuffle
             );
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);

@@ -88,8 +88,11 @@ public class Queue implements Serializable {
     public void setTextChannel(TextChannel textChannel) { this.textChannel = textChannel; }
 
     public void loadAndPlay(final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, Command command, boolean startNow, boolean shuffle) {
-        if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember()))
+        if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember())) {
+            if(getTrackScheduler().getQueue().isEmpty())
+                destroy();
             return; // one last check for first usage reasons
+        }
 
         String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
         if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class))
@@ -120,7 +123,8 @@ public class Queue implements Serializable {
                 }
 
                 List<AudioTrack> tracks = playlist.getTracks();
-                Collections.shuffle(tracks);
+                if(shuffle)
+                    Collections.shuffle(tracks);
                 tracks.forEach(track -> {
                     track.setUserData(requestedBy);
                     if(startNow) trackScheduler.queueTop(track);

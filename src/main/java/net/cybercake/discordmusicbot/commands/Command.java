@@ -35,6 +35,8 @@ public abstract class Command {
                 if(constructor == null)
                     throw new NullPointerException("constructor == null: " + clazz.getCanonicalName() + ": " + null);
                 Command newInstance = (Command) constructor.newInstance();
+                if(newInstance.requireMaintenanceMode() && !Main.MAINTENANCE)
+                    continue;
                 Log.info("Registering command: /" + newInstance.getName() + " (class: " + clazz.getCanonicalName() + ")");
                 commands.add(newInstance);
                 commandsData.add(addNewCommand(newInstance.getName(), newInstance));
@@ -63,8 +65,9 @@ public abstract class Command {
     }
 
     public static List<Command> getCommands() { return commands; }
-    public static @Nullable Command getCommandClass(Class<? extends Command> clazz) {
-        return getCommands()
+    @SuppressWarnings({"unchecked"})
+    public static @Nullable <T extends Command> T getCommandClass(Class<T> clazz) {
+        return (T) getCommands()
                 .stream()
                 .filter(command -> command.getClass().getCanonicalName().equalsIgnoreCase(clazz.getCanonicalName()))
                 .findFirst()
@@ -112,12 +115,14 @@ public abstract class Command {
 
     protected boolean registerButtonInteraction;
     protected boolean requireDjRole;
+    protected boolean requireMaintenanceMode;
 
     public Command(@Nullable String name, @Nullable String description) {
         this.name = name;
         this.description = description;
         this.registerButtonInteraction = false;
         this.requireDjRole = false;
+        this.requireMaintenanceMode = false;
     }
 
     public String getName() { return this.name; }
@@ -128,6 +133,7 @@ public abstract class Command {
     public @Nullable DefaultMemberPermissions getPermission() { return this.permission; }
     public boolean sendButtonInteractionEvent() { return this.registerButtonInteraction; }
     public boolean requiresDjRole() { return this.requireDjRole; }
+    public boolean requireMaintenanceMode() { return this.requireMaintenanceMode;}
 
     public abstract void command(SlashCommandInteractionEvent event);
     public void tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }

@@ -4,8 +4,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
+import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -21,8 +25,10 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.LongStream;
 
 public class QueueCMD extends Command {
@@ -32,11 +38,13 @@ public class QueueCMD extends Command {
                 "queue", "View the queue and upcoming songs."
         );
         this.aliases = new String[]{"nextsong"};
-        this.optionData = new OptionData[]{new OptionData(OptionType.INTEGER, "page", "Change the page that you're viewing", false, true)};
+        this.optionData = new OptionData[]{
+                new OptionData(OptionType.INTEGER, "page", "Change the page that you're viewing", false, true)
+        };
         this.registerButtonInteraction = true;
     }
 
-    private static final int ITEMS_PER_PAGE = 10;
+    private static final int ITEMS_PER_PAGE = 6;
 
     private void handleQueueCMD(IReplyCallback callback, int page) {
         if(PresetExceptions.memberNull(callback)) return;
@@ -46,34 +54,35 @@ public class QueueCMD extends Command {
         if(queue == null) return;
 
         int maxPages = getMaxPages(callback.getGuild());
-        List<String> items = new ArrayList<>();
+        List<AudioTrack> items;
         int fromIndex = (page*(ITEMS_PER_PAGE))-(ITEMS_PER_PAGE);
         int toIndex = (Math.min(page * (ITEMS_PER_PAGE), queue.getTrackScheduler().getQueue().size()));
         try {
-            queue.getTrackScheduler().getQueue().subList(fromIndex, toIndex)
-                    .forEach(track ->
-                            items.add(nextLineFormatting(queue, track, checkUser(track)))
-                    );
+            items = new ArrayList<>(queue.getTrackScheduler().getQueue().subList(fromIndex, toIndex));
         } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
             Embeds.throwError(callback, callback.getUser(), "Invalid queue page ('" + page + "'): " + indexOutOfBoundsException, indexOutOfBoundsException); return;
         }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("```glsl\nQueue Page ")
-                .append(page)
-                .append("/")
-                .append(maxPages)
-                .append("\n\n");
-        if(page == 1) builder.append(nextLineFormatting(queue, queue.getAudioPlayer().getPlayingTrack(), checkUser(queue.getAudioPlayer().getPlayingTrack())));
-        items.forEach(builder::append);
-        builder.append("\n").append("```");
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("Queue Page " + page + " / " + maxPages);
+
+        AudioTrack currentTrack = queue.getAudioPlayer().getPlayingTrack();
+        builder.setThumbnail(YouTubeUtils.extractImage(currentTrack.getInfo()));
+        builder.addField("Currently Playing", nextLineFormatting(queue, currentTrack, checkUser(currentTrack)), false);
+
+        StringJoiner upNext = new StringJoiner("\n");
+        items.stream().map(track -> nextLineFormatting(queue, track, checkUser(track))).forEach(upNext::add);
+        builder.addField("Up Next", upNext.toString(), false);
+
+        builder.setColor(new Color(0, 65, 59));
+
         List<ItemComponent> buttons = new ArrayList<>();
         buttons.add(Button.secondary("queue-first-" + page, "⏪ First").withDisabled(page <= 1));
         buttons.add(Button.secondary("queue-previous-" + page, "◀️ Previous").withDisabled(page <= 1));
         buttons.add(Button.secondary("queue-next-" + page, "Next ▶️").withDisabled(page == maxPages));
         buttons.add(Button.secondary("queue-last-" + page, "Last ⏩").withDisabled(page == maxPages));
 
-        WebhookMessageEditAction<Message> hook = callback.getHook().editOriginal(builder.toString());
+        WebhookMessageEditAction<Message> hook = callback.getHook().editOriginalEmbeds(builder.build());
         if(maxPages != 0)
             hook.setActionRow(buttons);
         hook.queue();
@@ -87,6 +96,28 @@ public class QueueCMD extends Command {
         int page = pageOption == null ? 1 : pageOption.getAsInt();
 
         handleQueueCMD(event, page);
+    }
+
+    private int getTrackIndexOf(Queue queue, AudioTrack track) {
+        int trackNumber = queue.getTrackScheduler().getQueue().indexOf(track) + 1;
+        if(trackNumber > queue.getTrackScheduler().getQueue().size())
+            trackNumber = 0;
+        return trackNumber;
+    }
+
+    private String nextLineFormatting(net.cybercake.discordmusicbot.queue.Queue queue, AudioTrack track, @Nullable User user) {
+        int trackNumber = getTrackIndexOf(queue, track);
+
+        int position = (int)(track.getPosition() / 1000);
+        String positionQuery = position == 0 ? "" : "&t=" + position;
+        return (trackNumber == 0 ? "\t" : trackNumber + ". ") +
+                "[" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + positionQuery + ") " +
+                (user == null ? "" : "(Requested by: " + user.getName() + ")");
+//        return " " +
+//                (trackNumber == 0 ? "Playing" : trackNumber) + ") " +
+//                track.getInfo().title +
+//                (user != null ? " - Requested By: " + user.getName() + "#" + user.getDiscriminator() : "") +
+//                "\n" + (trackNumber == 0 ? "\n" : "");
     }
 
     public void viewQueue(ButtonInteractionEvent event) {
@@ -122,18 +153,6 @@ public class QueueCMD extends Command {
 
     private User checkUser(AudioTrack track) {
         return (track.getUserData() == null ? null : TrackUtils.deserializeUserData(track.getUserData()).getFirstItem());
-    }
-
-    private String nextLineFormatting(net.cybercake.discordmusicbot.queue.Queue queue, AudioTrack track, @Nullable User user) {
-        int trackNumber = queue.getTrackScheduler().getQueue().indexOf(track) + 1;
-        if(trackNumber > queue.getTrackScheduler().getQueue().size())
-            trackNumber = 0;
-
-        return " " +
-                (trackNumber == 0 ? "Playing" : trackNumber) + ") " +
-                track.getInfo().title +
-                (user != null ? " - Requested By: " + user.getName() + "#" + user.getDiscriminator() : "") +
-                "\n" + (trackNumber == 0 ? "\n" : "");
     }
 
     @Override

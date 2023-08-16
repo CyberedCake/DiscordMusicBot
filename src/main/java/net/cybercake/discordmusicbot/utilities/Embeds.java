@@ -1,7 +1,6 @@
 package net.cybercake.discordmusicbot.utilities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.list.Pause;
 import net.cybercake.discordmusicbot.queue.Queue;
@@ -68,15 +67,8 @@ public class Embeds {
         return getErrorEmbed(user, "`" + technicalInformation + "` -- That's all we know, please contact a staff member");
     }
 
-    private static String extractImage(AudioTrackInfo info) {
-        @Nullable String image = null;
-        if(info.uri.contains("youtube.com"))
-            image = "https://i3.ytimg.com/vi/" + info.identifier + "/maxresdefault.jpg";
-        return image;
-    }
-
     public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild, long edit) {
-        String image = extractImage(track.getInfo());
+        String image = YouTubeUtils.extractImage(track.getInfo());
         Queue queue = Main.queueManager.getGuildQueue(guild);
 
         EmbedBuilder builder = new EmbedBuilder();

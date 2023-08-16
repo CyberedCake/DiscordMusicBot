@@ -36,6 +36,10 @@ public class CommandManager extends ListenerAdapter {
             }
             if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember()))
                 return;
+            if(command.requireMaintenanceMode() && !Main.MAINTENANCE) {
+                Embeds.throwError(event, event.getUser(), "You are not a bot developer and maintenance mode is set to false. Contact @cyberedcake if you need any help!", true, null);
+                return;
+            }
             command.command(event);
         } catch (Exception exception) {
             PresetExceptions.criticalRare(exception, event, "**This command failed, try again later.**");
