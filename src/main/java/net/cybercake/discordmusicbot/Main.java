@@ -59,7 +59,10 @@ public class Main {
         JDA = JDABuilder.createDefault(TOKEN)
                 .setActivity(Activity.watching("Cyberspace"))
                 .setStatus(OnlineStatus.ONLINE)
-                .setEnabledIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.values())
+                .setEnabledIntents(
+                        GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES,
+                        GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS
+                )
                 .setEventPassthrough(true)
                 .addEventListeners(new CommandManager(), new BotDisconnectEvent(), new ButtonInteraction())
                 .build()
