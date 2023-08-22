@@ -61,7 +61,8 @@ public class Main {
                 .setStatus(OnlineStatus.ONLINE)
                 .setEnabledIntents(
                         GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES,
-                        GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS
+                        GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.SCHEDULED_EVENTS,
                 )
                 .setEventPassthrough(true)
                 .addEventListeners(new CommandManager(), new BotDisconnectEvent(), new ButtonInteraction())
