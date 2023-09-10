@@ -217,6 +217,10 @@ public class TrackScheduler extends AudioEventAdapter {
         channel.sendMessageEmbeds(builder.build()).queue();
     }
 
+    public AudioTrack remove(int position) {
+        return this.queue.remove(position);
+    }
+
     public Stack<AudioTrack> getQueue() { return this.queue; }
 
     public Repeating repeating() { return this.repeating; }

@@ -5,11 +5,14 @@ import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+
+import java.util.stream.Collectors;
 
 public class Skip extends Command {
 
@@ -40,7 +43,7 @@ public class Skip extends Command {
         callback.deferReply().setEphemeral(true).complete().deleteOriginal().queue();
 
         TextChannel channel = (TextChannel) callback.getMessageChannel();
-        if(member.getVoiceState().getChannel().getMembers().size() > 2)
+        if(queue.getSkipSongManager().getUsersWhoCanSkip().size() > 1)
             channel.sendMessage(member.getAsMention() + " has requested to skip `" + queue.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + queue.getSkipSongManager().getMembersWantingSkip() + "/" + queue.getSkipSongManager().getMaxNeededToSkip() + " - " + (queue.getSkipSongManager().getMembersWantingSkipPercent()) + "%]**" + (queue.getSkipSongManager().getMembersWantingSkipPercent() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
         queue.getSkipSongManager().checkSkipProportion();
     }

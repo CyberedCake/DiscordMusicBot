@@ -59,8 +59,8 @@ public class QueueCMD extends Command {
         int toIndex = (Math.min(page * (ITEMS_PER_PAGE), queue.getTrackScheduler().getQueue().size()));
         try {
             items = new ArrayList<>(queue.getTrackScheduler().getQueue().subList(fromIndex, toIndex));
-        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-            Embeds.throwError(callback, callback.getUser(), "Invalid queue page ('" + page + "'): " + indexOutOfBoundsException, indexOutOfBoundsException); return;
+        } catch (Exception exception) {
+            Embeds.throwError(callback, callback.getUser(), "Possible invalid queue page ('" + page + "'): " + exception, exception); return;
         }
 
         EmbedBuilder builder = new EmbedBuilder();
@@ -159,6 +159,6 @@ public class QueueCMD extends Command {
     @Override
     @SuppressWarnings({"all"})
     public void tab(CommandAutoCompleteInteractionEvent event) {
-        event.replyChoiceLongs(LongStream.range(0L, getMaxPages(event.getGuild())+1L).boxed().toList()).queue();
+        event.replyChoiceLongs(LongStream.range(1L, getMaxPages(event.getGuild())+1L).boxed().toList()).queue();
     }
 }

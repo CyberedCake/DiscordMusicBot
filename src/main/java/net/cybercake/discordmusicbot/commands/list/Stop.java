@@ -21,7 +21,7 @@ public class Stop extends Command {
         super(
                 "stop", "Removes the bot from the voice chat."
         );
-        this.aliases = new String[]{"disconnect", "leave", "remove", "goodbye"};
+        this.aliases = new String[]{"disconnect", "leave", "goodbye"};
         this.requireDjRole = true;
         this.registerButtonInteraction = true;
     }

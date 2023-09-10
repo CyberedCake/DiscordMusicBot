@@ -55,7 +55,7 @@ public class Embeds {
         builder.setDescription(errorMessage + "\n \r");
         builder.setTimestamp(new Date().toInstant());
         if(user != null)
-            builder.setFooter("Requested by " + user.getName() + "#" + user.getDiscriminator());
+            builder.setFooter("Response to " + user.getName());
         return builder;
     }
 

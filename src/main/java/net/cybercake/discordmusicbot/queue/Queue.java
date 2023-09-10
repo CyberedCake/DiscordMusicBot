@@ -14,6 +14,7 @@ import net.cybercake.discordmusicbot.utilities.Preconditions;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
@@ -27,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class Queue implements Serializable {
@@ -109,7 +111,7 @@ public class Queue implements Serializable {
                         "Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "`) "
                 );
 
-                if(startNow) text.append("as next track");
+                if(startNow) text.append("as the next track");
                 else text.append("in position `").append(trackScheduler.getQueue().size()).append("`");
 
                 event.getHook().editOriginal(text.toString()).queue();
@@ -162,12 +164,9 @@ public class Queue implements Serializable {
     }
 
     private void connectFirst() {
-        if(audioManager.isConnected()) return;
-
         this.audioManager.openAudioConnection(this.voiceChannel);
-        if(this.voiceChannel instanceof StageChannel stage) {
-            stage.requestToSpeak().queueAfter(100, TimeUnit.MILLISECONDS);
-        }
+        if(this.voiceChannel instanceof StageChannel stage)
+            stage.requestToSpeak().queueAfter(400, TimeUnit.MILLISECONDS);
     }
 
     public void destroy() {
@@ -195,9 +194,13 @@ public class Queue implements Serializable {
             skipVotes.add(new SkipVote(member, System.currentTimeMillis(), audioPlayer.getPlayingTrack()));
         }
 
-        public List<Member> getHumanVCMembers() { return getVoiceChannel().getMembers()
+        public List<Member> getUsersWhoCanSkip() { return getVoiceChannel().getMembers()
                 .stream()
                 .filter(member -> !member.getUser().isBot())
+                .filter(member -> getVoiceChannel().getType() == ChannelType.STAGE
+                        && getVoiceChannel().asStageChannel().getStageInstance() != null
+                        && Objects.requireNonNull(getVoiceChannel().asStageChannel().getStageInstance()).getSpeakers().contains(member)
+                )
                 .toList();
         }
 
@@ -211,7 +214,7 @@ public class Queue implements Serializable {
         }
 
         public int getMaxNeededToSkip() {
-            return Math.round((Float.parseFloat(String.valueOf(this.getHumanVCMembers().size()))* (Main.SKIP_VOTE_PERCENTAGE)));
+            return Math.round((Float.parseFloat(String.valueOf(this.getUsersWhoCanSkip().size()))* (Main.SKIP_VOTE_PERCENTAGE)));
         }
 
         public void checkSkipProportion() {

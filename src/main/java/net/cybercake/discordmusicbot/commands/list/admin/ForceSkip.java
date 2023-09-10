@@ -14,7 +14,7 @@ public class ForceSkip extends Command {
                 "forceskip", "Forces the current song to be skipped."
         );
         this.permission = DefaultMemberPermissions.enabledFor( // need these permissions to execute
-                Permission.MANAGE_CHANNEL, Permission.MANAGE_SERVER, Permission.ADMINISTRATOR, Permission.VOICE_MOVE_OTHERS
+                Permission.VOICE_MOVE_OTHERS
         );
         this.requireDjRole = true;
     }
