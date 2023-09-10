@@ -11,6 +11,8 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.settings.SettingSubCommand;
 import net.cybercake.discordmusicbot.utilities.Preconditions;
+import net.cybercake.discordmusicbot.utilities.TrackUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -22,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -107,14 +110,14 @@ public class Queue implements Serializable {
                 else play(track);
 
                 track.setUserData(requestedBy);
-                StringBuilder text = new StringBuilder(
-                        "Enqueued `" + track.getInfo().title + "` (by `" + requestedBy.getName() + "`) "
-                );
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.setThumbnail(TrackUtils.getThumbnailLinkFor(track));
+                builder.setColor(new Color(0, 211, 16));
+                builder.addField("Enqueued Track:", (startNow ? "`#1`" : "`#" + trackScheduler.getQueue().size() + "`") + " - [" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + ")", true);
+                builder.addField("Requested By:", requestedBy.getAsMention(), true);
+                builder.addField("Duration:", "`" + TrackUtils.getFormattedDuration(track.getDuration()) + "`", true);
 
-                if(startNow) text.append("as the next track");
-                else text.append("in position `").append(trackScheduler.getQueue().size()).append("`");
-
-                event.getHook().editOriginal(text.toString()).queue();
+                event.getHook().editOriginalEmbeds(builder.build()).queue();
             }
 
             @Override
@@ -133,12 +136,16 @@ public class Queue implements Serializable {
                     else trackScheduler.queue(track);
                 });
 
-                StringBuilder builder = new StringBuilder("Added `" + playlist.getTracks().size() + "` tracks to the queue");
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.setThumbnail(TrackUtils.getThumbnailLinkFor(tracks.get(0)));
+                if(shuffle)
+                    builder.setDescription("*Added playlist tracks in a random order.*");
+                builder.setColor(new Color(0, 211, 16));
+                builder.addField("Enqueued Playlist:", "[" + playlist.getName() + "](https://www.youtube.com/watch?v=" + playlist.getSelectedTrack().getIdentifier() + ")", true);
+                builder.addField("Requested By:", requestedBy.getAsMention(), true);
+                builder.addField("Items in Playlist:", "`" + playlist.getTracks().size() + "`", true);
 
-                if(shuffle) builder.append( " in a random order.");
-                else builder.append(".");
-
-                event.getHook().editOriginal(builder.toString()).queue();
+                event.getHook().editOriginalEmbeds(builder.build()).queue();
             }
 
             @Override
