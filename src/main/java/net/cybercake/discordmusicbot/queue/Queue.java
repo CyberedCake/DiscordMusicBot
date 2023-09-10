@@ -122,7 +122,7 @@ public class Queue implements Serializable {
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-                if(searchQuery.contains("search")) {
+                if(playlist.isSearchResult()) {
                     trackLoaded(playlist.getTracks().get(0));
                     return;
                 }
@@ -141,7 +141,7 @@ public class Queue implements Serializable {
                 if(shuffle)
                     builder.setDescription("*Added playlist tracks in a random order.*");
                 builder.setColor(new Color(0, 211, 16));
-                builder.addField("Enqueued Playlist:", "[" + playlist.getName() + "](https://www.youtube.com/watch?v=" + playlist.getTracks().get(0).getIdentifier() + ")", true);
+                builder.addField("Enqueued Playlist:", playlist.getName(), true);
                 builder.addField("Requested By:", requestedBy.getAsMention(), true);
                 builder.addField("Items in Playlist:", "`" + playlist.getTracks().size() + "`", true);
 
@@ -171,6 +171,8 @@ public class Queue implements Serializable {
     }
 
     private void connectFirst() {
+        if(this.audioManager.isConnected()) return;
+
         this.audioManager.openAudioConnection(this.voiceChannel);
         if(this.voiceChannel instanceof StageChannel stage)
             stage.requestToSpeak().queueAfter(400, TimeUnit.MILLISECONDS);
