@@ -141,7 +141,7 @@ public class Queue implements Serializable {
                 if(shuffle)
                     builder.setDescription("*Added playlist tracks in a random order.*");
                 builder.setColor(new Color(0, 211, 16));
-                builder.addField("Enqueued Playlist:", "[" + playlist.getName() + "](https://www.youtube.com/watch?v=" + playlist.getSelectedTrack().getIdentifier() + ")", true);
+                builder.addField("Enqueued Playlist:", "[" + playlist.getName() + "](https://www.youtube.com/watch?v=" + playlist.getTracks().get(0).getIdentifier() + ")", true);
                 builder.addField("Requested By:", requestedBy.getAsMention(), true);
                 builder.addField("Items in Playlist:", "`" + playlist.getTracks().size() + "`", true);
 
