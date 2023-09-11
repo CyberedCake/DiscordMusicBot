@@ -12,6 +12,7 @@ import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.settings.SettingSubCommand;
 import net.cybercake.discordmusicbot.utilities.Preconditions;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
+import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -111,7 +112,7 @@ public class Queue implements Serializable {
 
                 track.setUserData(requestedBy);
                 EmbedBuilder builder = new EmbedBuilder();
-                builder.setThumbnail(TrackUtils.getThumbnailLinkFor(track));
+                builder.setThumbnail(YouTubeUtils.getThumbnailLinkFor(track));
                 builder.setColor(new Color(0, 211, 16));
                 builder.addField("Enqueued Track:", (startNow ? "`#1`" : "`#" + trackScheduler.getQueue().size() + "`") + " - [" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + ")", true);
                 builder.addField("Requested By:", requestedBy.getAsMention(), true);
@@ -137,7 +138,7 @@ public class Queue implements Serializable {
                 });
 
                 EmbedBuilder builder = new EmbedBuilder();
-                builder.setThumbnail(TrackUtils.getThumbnailLinkFor(tracks.get(0)));
+                builder.setThumbnail(YouTubeUtils.getThumbnailLinkFor(tracks.get(0)));
                 if(shuffle)
                     builder.setDescription("*Added playlist tracks in a random order.*");
                 builder.setColor(new Color(0, 211, 16));

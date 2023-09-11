@@ -1,5 +1,6 @@
 package net.cybercake.discordmusicbot.utilities;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import javax.annotation.Nullable;
@@ -13,4 +14,7 @@ public class YouTubeUtils {
         return image;
     }
 
+    public static String getThumbnailLinkFor(AudioTrack track){
+        return "https://img.youtube.com/vi/" + track.getIdentifier() + "/maxresdefault.jpg";
+    }
 }

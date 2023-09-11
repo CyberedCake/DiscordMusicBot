@@ -1,6 +1,5 @@
 package net.cybercake.discordmusicbot.utilities;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.User;
 
 public class TrackUtils {
@@ -33,10 +32,6 @@ public class TrackUtils {
             return new Pair<>(user, exception);
         }
         return null;
-    }
-
-    public static String getThumbnailLinkFor(AudioTrack track){
-        return "https://i3.ytimg.com/vi/" + track.getIdentifier() + "/maxresdefault.jpg";
     }
 
 }

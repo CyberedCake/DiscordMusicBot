@@ -125,7 +125,7 @@ public class Embeds {
     public static void sendNowPlayingStatus(IReplyCallback event, AudioTrack track, Guild guild) {
         @Nullable String image = null;
         if(track.getInfo().uri.contains("youtube.com"))
-            image = TrackUtils.getThumbnailLinkFor(track);
+            image = YouTubeUtils.getThumbnailLinkFor(track);
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(new Color(108, 221, 255));
