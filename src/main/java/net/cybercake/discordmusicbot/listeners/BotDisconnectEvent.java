@@ -1,7 +1,7 @@
 package net.cybercake.discordmusicbot.listeners;
 
 import net.cybercake.discordmusicbot.Main;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -16,11 +16,11 @@ import java.util.Date;
 
 public class BotDisconnectEvent extends ListenerAdapter {
 
-    public void handleSelfDisconnect(Member member, AudioChannelUnion channel, Queue queue, GuildVoiceUpdateEvent event) {
-        TextChannel textChannel = queue.getTextChannel();
+    public void handleSelfDisconnect(Member member, AudioChannelUnion channel, MusicPlayer musicPlayer, GuildVoiceUpdateEvent event) {
+        TextChannel textChannel = musicPlayer.getTextChannel();
         if(
                 event.getVoiceState().getChannel() != null
-                && event.getVoiceState().getChannel().equals(queue.getVoiceChannel())
+                && event.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())
         ) return; // in case the bot was summoned using /summon
 
         EmbedBuilder builder = new EmbedBuilder();
@@ -33,15 +33,15 @@ public class BotDisconnectEvent extends ListenerAdapter {
 
         Thread waitTime = new Thread(() -> {
             try {
-                queue.getTrackScheduler().pause(true);
+                musicPlayer.getTrackScheduler().pause(true);
                 Thread.sleep(1000);
-                queue.destroy();
+                musicPlayer.destroy();
             } catch (Exception ignored) { }
         });
         waitTime.start();
     }
 
-    public void handleOtherDisconnect(Member member, AudioChannelUnion channel, Queue queue, GuildVoiceUpdateEvent event) {
+    public void handleOtherDisconnect(Member member, AudioChannelUnion channel, MusicPlayer musicPlayer, GuildVoiceUpdateEvent event) {
 
     }
 
@@ -51,16 +51,16 @@ public class BotDisconnectEvent extends ListenerAdapter {
         if(event.getChannelLeft() == null) return;
 
         Guild guild = event.getGuild();
-        if(!Main.queueManager.checkQueueExists(guild)) return;
+        if(!Main.musicPlayerManager.checkQueueExists(guild)) return;
 
-        Queue queue = Main.queueManager.getGuildQueue(guild);
-        if(!queue.getVoiceChannel().equals(event.getChannelLeft())) return;
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(guild);
+        if(!musicPlayer.getVoiceChannel().equals(event.getChannelLeft())) return;
 
         Member member = event.getMember();
         AudioChannelUnion channel = event.getChannelLeft();
         if(event.getMember().getUser().equals(Main.JDA.getSelfUser()))
-            handleSelfDisconnect(member, channel, queue, event);
+            handleSelfDisconnect(member, channel, musicPlayer, event);
         else
-            handleOtherDisconnect(member, channel, queue, event);
+            handleOtherDisconnect(member, channel, musicPlayer, event);
     }
 }

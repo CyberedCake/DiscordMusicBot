@@ -25,14 +25,14 @@ public class LyricsCMD extends Command {
     public void command(SlashCommandInteractionEvent event) {
         event.deferReply().setEphemeral(true).queue();
 
-        if(event.getOption("song-title") == null && !Main.queueManager.checkQueueExists(Objects.requireNonNull(event.getGuild()))) {
+        if(event.getOption("song-title") == null && !Main.musicPlayerManager.checkQueueExists(Objects.requireNonNull(event.getGuild()))) {
             PresetExceptions.trackIsNotPlaying(event, Objects.requireNonNull(event.getMember()), true);
             return;
         }
 
         String songTitle = (event.getOption("song-title") != null
                 ? event.getOption("song-title").getAsString()
-                : Main.queueManager.getGuildQueue(event.getGuild()).getAudioPlayer().getPlayingTrack().getInfo().title);
+                : Main.musicPlayerManager.getGuildQueue(event.getGuild()).getAudioPlayer().getPlayingTrack().getInfo().title);
 
         EmbedBuilder builder = new EmbedBuilder();
         try {

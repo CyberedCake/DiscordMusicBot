@@ -3,7 +3,7 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.entities.Guild;
@@ -27,29 +27,29 @@ public class Resume extends Command {
         Member member = event.getMember();
         assert member != null;
 
-        Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
         if(event instanceof ButtonInteractionEvent
-                && !queue.getTrackScheduler().pause()
+                && !musicPlayer.getTrackScheduler().pause()
         ) return;
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
             Embeds.throwError(event, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
         }
 
-        if(!queue.getTrackScheduler().pause()) {
+        if(!musicPlayer.getTrackScheduler().pause()) {
             Embeds.throwError(event, member.getUser(), "The queue is already playing, use </pause:1084986931986833530> to pause the song", true, null); return;
         }
 
-        queue.getTrackScheduler().pause(false);
+        musicPlayer.getTrackScheduler().pause(false);
         if(showMessage)
             event.reply(":arrow_forward: You resumed the queue. Use </pause:1084986931986833530> to re-pause it!").queue();
         else
             event.reply(":arrow_forward: You resumed the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
         removePauseNickname(member.getGuild());
 
-        queue.getTrackScheduler().sendSongPlayingStatus(queue.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
+        musicPlayer.getTrackScheduler().sendSongPlayingStatus(musicPlayer.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
     }
 
                              @Override
@@ -61,8 +61,8 @@ public class Resume extends Command {
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("resume")) return;
         if(event.isAcknowledged()) return;
-        Queue queue = Main.queueManager.getGuildQueue(event.getGuild());
-        if(buttonId.contains("pauseresume") && (queue != null && !queue.getTrackScheduler().pause())) return;
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(event.getGuild());
+        if(buttonId.contains("pauseresume") && (musicPlayer != null && !musicPlayer.getTrackScheduler().pause())) return;
         handleResume(event, !buttonId.contains("-nomsg"));
     }
 

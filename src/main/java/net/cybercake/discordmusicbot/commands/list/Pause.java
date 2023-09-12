@@ -3,7 +3,7 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,18 +31,18 @@ public class Pause extends Command {
         Member member = event.getMember();
         assert member != null;
 
-        Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
             Embeds.throwError(event, member.getUser(), "You must be in the voice chat to pause the song", true, null); return;
         }
 
-        if(queue.getTrackScheduler().pause()) {
+        if(musicPlayer.getTrackScheduler().pause()) {
             Embeds.throwError(event, member.getUser(), "The queue is already paused, use </resume:1084986931986833531> to continue the song", true, null); return;
         }
 
-        queue.getTrackScheduler().pause(true);
+        musicPlayer.getTrackScheduler().pause(true);
         if(showMessage)
             event.reply(":pause_button: You paused the queue. Use </resume:1084986931986833531> to unpause it!")
                 .setActionRow(Button.success("resume", "Resume the song"))
@@ -52,7 +52,7 @@ public class Pause extends Command {
         addPauseNickname(member.getGuild());
         lastPauser = member.getUser();
 
-        queue.getTrackScheduler().sendSongPlayingStatus(queue.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
+        musicPlayer.getTrackScheduler().sendSongPlayingStatus(musicPlayer.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
 
     }
 
@@ -65,8 +65,8 @@ public class Pause extends Command {
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("pause")) return;
         if(event.isAcknowledged()) return;
-        Queue queue = Main.queueManager.getGuildQueue(event.getGuild());
-        if(buttonId.contains("pauseresume") && (queue != null && queue.getTrackScheduler().pause())) return;
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(event.getGuild());
+        if(buttonId.contains("pauseresume") && (musicPlayer != null && musicPlayer.getTrackScheduler().pause())) return;
         handlePause(event, !buttonId.contains("-nomsg"));
     }
 

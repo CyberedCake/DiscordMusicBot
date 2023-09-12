@@ -2,7 +2,7 @@ package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Reply;
@@ -32,8 +32,8 @@ public class Loop extends Command {
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 
-        net.cybercake.discordmusicbot.queue.Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
         if(subCommands == null) {
             Embeds.executeEmbed(event, Embeds.getTechnicalErrorEmbed(event.getUser(), "no subCommands for " + Loop.class.getCanonicalName() + " found: []"), true); return;
@@ -46,9 +46,9 @@ public class Loop extends Command {
         }
 
         if(subCommand.equalsIgnoreCase("song"))
-            handleLoopSong(event, queue);
+            handleLoopSong(event, musicPlayer);
         else if(subCommand.equalsIgnoreCase("queue"))
-            handleLoopQueue(event, queue);
+            handleLoopQueue(event, musicPlayer);
         else
             Embeds.throwError(event, event.getUser(), "Invalid sub-command: " + subCommand, true, null);
     }
@@ -60,15 +60,15 @@ public class Loop extends Command {
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 
-        net.cybercake.discordmusicbot.queue.Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
-        if(buttonId.contains("song")) handleLoopSong(event, queue);
-        else if(buttonId.contains("queue")) handleLoopQueue(event, queue);
+        if(buttonId.contains("song")) handleLoopSong(event, musicPlayer);
+        else if(buttonId.contains("queue")) handleLoopQueue(event, musicPlayer);
     }
 
-    private void handleLoopSong(IReplyCallback event, Queue queue) {
-        TrackScheduler scheduler = queue.getTrackScheduler();
+    private void handleLoopSong(IReplyCallback event, MusicPlayer musicPlayer) {
+        TrackScheduler scheduler = musicPlayer.getTrackScheduler();
         TrackScheduler.Repeating repeatingNew = scheduler.repeating() == TrackScheduler.Repeating.REPEATING_SONG
                 ? TrackScheduler.Repeating.FALSE
                 : TrackScheduler.Repeating.REPEATING_SONG;
@@ -82,7 +82,7 @@ public class Loop extends Command {
                     " Loop *for this song* is now **disabled**", true);
     }
 
-    private void handleLoopQueue(IReplyCallback event, Queue queue) {
+    private void handleLoopQueue(IReplyCallback event, MusicPlayer musicPlayer) {
         Embeds.throwError(event, event.getUser(), "This feature is **coming soon**, try again later!", true, null);
     }
 }

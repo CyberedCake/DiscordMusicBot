@@ -4,9 +4,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
-import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
 import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -50,15 +49,15 @@ public class QueueCMD extends Command {
         if(PresetExceptions.memberNull(callback)) return;
         assert callback.getMember() != null;
 
-        net.cybercake.discordmusicbot.queue.Queue queue = PresetExceptions.trackIsNotPlaying(callback, callback.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(callback, callback.getMember(), true);
+        if(musicPlayer == null) return;
 
         int maxPages = getMaxPages(callback.getGuild());
         List<AudioTrack> items;
         int fromIndex = (page*(ITEMS_PER_PAGE))-(ITEMS_PER_PAGE);
-        int toIndex = (Math.min(page * (ITEMS_PER_PAGE), queue.getTrackScheduler().getQueue().size()));
+        int toIndex = (Math.min(page * (ITEMS_PER_PAGE), musicPlayer.getTrackScheduler().getQueue().size()));
         try {
-            items = new ArrayList<>(queue.getTrackScheduler().getQueue().subList(fromIndex, toIndex));
+            items = new ArrayList<>(musicPlayer.getTrackScheduler().getQueue().subList(fromIndex, toIndex));
         } catch (Exception exception) {
             Embeds.throwError(callback, callback.getUser(), "Possible invalid queue page ('" + page + "'): " + exception, exception); return;
         }
@@ -66,12 +65,12 @@ public class QueueCMD extends Command {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Queue Page " + page + " / " + maxPages);
 
-        AudioTrack currentTrack = queue.getAudioPlayer().getPlayingTrack();
+        AudioTrack currentTrack = musicPlayer.getAudioPlayer().getPlayingTrack();
         builder.setThumbnail(YouTubeUtils.extractImage(currentTrack.getInfo()));
-        builder.addField("Currently Playing", nextLineFormatting(queue, currentTrack, checkUser(currentTrack)), false);
+        builder.addField("Currently Playing", nextLineFormatting(musicPlayer, currentTrack, checkUser(currentTrack)), false);
 
         StringJoiner upNext = new StringJoiner("\n");
-        items.stream().map(track -> nextLineFormatting(queue, track, checkUser(track))).forEach(upNext::add);
+        items.stream().map(track -> nextLineFormatting(musicPlayer, track, checkUser(track))).forEach(upNext::add);
         if(!upNext.toString().isEmpty())
             builder.addField("Up Next", upNext.toString(), false);
 
@@ -99,15 +98,15 @@ public class QueueCMD extends Command {
         handleQueueCMD(event, page);
     }
 
-    private int getTrackIndexOf(Queue queue, AudioTrack track) {
-        int trackNumber = queue.getTrackScheduler().getQueue().indexOf(track) + 1;
-        if(trackNumber > queue.getTrackScheduler().getQueue().size())
+    private int getTrackIndexOf(MusicPlayer musicPlayer, AudioTrack track) {
+        int trackNumber = musicPlayer.getTrackScheduler().getQueue().indexOf(track) + 1;
+        if(trackNumber > musicPlayer.getTrackScheduler().getQueue().size())
             trackNumber = 0;
         return trackNumber;
     }
 
-    private String nextLineFormatting(net.cybercake.discordmusicbot.queue.Queue queue, AudioTrack track, @Nullable User user) {
-        int trackNumber = getTrackIndexOf(queue, track);
+    private String nextLineFormatting(MusicPlayer musicPlayer, AudioTrack track, @Nullable User user) {
+        int trackNumber = getTrackIndexOf(musicPlayer, track);
 
         int position = (int)(track.getPosition() / 1000);
         String positionQuery = position == 0 ? "" : "&t=" + position;
@@ -134,8 +133,8 @@ public class QueueCMD extends Command {
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 
-        net.cybercake.discordmusicbot.queue.Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
         int page = Integer.parseInt(event.getComponentId().split("-")[2]);
         event.deferEdit().queue();
@@ -149,7 +148,7 @@ public class QueueCMD extends Command {
     }
 
     private int getMaxPages(Guild guild) {
-        return (int)Math.ceil((double)Main.queueManager.getGuildQueue(guild).getTrackScheduler().getQueue().size()/(double)(ITEMS_PER_PAGE));
+        return (int)Math.ceil((double)Main.musicPlayerManager.getGuildQueue(guild).getTrackScheduler().getQueue().size()/(double)(ITEMS_PER_PAGE));
     }
 
     private User checkUser(AudioTrack track) {

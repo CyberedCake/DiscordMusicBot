@@ -14,7 +14,7 @@ import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Asserts;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
@@ -74,13 +74,13 @@ public class Play extends Command {
             Embeds.throwError(event, user, "You must be in a voice channel to continue.", true, null); return;
         }
 
-        Queue queue = Main.queueManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel());
-        if(queue != null && !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
-            Embeds.throwError(event, user, "You must be in the voice channel " + queue.getVoiceChannel().getAsMention() + " to continue.", true, null); return;
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel());
+        if(musicPlayer != null && !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
+            Embeds.throwError(event, user, "You must be in the voice channel " + musicPlayer.getVoiceChannel().getAsMention() + " to continue.", true, null); return;
         }
 
         try {
-            Main.queueManager.getGuildQueue(member.getGuild()).loadAndPlay(
+            Main.musicPlayerManager.getGuildQueue(member.getGuild()).loadAndPlay(
                     user,
                     query,
                     event,

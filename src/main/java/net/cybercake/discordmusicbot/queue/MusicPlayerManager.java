@@ -14,12 +14,12 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class QueueManager {
+public class MusicPlayerManager {
 
-    private final Map<Long, Queue> musicManagers;
+    private final Map<Long, MusicPlayer> musicManagers;
     private final AudioPlayerManager audioPlayerManager;
 
-    public QueueManager() {
+    public MusicPlayerManager() {
         this.musicManagers = new HashMap<>();
 
         this.audioPlayerManager = new DefaultAudioPlayerManager();
@@ -33,43 +33,43 @@ public class QueueManager {
 
     public AudioPlayerManager getAudioPlayerManager() { return audioPlayerManager; }
 
-    public Map<Long, Queue> getAllQueues() { return this.musicManagers; }
+    public Map<Long, MusicPlayer> getAllQueues() { return this.musicManagers; }
 
     public boolean checkQueueExists(Guild guild) {
         return this.musicManagers.get(Long.parseLong(guild.getId())) != null;
     }
 
-    public synchronized Queue getGuildQueue(Guild guild, @Nullable AudioChannelUnion voiceChannel, @Nullable TextChannel textChannel) {
+    public synchronized MusicPlayer getGuildQueue(Guild guild, @Nullable AudioChannelUnion voiceChannel, @Nullable TextChannel textChannel) {
         long guildId = Long.parseLong(guild.getId());
-        Queue queue = this.musicManagers.get(guildId);
+        MusicPlayer musicPlayer = this.musicManagers.get(guildId);
 
         if(!checkQueueExists(guild)) {
-            if(voiceChannel != null && textChannel != null) queue = createQueue(guild, voiceChannel, textChannel);
+            if(voiceChannel != null && textChannel != null) musicPlayer = createQueue(guild, voiceChannel, textChannel);
             if(voiceChannel == null) throw new IllegalArgumentException("Failed to find a queue for the guild " + guildId + " (" + guild.getName() + ")");
         }
 
-        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(queue.getAudioPlayer()));
+        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(musicPlayer.getAudioPlayer()));
 
-        return queue;
+        return musicPlayer;
     }
 
-    public synchronized Queue getGuildQueue(Guild guild) {
+    public synchronized MusicPlayer getGuildQueue(Guild guild) {
         return getGuildQueue(guild, null, null);
     }
 
-    public synchronized Queue createQueue(Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
+    public synchronized MusicPlayer createQueue(Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
         Log.info("Created a new queue for guild " + guild.getId() + " (" + guild.getName() + ")" + " in voice channel " + voiceChannel.getId() + " (" + voiceChannel.getName() + ")");
-        Queue queue = new Queue(audioPlayerManager, guild, voiceChannel, textChannel);
-        musicManagers.put(Long.valueOf(guild.getId()), queue);
-        return queue;
+        MusicPlayer musicPlayer = new MusicPlayer(audioPlayerManager, guild, voiceChannel, textChannel);
+        musicManagers.put(Long.valueOf(guild.getId()), musicPlayer);
+        return musicPlayer;
     }
 
-    protected void removeQueue(Queue queue) {
-        Log.info("Closing audio connection and deleting queue for guild " + queue.getGuild().getId() + " (" + queue.getGuild().getName() + ")...");
-        Map.Entry<Long, Queue> entry = this.musicManagers.entrySet().stream()
-                .filter((queueEntry) -> queueEntry.getValue().equals(queue))
+    protected void removeQueue(MusicPlayer musicPlayer) {
+        Log.info("Closing audio connection and deleting queue for guild " + musicPlayer.getGuild().getId() + " (" + musicPlayer.getGuild().getName() + ")...");
+        Map.Entry<Long, MusicPlayer> entry = this.musicManagers.entrySet().stream()
+                .filter((queueEntry) -> queueEntry.getValue().equals(musicPlayer))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(Queue.class.getCanonicalName() + " provided in '" + QueueManager.class.getCanonicalName() + ".removeQueue' does not exist and is not stored by " + QueueManager.class.getCanonicalName() + "! Found these: " + this.musicManagers.toString()));
+                .orElseThrow(() -> new IllegalArgumentException(MusicPlayer.class.getCanonicalName() + " provided in '" + MusicPlayerManager.class.getCanonicalName() + ".removeQueue' does not exist and is not stored by " + MusicPlayerManager.class.getCanonicalName() + "! Found these: " + this.musicManagers.toString()));
         this.musicManagers.remove(entry.getKey());
     }
 

@@ -2,7 +2,7 @@ package net.cybercake.discordmusicbot.commands.list.admin;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -24,10 +24,10 @@ public class ForceSkip extends Command {
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 
-        Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
-        queue.getTrackScheduler().nextTrack();
+        musicPlayer.getTrackScheduler().nextTrack();
         event.reply("You skipped the current track, advancing to the next one...").queue();
     }
 }

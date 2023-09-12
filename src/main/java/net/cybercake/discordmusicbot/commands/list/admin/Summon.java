@@ -2,7 +2,7 @@ package net.cybercake.discordmusicbot.commands.list.admin;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -26,13 +26,13 @@ public class Summon extends Command {
         assert event.getMember() != null;
         Member member = event.getMember();
 
-        Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
         if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null) { // they are not in a voice chat
             Embeds.throwError(event, member.getUser(), "You must be in a voice channel to continue.", true, null); return;
         }
 
-        queue.setVoiceChannel(member.getVoiceState().getChannel(), event);
+        musicPlayer.setVoiceChannel(member.getVoiceState().getChannel(), event);
     }
 }

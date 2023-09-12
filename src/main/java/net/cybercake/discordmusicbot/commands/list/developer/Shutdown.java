@@ -3,7 +3,7 @@ package net.cybercake.discordmusicbot.commands.list.developer;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -39,11 +39,11 @@ public class Shutdown extends Command {
             builder.setColor(new Color(255, 152, 68));
             builder.setTimestamp(new Date().toInstant());
             List<Guild> shutdownFor = new ArrayList<>();
-            for(Queue queue : Main.queueManager.getAllQueues().values()) {
-                Log.info("Shutting down music bot for " + queue.getGuild().getId() + " (" + queue.getGuild().getName() + ")...");
-                shutdownFor.add(queue.getGuild());
-                queue.getTextChannel().sendMessageEmbeds(builder.build()).queue();
-                queue.destroy();
+            for(MusicPlayer musicPlayer : Main.musicPlayerManager.getAllQueues().values()) {
+                Log.info("Shutting down music bot for " + musicPlayer.getGuild().getId() + " (" + musicPlayer.getGuild().getName() + ")...");
+                shutdownFor.add(musicPlayer.getGuild());
+                musicPlayer.getTextChannel().sendMessageEmbeds(builder.build()).queue();
+                musicPlayer.destroy();
             }
             event.replyEmbeds(new EmbedBuilder().setTitle("Goodbye!").setDescription("Shutting down the bot..." +
                     "\n" +

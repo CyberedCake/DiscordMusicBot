@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class Queue implements Serializable {
+public class MusicPlayer implements Serializable {
 
     private final Guild guild;
     private final AudioPlayerManager audioPlayerManager;
@@ -49,7 +49,7 @@ public class Queue implements Serializable {
 
     private final List<SkipVote> skipVotes = new ArrayList<>();
 
-    protected Queue(AudioPlayerManager audioPlayerManager, Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
+    protected MusicPlayer(AudioPlayerManager audioPlayerManager, Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
         this.settings = SettingSubCommand.doesExist_elseCreate(guild);
 
         this.guild = guild;
@@ -180,7 +180,7 @@ public class Queue implements Serializable {
     }
 
     public void destroy() {
-        Main.queueManager.removeQueue(this);
+        Main.musicPlayerManager.removeQueue(this);
         this.getAudioPlayer().stopTrack();
         this.getTrackScheduler().getQueue().clear();
         this.audioManager.closeAudioConnection();

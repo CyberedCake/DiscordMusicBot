@@ -3,7 +3,7 @@ package net.cybercake.discordmusicbot.utilities;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.list.Pause;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -69,26 +69,26 @@ public class Embeds {
 
     public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild, long edit) {
         String image = YouTubeUtils.extractImage(track.getInfo());
-        Queue queue = Main.queueManager.getGuildQueue(guild);
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(guild);
 
         EmbedBuilder builder = new EmbedBuilder();
         if(image != null)
             builder.setThumbnail(image);
-        builder.setAuthor((queue.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB6 Now Playing"));
+        builder.setAuthor((musicPlayer.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB6 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
-        if(!queue.getTrackScheduler().pause() && track.getUserData() != null)
+        if(!musicPlayer.getTrackScheduler().pause() && track.getUserData() != null)
             builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", true);
-        if(queue.getTrackScheduler().pause())
+        if(musicPlayer.getTrackScheduler().pause())
             builder.addField("Paused By", "<@" + Pause.lastPauser.getId() + ">", true);
-        if(queue.getTrackScheduler().repeating() != TrackScheduler.Repeating.FALSE)
-            builder.addField("Looping", queue.getTrackScheduler().repeating().userFriendlyString(), true);
+        if(musicPlayer.getTrackScheduler().repeating() != TrackScheduler.Repeating.FALSE)
+            builder.addField("Looping", musicPlayer.getTrackScheduler().repeating().userFriendlyString(), true);
         builder.addField("Artist", track.getInfo().author, true);
         builder.setTimestamp(new Date().toInstant());
         Message message;
         try {
             Button skipButton = Button.secondary("skip-track-" + track.getIdentifier(), Emoji.fromFormatted("⏭"));
-            if(queue.getTrackScheduler().getQueue().isEmpty())
+            if(musicPlayer.getTrackScheduler().getQueue().isEmpty())
                 skipButton = skipButton.asDisabled();
             ItemComponent[][] buttons = new ItemComponent[][]{
                     new ItemComponent[]{
@@ -108,13 +108,13 @@ public class Embeds {
             };
 
             if(edit == -1L) {
-                MessageCreateAction create = Main.queueManager.getGuildQueue(guild).getTextChannel()
+                MessageCreateAction create = Main.musicPlayerManager.getGuildQueue(guild).getTextChannel()
                         .sendMessageEmbeds(builder.build());
                 for(ItemComponent[] component : buttons)
                     create.addActionRow(component);
                 message = create.complete();
             } else
-                message = queue.getTextChannel().editMessageEmbedsById(edit, builder.build()).complete();
+                message = musicPlayer.getTextChannel().editMessageEmbedsById(edit, builder.build()).complete();
 
         } catch (Exception exception) {
             throw new IllegalStateException("Failed to send now playing status in text channel for " + guild.getId() + " (" + guild.getName() + ")", exception);

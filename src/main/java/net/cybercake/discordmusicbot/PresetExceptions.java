@@ -1,7 +1,7 @@
 package net.cybercake.discordmusicbot;
 
 import net.cybercake.discordmusicbot.commands.CommandManager;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -44,16 +44,16 @@ public class PresetExceptions {
         return false;
     }
 
-    public static @Nullable Queue trackIsNotPlaying(IReplyCallback callback, Member member, boolean ephemeral) {
-        if(!Main.queueManager.checkQueueExists(member.getGuild())) {
+    public static @Nullable MusicPlayer trackIsNotPlaying(IReplyCallback callback, Member member, boolean ephemeral) {
+        if(!Main.musicPlayerManager.checkQueueExists(member.getGuild())) {
             Embeds.throwError(callback, member.getUser(), "There currently aren't any songs playing in this server.", ephemeral, null); return null;
         }
 
-        Queue queue = Main.queueManager.getGuildQueue(member.getGuild());
-        if(queue.getAudioPlayer().getPlayingTrack() == null) {
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(member.getGuild());
+        if(musicPlayer.getAudioPlayer().getPlayingTrack() == null) {
             Embeds.throwError(callback, member.getUser(), "There currently aren't any songs playing in this server.", ephemeral, null); return null;
         }
-        return queue;
+        return musicPlayer;
     }
 
     public static boolean isNotBotDeveloper(IReplyCallback callback, Member member) { // returns true if no bot developer is found

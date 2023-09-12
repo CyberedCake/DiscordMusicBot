@@ -2,15 +2,13 @@ package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 
 import java.awt.*;
 import java.util.Date;
@@ -42,15 +40,15 @@ public class Stop extends Command {
         Member member = event.getMember();
         assert member != null;
 
-        Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
             Embeds.throwError(event, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
         }
 
         event.deferReply().queue();
-        queue.destroy();
+        musicPlayer.destroy();
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Bot disconnected.");

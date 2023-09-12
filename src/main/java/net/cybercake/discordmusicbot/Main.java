@@ -8,15 +8,12 @@ import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.CommandManager;
 import net.cybercake.discordmusicbot.listeners.BotDisconnectEvent;
 import net.cybercake.discordmusicbot.listeners.ButtonInteraction;
-import net.cybercake.discordmusicbot.queue.QueueManager;
+import net.cybercake.discordmusicbot.queue.MusicPlayerManager;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
@@ -29,7 +26,7 @@ public class Main {
     public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
 
     public static JDA JDA;
-    public static QueueManager queueManager;
+    public static MusicPlayerManager musicPlayerManager;
     public static LyricsClient lyricsClient;
     public static SpotifyApi spotifyApi;
     public static boolean MAINTENANCE = false;
@@ -75,7 +72,7 @@ public class Main {
 
         Log.info("Setting needed variables...");
         try {
-            queueManager = new QueueManager();
+            musicPlayerManager = new MusicPlayerManager();
             lyricsClient = new LyricsClient();
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(SPOTIFY_CLIENT)

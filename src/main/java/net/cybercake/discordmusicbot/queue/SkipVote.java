@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.entities.Member;
 public record SkipVote(Member member, long timestamp, AudioTrack audioTrack) {
 
     public boolean isExpired() {
-        Queue queue = Main.queueManager.getGuildQueue(member.getGuild());
-        return (queue == null || !queue.getAudioPlayer().getPlayingTrack().equals(audioTrack));
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(member.getGuild());
+        return (musicPlayer == null || !musicPlayer.getAudioPlayer().getPlayingTrack().equals(audioTrack));
     }
 
 }

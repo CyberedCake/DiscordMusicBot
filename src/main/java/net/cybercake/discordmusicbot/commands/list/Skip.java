@@ -3,16 +3,13 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.queue.Queue;
+import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
-import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-
-import java.util.stream.Collectors;
 
 public class Skip extends Command {
 
@@ -25,27 +22,27 @@ public class Skip extends Command {
         this.requireDjRole = true;
     }
 
-    public static void handleSkip(Queue queue, Member member, IReplyCallback callback, String identifier) {
-        if(!queue.getAudioPlayer().getPlayingTrack().getIdentifier().equalsIgnoreCase(identifier)) {
+    public static void handleSkip(MusicPlayer musicPlayer, Member member, IReplyCallback callback, String identifier) {
+        if(!musicPlayer.getAudioPlayer().getPlayingTrack().getIdentifier().equalsIgnoreCase(identifier)) {
             Embeds.throwError(callback, member.getUser(), "That song is no longer playing.", true, null); return;
         }
 
-        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(queue.getVoiceChannel())) {
+        if(member.getVoiceState() == null || member.getVoiceState().getChannel() == null || !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
             Embeds.throwError(callback, member.getUser(), "You must be in the voice chat to skip a song", true, null); return;
         }
 
-        if(queue.getSkipSongManager().hasMemberSkipVoted(member)) {
+        if(musicPlayer.getSkipSongManager().hasMemberSkipVoted(member)) {
             Embeds.throwError(callback, member.getUser(), "You already voted to skip this song.", true, null); return;
         }
 
-        queue.getSkipSongManager().addMemberToSkipVote(member);
+        musicPlayer.getSkipSongManager().addMemberToSkipVote(member);
 
         callback.deferReply().setEphemeral(true).complete().deleteOriginal().queue();
 
         TextChannel channel = (TextChannel) callback.getMessageChannel();
-        if(queue.getSkipSongManager().getUsersWhoCanSkip().size() > 1)
-            channel.sendMessage(member.getAsMention() + " has requested to skip `" + queue.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + queue.getSkipSongManager().getMembersWantingSkip() + "/" + queue.getSkipSongManager().getMaxNeededToSkip() + " - " + (queue.getSkipSongManager().getMembersWantingSkipPercent()) + "%]**" + (queue.getSkipSongManager().getMembersWantingSkipPercent() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
-        queue.getSkipSongManager().checkSkipProportion();
+        if(musicPlayer.getSkipSongManager().getUsersWhoCanSkip().size() > 1)
+            channel.sendMessage(member.getAsMention() + " has requested to skip `" + musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + musicPlayer.getSkipSongManager().getMembersWantingSkip() + "/" + musicPlayer.getSkipSongManager().getMaxNeededToSkip() + " - " + (musicPlayer.getSkipSongManager().getMembersWantingSkipPercent()) + "%]**" + (musicPlayer.getSkipSongManager().getMembersWantingSkipPercent() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
+        musicPlayer.getSkipSongManager().checkSkipProportion();
     }
 
     @Override
@@ -53,14 +50,14 @@ public class Skip extends Command {
         if(PresetExceptions.memberNull(event)) return;
         assert event.getMember() != null;
 
-        Queue queue = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
-        if(queue == null) return;
-        Skip.handleSkip(queue, event.getMember(), event, Main.queueManager.getGuildQueue(event.getGuild()).getAudioPlayer().getPlayingTrack().getIdentifier());
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
+        Skip.handleSkip(musicPlayer, event.getMember(), event, Main.musicPlayerManager.getGuildQueue(event.getGuild()).getAudioPlayer().getPlayingTrack().getIdentifier());
     }
 
     @Override
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("skip-track-")) return;
-        Skip.handleSkip(Main.queueManager.getGuildQueue(event.getGuild()), event.getMember(), event, event.getComponentId().replace("skip-track-", ""));
+        Skip.handleSkip(Main.musicPlayerManager.getGuildQueue(event.getGuild()), event.getMember(), event, event.getComponentId().replace("skip-track-", ""));
     }
 }
