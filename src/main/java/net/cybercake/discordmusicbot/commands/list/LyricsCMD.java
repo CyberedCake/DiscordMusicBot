@@ -38,11 +38,12 @@ public class LyricsCMD extends Command {
         try {
             com.jagrosh.jlyrics.Lyrics lyrics = Main.lyricsClient.getLyrics(songTitle).get();
             if(lyrics == null) {
-                builder = Embeds.getErrorEmbed(event.getUser(), "Cannot find a song with lyrics by that title (||`" + songTitle + "`||)");
+                builder = Embeds.getErrorEmbed(event.getUser(), "Cannot find a song with lyrics by that title (`" + songTitle + "`)");
                 throw new NullPointerException("\"" + songTitle + "\" doesn't have lyrics associated with it");
             }
             builder.setTitle(lyrics.getTitle(), lyrics.getURL());
             builder.setDescription(lyrics.getContent().replace("  ", "\n"));
+            builder.setFooter("Source: " + lyrics.getSource());
             builder.setColor(new Color(186, 151, 255));
         } catch (Exception exception) {
             if(!exception.getClass().equals(NullPointerException.class))
