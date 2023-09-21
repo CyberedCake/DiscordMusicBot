@@ -39,7 +39,7 @@ public class Shutdown extends Command {
             builder.setColor(new Color(255, 152, 68));
             builder.setTimestamp(new Date().toInstant());
             List<Guild> shutdownFor = new ArrayList<>();
-            for(MusicPlayer musicPlayer : Main.musicPlayerManager.getAllQueues().values()) {
+            for(MusicPlayer musicPlayer : Main.musicPlayerManager.getAllMusicPlayers().values()) {
                 Log.info("Shutting down music bot for " + musicPlayer.getGuild().getId() + " (" + musicPlayer.getGuild().getName() + ")...");
                 shutdownFor.add(musicPlayer.getGuild());
                 musicPlayer.getTextChannel().sendMessageEmbeds(builder.build()).queue();

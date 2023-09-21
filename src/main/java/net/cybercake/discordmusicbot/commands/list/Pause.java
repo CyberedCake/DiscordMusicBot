@@ -65,7 +65,7 @@ public class Pause extends Command {
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("pause")) return;
         if(event.isAcknowledged()) return;
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(event.getGuild());
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild());
         if(buttonId.contains("pauseresume") && (musicPlayer != null && musicPlayer.getTrackScheduler().pause())) return;
         handlePause(event, !buttonId.contains("-nomsg"));
     }

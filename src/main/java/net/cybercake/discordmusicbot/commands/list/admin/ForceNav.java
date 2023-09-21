@@ -3,26 +3,26 @@ package net.cybercake.discordmusicbot.commands.list.admin;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
+import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-public class ForceSkip extends Command {
+public class ForceNav extends Command {
 
-    public ForceSkip() {
-        super(
-                "forceskip", "Forces the current song to be skipped."
-        );
+    public ForceNav() {
+        super("forcenav", "Forcibly navigates the queue to a certain track position.");
+        this.requireDjRole = true;
         this.permission = DefaultMemberPermissions.enabledFor( // need these permissions to execute
                 Permission.VOICE_MOVE_OTHERS
         );
         this.optionData = new OptionData[]{
-                new OptionData(OptionType.INTEGER, "tracks", "How many tracks to skip. The default is 0.", false)
+                new OptionData(OptionType.INTEGER, "to-position", "Skips to this position in the queue.", true)
         };
-        this.requireDjRole = true;
     }
 
     @Override
@@ -33,10 +33,13 @@ public class ForceSkip extends Command {
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(musicPlayer == null) return;
 
-        OptionMapping tracks = event.getOption("tracks");
+        OptionMapping toPosition = event.getOption("to-position");
+        if(toPosition == null){
+            Embeds.executeEmbed(event, Embeds.getTechnicalErrorEmbed(event.getUser(), "toPosition OptionMapping is null, yet is required"), true); return;
+        }
 
-        musicPlayer.getTrackScheduler().nextTrack(tracks == null ? 0 : tracks.getAsInt());
-        event.reply("You skipped the current track, " + (tracks == null ? "advancing to the next one" : "skipping to track at position `" + tracks.getAsInt() + "`") + "...").queue();
+        musicPlayer.getTrackScheduler().getQueue().toIndex(toPosition.getAsInt() - 1);
+        musicPlayer.getTrackScheduler().nextTrack();
+        event.reply("You forcibly navigated to the song at position `" + toPosition.getAsInt() + "`: **" + musicPlayer.getTrackScheduler().getQueue().getCurrentItem() + "**").queue();
     }
 }
-

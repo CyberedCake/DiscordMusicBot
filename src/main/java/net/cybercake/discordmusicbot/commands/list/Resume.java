@@ -61,14 +61,14 @@ public class Resume extends Command {
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("resume")) return;
         if(event.isAcknowledged()) return;
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(event.getGuild());
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild());
         if(buttonId.contains("pauseresume") && (musicPlayer != null && !musicPlayer.getTrackScheduler().pause())) return;
         handleResume(event, !buttonId.contains("-nomsg"));
     }
 
     public static void removePauseNickname(Guild guild) {
         Member selfMember = guild.getSelfMember();
-        if(selfMember.getNickname() == null || !selfMember.getNickname().contains(" ⏸")) return;
-        selfMember.modifyNickname(selfMember.getNickname().replace(" ⏸", "")).queue();
+        if(selfMember.getNickname() == null || !selfMember.getNickname().contains("⏸")) return;
+        selfMember.modifyNickname(selfMember.getNickname().replace("⏸", "")).queue();
     }
 }

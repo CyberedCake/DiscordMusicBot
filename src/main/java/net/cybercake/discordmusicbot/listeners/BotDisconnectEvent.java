@@ -51,9 +51,9 @@ public class BotDisconnectEvent extends ListenerAdapter {
         if(event.getChannelLeft() == null) return;
 
         Guild guild = event.getGuild();
-        if(!Main.musicPlayerManager.checkQueueExists(guild)) return;
+        if(!Main.musicPlayerManager.checkMusicPlayerExists(guild)) return;
 
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(guild);
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(guild);
         if(!musicPlayer.getVoiceChannel().equals(event.getChannelLeft())) return;
 
         Member member = event.getMember();

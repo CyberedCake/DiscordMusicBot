@@ -32,18 +32,18 @@ public class ListAllActiveServers extends Command {
 
         if(PresetExceptions.isNotBotDeveloper(event, Objects.requireNonNull(event.getMember()))) return;
 
-        List<Guild> activeGuilds = Main.musicPlayerManager.getAllQueues().values().stream().map(MusicPlayer::getGuild).toList();
+        List<Guild> activeGuilds = Main.musicPlayerManager.getAllMusicPlayers().values().stream().map(MusicPlayer::getGuild).toList();
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("All Active Servers");
         builder.setDescription("The bot is active in (" + activeGuilds.size() + ") guild" + (activeGuilds.size() == 1 ? "" : "s"));
         for(Guild guild : activeGuilds) {
             try {
-                MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(guild);
+                MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(guild);
                 AudioTrack currentTrack = musicPlayer.getAudioPlayer().getPlayingTrack();
                 builder.addField("**" + guild.getName() + "**", // this is simply so I can guage whether or not I can restart the bot or if it may be a while before I can
                         "URI: `" + currentTrack.getInfo().uri + "`" + "\n" +
                                 "Duration: `" + TrackUtils.getFormattedDuration(currentTrack.getPosition()) + "/" + TrackUtils.getFormattedDuration(currentTrack.getDuration()) + "`" + "\n" +
-                                "Queue Size: `" + musicPlayer.getTrackScheduler().getQueue().size() + "`" + "\n" +
+                                "Queue Size: `" + musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().size() + "`" + "\n" +
                                 "Channel: `" + musicPlayer.getVoiceChannel().getName() + "`" + "\n" +
                                 "Active Users: `" + musicPlayer.getVoiceChannel().getMembers().stream().filter(member -> !member.getUser().isBot()).toList().size() + "`"
                         ,

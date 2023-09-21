@@ -95,7 +95,7 @@ public class MusicPlayer implements Serializable {
 
     public void loadAndPlay(final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, Command command, boolean startNow, boolean shuffle) {
         if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember())) {
-            if(getTrackScheduler().getQueue().isEmpty())
+            if(getTrackScheduler().queue.isEmpty())
                 destroy();
             return; // one last check for first usage reasons
         }
@@ -107,14 +107,13 @@ public class MusicPlayer implements Serializable {
         this.audioPlayerManager.loadItem(searchQuery, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                if(startNow) playNow(track);
-                else play(track);
+                play(track, startNow);
 
                 track.setUserData(requestedBy);
                 EmbedBuilder builder = new EmbedBuilder();
                 builder.setThumbnail(YouTubeUtils.getThumbnailLinkFor(track));
                 builder.setColor(new Color(0, 211, 16));
-                builder.addField("Enqueued Track:", (startNow ? "`#1`" : "`#" + trackScheduler.getQueue().size() + "`") + " - [" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + ")", true);
+                builder.addField("Enqueued Track:", (startNow ? "`#1`" : "`#" + trackScheduler.queue.getLiteralQueue().size() + "`") + " - [" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + ")", true);
                 builder.addField("Requested By:", requestedBy.getAsMention(), true);
                 builder.addField("Duration:", "`" + TrackUtils.getFormattedDuration(track.getDuration()) + "`", true);
 
@@ -133,8 +132,7 @@ public class MusicPlayer implements Serializable {
                     Collections.shuffle(tracks);
                 tracks.forEach(track -> {
                     track.setUserData(requestedBy);
-                    if(startNow) trackScheduler.queueTop(track);
-                    else trackScheduler.queue(track);
+                    play(track, startNow);
                 });
 
                 EmbedBuilder builder = new EmbedBuilder();
@@ -161,14 +159,10 @@ public class MusicPlayer implements Serializable {
         });
     }
 
-    private void play(AudioTrack track) {
+    private void play(AudioTrack track, boolean asNext) {
         connectFirst();
-        this.trackScheduler.queue(track);
-    }
-
-    private void playNow(AudioTrack track) {
-        connectFirst();
-        this.trackScheduler.queueTop(track);
+        this.trackScheduler.queue.addToQueue(track, asNext);
+        this.trackScheduler.queue.playNextTrack(false);
     }
 
     private void connectFirst() {
@@ -180,9 +174,9 @@ public class MusicPlayer implements Serializable {
     }
 
     public void destroy() {
-        Main.musicPlayerManager.removeQueue(this);
+        Main.musicPlayerManager.removeMusicPlayer(this);
         this.getAudioPlayer().stopTrack();
-        this.getTrackScheduler().getQueue().clear();
+        this.getTrackScheduler().destroy();
         this.audioManager.closeAudioConnection();
         this.audioPlayer.destroy();
     }

@@ -52,12 +52,12 @@ public class Skip extends Command {
 
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(musicPlayer == null) return;
-        Skip.handleSkip(musicPlayer, event.getMember(), event, Main.musicPlayerManager.getGuildQueue(event.getGuild()).getAudioPlayer().getPlayingTrack().getIdentifier());
+        Skip.handleSkip(musicPlayer, event.getMember(), event, Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild()).getAudioPlayer().getPlayingTrack().getIdentifier());
     }
 
     @Override
     public void button(ButtonInteractionEvent event, String buttonId) {
         if(!buttonId.contains("skip-track-")) return;
-        Skip.handleSkip(Main.musicPlayerManager.getGuildQueue(event.getGuild()), event.getMember(), event, event.getComponentId().replace("skip-track-", ""));
+        Skip.handleSkip(Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild()), event.getMember(), event, event.getComponentId().replace("skip-track-", ""));
     }
 }

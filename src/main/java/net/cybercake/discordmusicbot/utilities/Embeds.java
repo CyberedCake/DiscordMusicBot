@@ -69,7 +69,7 @@ public class Embeds {
 
     public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild, long edit) {
         String image = YouTubeUtils.extractImage(track.getInfo());
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(guild);
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(guild);
 
         EmbedBuilder builder = new EmbedBuilder();
         if(image != null)
@@ -88,7 +88,7 @@ public class Embeds {
         Message message;
         try {
             Button skipButton = Button.secondary("skip-track-" + track.getIdentifier(), Emoji.fromFormatted("⏭"));
-            if(musicPlayer.getTrackScheduler().getQueue().isEmpty())
+            if(musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().isEmpty())
                 skipButton = skipButton.asDisabled();
             ItemComponent[][] buttons = new ItemComponent[][]{
                     new ItemComponent[]{
@@ -108,7 +108,7 @@ public class Embeds {
             };
 
             if(edit == -1L) {
-                MessageCreateAction create = Main.musicPlayerManager.getGuildQueue(guild).getTextChannel()
+                MessageCreateAction create = Main.musicPlayerManager.getGuildMusicPlayer(guild).getTextChannel()
                         .sendMessageEmbeds(builder.build());
                 for(ItemComponent[] component : buttons)
                     create.addActionRow(component);

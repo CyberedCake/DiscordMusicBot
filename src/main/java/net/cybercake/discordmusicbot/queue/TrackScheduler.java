@@ -22,9 +22,9 @@ import java.util.*;
 
 public class TrackScheduler extends AudioEventAdapter {
 
-    private final Guild guild;
-    private final AudioPlayer audioPlayer;
-    private final Stack<AudioTrack> queue;
+    final Guild guild;
+    final AudioPlayer audioPlayer;
+    final Queue queue;
 
     public enum Repeating {
         FALSE("❌ Loop Disabled"),
@@ -46,47 +46,47 @@ public class TrackScheduler extends AudioEventAdapter {
     public TrackScheduler(Guild guild, AudioPlayer audioPlayer) {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
-        this.queue = new Stack<>();
+        this.queue = new Queue(this);
         this.repeating = Repeating.FALSE;
 
         this.message = null;
     }
 
-    @SuppressWarnings({"all"})
-    public void queue(AudioTrack track) {
-        if(!audioPlayer.startTrack(track, true))
-            queue.push(track);
-    }
+    public Queue getQueue() { return this.queue; }
 
-    public void queueTop(AudioTrack track) {
-        if(!audioPlayer.startTrack(track, true))
-            queue.add(0, track);
-    }
 
     public void pause(boolean pause) { this.audioPlayer.setPaused(pause); }
     public boolean pause() { return this.audioPlayer.isPaused(); }
 
     public void nextTrack() {
-        if(queue.isEmpty()) {
-            endQueue(Main.musicPlayerManager.getGuildQueue(guild)); return;
+        nextTrack(0);
+    }
+
+    /**
+     * @param skipAmount the amount of songs to skip (default is 0)
+     */
+    public void nextTrack(int skipAmount) {
+        if(this.queue.isEmpty()) {
+            endQueue(Main.musicPlayerManager.getGuildMusicPlayer(guild)); return;
         }
-        AudioTrack nextTrack = queue.firstElement();
-        queue.remove(nextTrack);
+
+        if(skipAmount > 0)
+            this.queue.toIndex(this.queue.getCurrentIndex() + skipAmount);
 
         try {
-            audioPlayer.startTrack(nextTrack, false);
+            this.queue.playNextTrack(true);
             this.trackExceptionRepeats = 0;
         } catch (IllegalStateException illegalStateException) {
             Log.error("Failed in starting next track", illegalStateException);
             if(!illegalStateException.getMessage().contains("Cannot play the same instance")) return;
-            endQueue(Main.musicPlayerManager.getGuildQueue(this.guild));
+            endQueue(Main.musicPlayerManager.getGuildMusicPlayer(this.guild));
         }
     }
 
     public void shuffle() {
-        if(queue.isEmpty()) throw new IllegalStateException("Cannot shuffle a queue that is less than one item.");
+        if(this.queue.isEmpty()) throw new IllegalStateException("Cannot shuffle a queue that is less than one item.");
 
-        Collections.shuffle(queue, new Random(System.currentTimeMillis()));
+        this.queue.randomizeOrder();
     }
 
     public enum ToDoWithOld {
@@ -101,7 +101,7 @@ public class TrackScheduler extends AudioEventAdapter {
             Thread sendNowPlayingMessage = new Thread(() -> {
                 try {
                     Thread.sleep(600L); // delay because information that is set after this method finishes is required inside the embed
-                    if(!Main.musicPlayerManager.checkQueueExists(this.guild)) return;
+                    if(!Main.musicPlayerManager.checkMusicPlayerExists(this.guild)) return;
                     this.message = Embeds.sendSongPlayingStatus(
                             track,
                             this.guild,
@@ -140,8 +140,8 @@ public class TrackScheduler extends AudioEventAdapter {
             return;
         Resume.removePauseNickname(this.guild);
         deleteOldSongPlayingStatus();
-        if(!Main.musicPlayerManager.checkQueueExists(this.guild)) return;
-        MusicPlayer musicPlayerMain = Main.musicPlayerManager.getGuildQueue(this.guild);
+        if(!Main.musicPlayerManager.checkMusicPlayerExists(this.guild)) return;
+        MusicPlayer musicPlayerMain = Main.musicPlayerManager.getGuildMusicPlayer(this.guild);
         musicPlayerMain.getSkipSongManager().clearSkipVoteQueue();
         if(queue.isEmpty()) {
             endQueue(musicPlayerMain); return;
@@ -179,7 +179,7 @@ public class TrackScheduler extends AudioEventAdapter {
             thread.start();
             return;
         }
-        TextChannel channel = Main.musicPlayerManager.getGuildQueue(guild).getTextChannel();
+        TextChannel channel = Main.musicPlayerManager.getGuildMusicPlayer(guild).getTextChannel();
         if(this.message != null) { // delete previous message if it exists
             if(channel == null) channel = this.message.getFirstItem();
             this.message.getFirstItem().deleteMessageById(this.message.getSecondItem()).queue();
@@ -198,7 +198,7 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void endQueue(MusicPlayer musicPlayer) {
-        if(!Main.musicPlayerManager.checkQueueExists(this.guild)) return;
+        if(!Main.musicPlayerManager.checkMusicPlayerExists(this.guild)) return;
         musicPlayer.getAudioPlayer().stopTrack();
 
         TextChannel channel = musicPlayer.getTextChannel();
@@ -221,11 +221,13 @@ public class TrackScheduler extends AudioEventAdapter {
         return this.queue.remove(position);
     }
 
-    public Stack<AudioTrack> getQueue() { return this.queue; }
-
     public Repeating repeating() { return this.repeating; }
     public void repeating(Repeating repeating) {
         this.repeating = repeating;
         sendSongPlayingStatus(audioPlayer.getPlayingTrack(), ToDoWithOld.EDIT);
+    }
+
+    public void destroy() {
+        this.queue.destroy();
     }
 }

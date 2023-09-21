@@ -35,7 +35,7 @@ public class Remove extends Command {
 
         int position = possibleOption.getAsInt() - 1;
 
-        if(position >= musicPlayer.getTrackScheduler().getQueue().size()) {
+        if(position >= musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().size()) {
             Embeds.throwError(event, event.getUser(), "You cannot remove a position that is not in the queue.", true, null); return;
         }
 

@@ -45,6 +45,14 @@ public class QueueCMD extends Command {
 
     private static final int ITEMS_PER_PAGE = 6;
 
+    public int getPageOf(int position) {
+        return (int) (double) ((position + ITEMS_PER_PAGE) / ITEMS_PER_PAGE);
+        // simple algebra
+        // \operatorname{floor}\left(\frac{v+6}{6}\right)
+        // ^ paste into desmos
+        // originated from the equation below: \left(i\cdot6\right)-6=p_{g} (where i is the index, like 7, and p_g is the page number)
+    }
+
     private void handleQueueCMD(IReplyCallback callback, int page) {
         if(PresetExceptions.memberNull(callback)) return;
         assert callback.getMember() != null;
@@ -52,12 +60,16 @@ public class QueueCMD extends Command {
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(callback, callback.getMember(), true);
         if(musicPlayer == null) return;
 
+        AudioTrack currentTrack = musicPlayer.getAudioPlayer().getPlayingTrack();
+        if(page == -1)
+            page = getPageOf(getTrackIndexOf(musicPlayer, currentTrack));
+
         int maxPages = getMaxPages(callback.getGuild());
         List<AudioTrack> items;
         int fromIndex = (page*(ITEMS_PER_PAGE))-(ITEMS_PER_PAGE);
-        int toIndex = (Math.min(page * (ITEMS_PER_PAGE), musicPlayer.getTrackScheduler().getQueue().size()));
+        int toIndex = (Math.min(page * (ITEMS_PER_PAGE), musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().size()));
         try {
-            items = new ArrayList<>(musicPlayer.getTrackScheduler().getQueue().subList(fromIndex, toIndex));
+            items = new ArrayList<>(musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().subList(fromIndex, toIndex));
         } catch (Exception exception) {
             Embeds.throwError(callback, callback.getUser(), "Possible invalid queue page ('" + page + "'): " + exception, exception); return;
         }
@@ -65,7 +77,6 @@ public class QueueCMD extends Command {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Queue Page " + page + " / " + maxPages);
 
-        AudioTrack currentTrack = musicPlayer.getAudioPlayer().getPlayingTrack();
         builder.setThumbnail(YouTubeUtils.extractImage(currentTrack.getInfo()));
         builder.addField("Currently Playing", nextLineFormatting(musicPlayer, currentTrack, checkUser(currentTrack)), false);
 
@@ -93,20 +104,21 @@ public class QueueCMD extends Command {
         event.deferReply().setEphemeral(true).queue();
 
         OptionMapping pageOption = event.getOption("page");
-        int page = pageOption == null ? 1 : pageOption.getAsInt();
+        int page = pageOption == null ? -1 : pageOption.getAsInt();
 
         handleQueueCMD(event, page);
     }
 
     private int getTrackIndexOf(MusicPlayer musicPlayer, AudioTrack track) {
-        int trackNumber = musicPlayer.getTrackScheduler().getQueue().indexOf(track) + 1;
-        if(trackNumber > musicPlayer.getTrackScheduler().getQueue().size())
+        int trackNumber = musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().indexOf(track) + 1;
+        if(trackNumber > musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().size())
             trackNumber = 0;
         return trackNumber;
     }
 
     private String nextLineFormatting(MusicPlayer musicPlayer, AudioTrack track, @Nullable User user) {
         int trackNumber = getTrackIndexOf(musicPlayer, track);
+        boolean isPlaying = musicPlayer.getAudioPlayer().getPlayingTrack().getIdentifier().equalsIgnoreCase(track.getIdentifier());
 
         int position = (int)(track.getPosition() / 1000);
         String positionQuery = position == 0 ? "" : "&t=" + position;
@@ -148,7 +160,7 @@ public class QueueCMD extends Command {
     }
 
     private int getMaxPages(Guild guild) {
-        return (int)Math.ceil((double)Main.musicPlayerManager.getGuildQueue(guild).getTrackScheduler().getQueue().size()/(double)(ITEMS_PER_PAGE));
+        return (int)Math.ceil((double)Main.musicPlayerManager.getGuildMusicPlayer(guild).getTrackScheduler().getQueue().getLiteralQueue().size()/(double)(ITEMS_PER_PAGE));
     }
 
     private User checkUser(AudioTrack track) {

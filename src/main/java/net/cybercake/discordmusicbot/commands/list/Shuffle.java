@@ -38,11 +38,11 @@ public class Shuffle extends Command {
 
         if(PresetExceptions.isNotInVoiceChat(event, event.getMember(), musicPlayer.getVoiceChannel())) return;
 
-        if(musicPlayer.getTrackScheduler().getQueue().isEmpty()) {
+        if(musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().isEmpty()) {
             Embeds.throwError(event, event.getUser(), "There aren't any items to shuffle.", true, null); return;
         }
 
         musicPlayer.getTrackScheduler().shuffle();
-        event.reply(":white_check_mark: Successfully shuffled the queue. The next song is now `" + musicPlayer.getTrackScheduler().getQueue().get(0).getInfo().title + "`").queue();
+        event.reply(":white_check_mark: Successfully shuffled the queue. The next song is now `" + musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().get(0).getInfo().title + "`").queue();
     }
 }

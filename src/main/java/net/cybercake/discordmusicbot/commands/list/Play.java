@@ -74,13 +74,13 @@ public class Play extends Command {
             Embeds.throwError(event, user, "You must be in a voice channel to continue.", true, null); return;
         }
 
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel());
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel());
         if(musicPlayer != null && !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
             Embeds.throwError(event, user, "You must be in the voice channel " + musicPlayer.getVoiceChannel().getAsMention() + " to continue.", true, null); return;
         }
 
         try {
-            Main.musicPlayerManager.getGuildQueue(member.getGuild()).loadAndPlay(
+            Main.musicPlayerManager.getGuildMusicPlayer(member.getGuild()).loadAndPlay(
                     user,
                     query,
                     event,

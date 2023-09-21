@@ -45,11 +45,11 @@ public class PresetExceptions {
     }
 
     public static @Nullable MusicPlayer trackIsNotPlaying(IReplyCallback callback, Member member, boolean ephemeral) {
-        if(!Main.musicPlayerManager.checkQueueExists(member.getGuild())) {
+        if(!Main.musicPlayerManager.checkMusicPlayerExists(member.getGuild())) {
             Embeds.throwError(callback, member.getUser(), "There currently aren't any songs playing in this server.", ephemeral, null); return null;
         }
 
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildQueue(member.getGuild());
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(member.getGuild());
         if(musicPlayer.getAudioPlayer().getPlayingTrack() == null) {
             Embeds.throwError(callback, member.getUser(), "There currently aren't any songs playing in this server.", ephemeral, null); return null;
         }
