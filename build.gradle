@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
 
     implementation 'ch.qos.logback:logback-classic:1.4.11'
     implementation 'net.dv8tion:JDA:5.0.0-beta.13'
