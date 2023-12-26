@@ -55,7 +55,7 @@ public class SeekQueueVoteFromCommand {
             embed.setTitle(type.title + ": " + seekVote.getMembersWantingToSeek() + "/" + seekManager.getMaxNeededToSeek() + " - " + seekVote.getMembersWantingToSeekPercentage() + "%");
             AudioTrack track = musicPlayer.getAudioPlayer().getPlayingTrack();
             embed.setDescription(member.getAsMention() + " " +
-                    type.subtitle.replace("<previous-song>", "__" + previous(queue) + "__") + " [" + track.getInfo().title + " by " + track.getInfo().author + "](" + TrackUtils.getUrlOf(track.getInfo()) + ")" + (seekVote.getMembersWantingToSeekPercentage() >= 100 ? "\n" +
+                    type.subtitle.replace("<previous-song>", "__" + previous(queue) + "__") + " [" + track.getInfo().title + "](" + TrackUtils.getUrlOf(track.getInfo()) + ") by " + track.getInfo().author + (seekVote.getMembersWantingToSeekPercentage() >= 100 ? "\n" +
                     "*The vote has passed, " + type.execution + ".*" : "")
             );
             embed.setThumbnail(YouTubeUtils.extractImage(track.getInfo()));

@@ -77,10 +77,13 @@ public class TrackScheduler extends AudioEventAdapter {
         this.postQueueSeek();
     }
 
-    public void previousTrack() {
-        this.queue.toIndex(this.queue.getCurrentIndex() - 2);
-
+    public void previousTrack(int previousAmount) {
+        this.queue.toIndex(this.queue.getCurrentIndex() - (previousAmount + 1));
         this.postQueueSeek();
+    }
+
+    public void previousTrack() {
+        previousTrack(1);
     }
 
     private void postQueueSeek() {
