@@ -1,44 +1,32 @@
 package net.cybercake.discordmusicbot.queue;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.GuildSettings;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.commands.settings.SettingSubCommand;
+import net.cybercake.discordmusicbot.queue.seek.SongQueueSeekManager;
 import net.cybercake.discordmusicbot.utilities.Preconditions;
-import net.cybercake.discordmusicbot.utilities.TrackUtils;
-import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class MusicPlayer implements Serializable {
 
+    public static String FILE_IDENTIFIER = UUID.randomUUID().toString();
+
     private final Guild guild;
-    private final AudioPlayerManager audioPlayerManager;
     private final AudioManager audioManager;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
@@ -47,7 +35,9 @@ public class MusicPlayer implements Serializable {
     private AudioChannelUnion voiceChannel;
     private TextChannel textChannel;
 
-    private final List<SkipVote> skipVotes = new ArrayList<>();
+    final AudioPlayerManager audioPlayerManager;
+
+    private final SongQueueSeekManager seekManager;
 
     protected MusicPlayer(AudioPlayerManager audioPlayerManager, Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
         this.settings = SettingSubCommand.doesExist_elseCreate(guild);
@@ -63,6 +53,8 @@ public class MusicPlayer implements Serializable {
         this.audioPlayerManager = audioPlayerManager;
         this.audioPlayer = audioPlayerManager.createPlayer();
 
+        this.seekManager = SongQueueSeekManager.as(this);
+
         this.trackScheduler = new TrackScheduler(this.guild, this.audioPlayer);
 
         this.audioPlayer.addListener(this.trackScheduler);
@@ -72,6 +64,8 @@ public class MusicPlayer implements Serializable {
     public AudioPlayer getAudioPlayer() { return this.audioPlayer; }
     public TrackScheduler getTrackScheduler() { return this.trackScheduler; }
     public GuildSettings getSettings() { return this.settings; }
+
+    public SongQueueSeekManager getSeekManager() { return this.seekManager; }
 
     public AudioChannelUnion getVoiceChannel() { return this.voiceChannel; }
     public TextChannel getTextChannel() { return this.textChannel; }
@@ -93,73 +87,30 @@ public class MusicPlayer implements Serializable {
     }
     public void setTextChannel(TextChannel textChannel) { this.textChannel = textChannel; }
 
-    public void loadAndPlay(final User requestedBy, String trackUrl, final SlashCommandInteractionEvent event, Command command, boolean startNow, boolean shuffle) {
-        if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember())) {
+    public void loadAndPlay(TrackLoadSettings settings) {
+        if(settings.getParentCommand().requiresDjRole() && Command.requireDjRole(settings.getParentEvent(), settings.getParentEvent().getMember())) {
             if(getTrackScheduler().queue.isEmpty())
                 destroy();
             return; // one last check for first usage reasons
         }
 
-        String trackUrlCheckEffectiveFinal = trackUrl; // required because needs an effective final variable
-        if(Preconditions.checkThrows(() -> new URL(trackUrlCheckEffectiveFinal), MalformedURLException.class))
-            trackUrl = "ytsearch:" + trackUrl;
-        final String searchQuery = trackUrl; // same deal here, needs effective final variable for some functions to work
-        this.audioPlayerManager.loadItem(searchQuery, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                play(track, startNow);
+        if(settings.getFile() != null) {
+            settings.change((builder) -> builder.trackUrl(FILE_IDENTIFIER));
+            this.audioPlayerManager.loadItem(FILE_IDENTIFIER, new TrackLoadStatus(this, settings));
+            return;
+        }
 
-                track.setUserData(requestedBy);
-                EmbedBuilder builder = new EmbedBuilder();
-                builder.setThumbnail(YouTubeUtils.getThumbnailLinkFor(track));
-                builder.setColor(new Color(0, 211, 16));
-                builder.addField("Enqueued Track:", (startNow ? "`#1`" : "`#" + trackScheduler.queue.getLiteralQueue().size() + "`") + " - [" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + ")", true);
-                builder.addField("Requested By:", requestedBy.getAsMention(), true);
-                builder.addField("Duration:", "`" + TrackUtils.getFormattedDuration(track.getDuration()) + "`", true);
-
-                event.getHook().editOriginalEmbeds(builder.build()).queue();
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                if(playlist.isSearchResult()) {
-                    trackLoaded(playlist.getTracks().get(0));
-                    return;
-                }
-
-                List<AudioTrack> tracks = playlist.getTracks();
-                if(shuffle)
-                    Collections.shuffle(tracks);
-                tracks.forEach(track -> {
-                    track.setUserData(requestedBy);
-                    play(track, startNow);
-                });
-
-                EmbedBuilder builder = new EmbedBuilder();
-                builder.setThumbnail(YouTubeUtils.getThumbnailLinkFor(tracks.get(0)));
-                if(shuffle)
-                    builder.setDescription("*Added playlist tracks in a random order.*");
-                builder.setColor(new Color(0, 211, 16));
-                builder.addField("Enqueued Playlist:", playlist.getName(), true);
-                builder.addField("Requested By:", requestedBy.getAsMention(), true);
-                builder.addField("Items in Playlist:", "`" + playlist.getTracks().size() + "`", true);
-
-                event.getHook().editOriginalEmbeds(builder.build()).queue();
-            }
-
-            @Override
-            public void noMatches() {
-                event.getHook().editOriginal("Failed to find any track named `" + searchQuery.replace("ytsearch:", "") + "`").queue();
-            }
-
-            @Override
-            public void loadFailed(FriendlyException exception) {
-                event.getHook().editOriginal("Could not play that track. Try again later! `" + exception.getMessage() + "`").queue();
-            }
-        });
+        if(settings.getTrackUrl() != null) {
+            String trackUrl = settings.getTrackUrl();
+            final String checkUrl = trackUrl; // required for lambda below: () -> new URL(checkUrl) requires a final variable
+            if(Preconditions.checkThrows(() -> new URL(checkUrl), MalformedURLException.class))
+                trackUrl = "ytsearch:" + trackUrl;
+            final String searchQuery = trackUrl; // same deal here, needs effective final variable for some functions to work
+            this.audioPlayerManager.loadItem(searchQuery, new TrackLoadStatus(this, settings));
+        }
     }
 
-    private void play(AudioTrack track, boolean asNext) {
+    void play(AudioTrack track, boolean asNext) {
         connectFirst();
         this.trackScheduler.queue.addToQueue(track, asNext);
         this.trackScheduler.queue.playNextTrack(false);
@@ -181,52 +132,6 @@ public class MusicPlayer implements Serializable {
         this.audioPlayer.destroy();
     }
 
-
-    public SkipSongManager getSkipSongManager() { return new SkipSongManager(); }
-    public class SkipSongManager {
-        protected void clearSkipVoteQueue() {
-            skipVotes.clear();
-        }
-
-        public boolean hasMemberSkipVoted(Member member) {
-            return skipVotes.stream().filter(vote -> vote.member().getIdLong() == member.getIdLong()).findFirst().orElse(null) != null;
-        }
-
-        public void addMemberToSkipVote(Member member) {
-            if(hasMemberSkipVoted(member))
-                throw new IllegalArgumentException("That member has already voted to skip at some point in the past.");
-            skipVotes.add(new SkipVote(member, System.currentTimeMillis(), audioPlayer.getPlayingTrack()));
-        }
-
-        public List<Member> getUsersWhoCanSkip() { return getVoiceChannel().getMembers()
-                .stream()
-                .filter(member -> !member.getUser().isBot())
-                .filter(member -> getVoiceChannel().getType() == ChannelType.STAGE
-                        && getVoiceChannel().asStageChannel().getStageInstance() != null
-                        && Objects.requireNonNull(getVoiceChannel().asStageChannel().getStageInstance()).getSpeakers().contains(member)
-                )
-                .toList();
-        }
-
-        public int getMembersWantingSkip() { return skipVotes.size(); }
-
-        /**
-         * This percentage is already multiplied by 100
-         */
-        public int getMembersWantingSkipPercent() {
-            return Math.round(Float.parseFloat(String.valueOf(this.getMembersWantingSkip())) / Float.parseFloat(String.valueOf(this.getMaxNeededToSkip()))*100);
-        }
-
-        public int getMaxNeededToSkip() {
-            return Math.round((Float.parseFloat(String.valueOf(this.getUsersWhoCanSkip().size()))* (Main.SKIP_VOTE_PERCENTAGE)));
-        }
-
-        public void checkSkipProportion() {
-            if(getMembersWantingSkipPercent() < 100) return;
-            trackScheduler.nextTrack();
-        }
-    }
-
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{" +
@@ -237,7 +142,7 @@ public class MusicPlayer implements Serializable {
                 ", audioManager=" + audioManager +
                 ", audioPlayer=" + audioPlayer +
                 ", trackScheduler=" + trackScheduler +
-                ", skipVotes=" + skipVotes +
+                ", skipVotes=" + this.seekManager +
                 '}';
     }
 }

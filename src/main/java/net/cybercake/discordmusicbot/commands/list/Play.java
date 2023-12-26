@@ -15,6 +15,7 @@ import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
+import net.cybercake.discordmusicbot.queue.TrackLoadSettings;
 import net.cybercake.discordmusicbot.utilities.Asserts;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
@@ -63,6 +64,7 @@ public class Play extends Command {
         handlePlay(event, query, priority == null ? null : priority.getAsBoolean(), shuffle == null ? null : shuffle.getAsBoolean());
     }
 
+    @SuppressWarnings("DuplicatedCode")
     public void handlePlay(SlashCommandInteractionEvent event, String query, @Nullable Boolean priority, @Nullable Boolean shuffle) {
         Member member = event.getMember();
         User user = event.getUser();
@@ -74,19 +76,24 @@ public class Play extends Command {
             Embeds.throwError(event, user, "You must be in a voice channel to continue.", true, null); return;
         }
 
-        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel());
+        MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayerForChannelsElseCreate(
+                member.getGuild(), member.getVoiceState().getChannel(), event.getChannel().asTextChannel()
+        );
         if(musicPlayer != null && !member.getVoiceState().getChannel().equals(musicPlayer.getVoiceChannel())) {
             Embeds.throwError(event, user, "You must be in the voice channel " + musicPlayer.getVoiceChannel().getAsMention() + " to continue.", true, null); return;
         }
 
         try {
-            Main.musicPlayerManager.getGuildMusicPlayer(member.getGuild()).loadAndPlay(
-                    user,
-                    query,
-                    event,
-                    this,
-                    priority != null && priority,
-                    shuffle != null && shuffle
+            Main.musicPlayerManager.getGuildMusicPlayer(member.getGuild()).loadAndPlay( // repeated because this should create a new one
+                    TrackLoadSettings.config(
+                            user,
+                            query,
+                            event,
+                            this,
+                            priority != null && priority,
+                            shuffle != null && shuffle
+                    )
+                            .build()
             );
         } catch (Exception exception) {
             Embeds.throwError(event, user, "A general error occurred whilst trying to add the song! `" + exception + "`", exception);
@@ -137,18 +144,15 @@ public class Play extends Command {
 
     // 🎵
     public List<String> spotifySearchResults(String query) throws IOException, ParseException, SpotifyWebApiException {
-        List<String> spotifyReturnedSearchResults = new ArrayList<>();
 
         // search tracks
         SearchTracksRequest tracksRequest = Main.spotifyApi.searchTracks(query).limit(1).build();
         Paging<Track> trackPaging = tracksRequest.execute();
-        spotifyReturnedSearchResults.addAll(
-                Arrays.stream(trackPaging.getItems())
-                        .map(Track::getName)
-                        .map(this::shorten)
-                        .map(item -> "Spotify: \uD83C\uDFB5 " + item)
-                        .toList()
-        );
+        List<String> spotifyReturnedSearchResults = new ArrayList<>(Arrays.stream(trackPaging.getItems())
+                .map(Track::getName)
+                .map(this::shorten)
+                .map(item -> "Spotify: \uD83C\uDFB5 " + item)
+                .toList());
 
         // search playlists
         SearchPlaylistsRequest playlistsRequest = Main.spotifyApi.searchPlaylists(query).limit(1).build();

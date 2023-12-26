@@ -1,6 +1,7 @@
 package net.cybercake.discordmusicbot.commands.settings;
 
 import net.cybercake.discordmusicbot.GuildSettings;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -46,7 +47,7 @@ public abstract class SettingSubCommand {
         oldValue = oldValue.contains("null") ? setting.getValueIfNoneIsSet() : oldValue;
         newValue = newValue.contains("null") ? setting.getValueIfNoneIsSet() : newValue;
         MessageEmbed embed = new EmbedBuilder()
-                .setColor(new Color(100, 223, 0))
+                .setColor(Colors.SUCCESS.get())
                 .setTitle("__Changed Value: `" + setting.getDisplayName() + "`__")
                 .setTimestamp(new Date().toInstant())
                 .addField("Old Value", oldValue, true)

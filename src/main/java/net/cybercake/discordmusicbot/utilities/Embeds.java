@@ -1,9 +1,12 @@
 package net.cybercake.discordmusicbot.utilities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.list.Pause;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
+import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,8 +25,6 @@ import java.awt.*;
 import java.util.Date;
 
 public class Embeds {
-
-    public static Color ERROR_COLOR = new Color(186, 24, 19);
 
 
     public static void executeEmbed(IReplyCallback event, EmbedBuilder builder, boolean ephemeral) { executeEmbed(event, builder.build(), ephemeral); }
@@ -50,7 +51,7 @@ public class Embeds {
 
     public static EmbedBuilder getErrorEmbed(@Nullable User user, String errorMessage) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(ERROR_COLOR);
+        builder.setColor(Colors.ERROR.get());
         builder.setTitle("An error occurred!");
         builder.setDescription(errorMessage + "\n \r");
         builder.setTimestamp(new Date().toInstant());
@@ -67,13 +68,21 @@ public class Embeds {
         return getErrorEmbed(user, "`" + technicalInformation + "` -- That's all we know, please contact a staff member");
     }
 
+    private static String imageOf(AudioTrackInfo info) {
+        String youtube = YouTubeUtils.extractImage(info);
+        if (youtube != null) return youtube;
+
+        return SpotifyUtils.extractImage(info);
+    }
+
     public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild, long edit) {
-        String image = YouTubeUtils.extractImage(track.getInfo());
+        String image = imageOf(track.getInfo());
         MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(guild);
 
         EmbedBuilder builder = new EmbedBuilder();
         if(image != null)
             builder.setThumbnail(image);
+        builder.setColor(Colors.CURRENT_SONG_STATUS.get());
         builder.setAuthor((musicPlayer.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB6 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
@@ -84,15 +93,21 @@ public class Embeds {
         if(musicPlayer.getTrackScheduler().repeating() != TrackScheduler.Repeating.FALSE)
             builder.addField("Looping", musicPlayer.getTrackScheduler().repeating().userFriendlyString(), true);
         builder.addField("Artist", track.getInfo().author, true);
-        builder.setTimestamp(new Date().toInstant());
         Message message;
         try {
             Button skipButton = Button.secondary("skip-track-" + track.getIdentifier(), Emoji.fromFormatted("⏭"));
-            if(musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().isEmpty())
+
+            Queue queue = musicPlayer.getTrackScheduler().getQueue();
+            if (queue.getCurrentIndex() >= queue.getLiteralQueue().size())
                 skipButton = skipButton.asDisabled();
+
+            Button backButton = Button.secondary("previous-track-" + track.getIdentifier(), Emoji.fromFormatted("⏮"));
+            if (queue.getCurrentIndex() <= 1)
+                backButton = backButton.asDisabled();
+
             ItemComponent[][] buttons = new ItemComponent[][]{
                     new ItemComponent[]{
-                            Button.secondary("back-one-track", Emoji.fromFormatted("⏮")).asDisabled(),
+                            backButton,
                             Button.secondary("pauseresume-nomsg", Emoji.fromFormatted("⏸")),
                             skipButton
                     },
@@ -125,10 +140,10 @@ public class Embeds {
     public static void sendNowPlayingStatus(IReplyCallback event, AudioTrack track, Guild guild) {
         @Nullable String image = null;
         if(track.getInfo().uri.contains("youtube.com"))
-            image = YouTubeUtils.getThumbnailLinkFor(track);
+            image = YouTubeUtils.extractImage(track.getInfo());
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(new Color(108, 221, 255));
+        builder.setColor(Colors.NOW_PLAYING.get());
         if(image != null)
             builder.setThumbnail(image);
         builder.setAuthor(track.getInfo().author);
@@ -136,7 +151,6 @@ public class Embeds {
         builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()));
         if(track.getUserData() != null)
             builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", false);
-        builder.setTimestamp(new Date().toInstant());
 
         if(event.isAcknowledged())
             event.getHook().editOriginalEmbeds(builder.build()).queue();
@@ -147,7 +161,7 @@ public class Embeds {
     public static void sendMaintenanceStatus(IReplyCallback callback, String initialMessage) {
         callback.replyEmbeds(new EmbedBuilder().setTitle(":exclamation: Bot is under maintenance! :exclamation:")
                         .setDescription(initialMessage + "Check again later when maintenance mode is off.\n\n*If you believe this to be in error, please contact **CyberedCake#9221** on Discord immediately!*")
-                        .setColor(new Color(255, 41, 41)).build())
+                        .setColor(Colors.ERROR.get()).build())
                 .setEphemeral(true)
                 .queue();
     }

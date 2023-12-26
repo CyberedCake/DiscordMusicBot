@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
@@ -56,7 +57,7 @@ public class ListAllActiveServers extends Command {
                         );
             }
         }
-        builder.setColor(new Color(205, 255, 172));
+        builder.setColor(Colors.LIST.get());
 
         event.replyEmbeds(builder.build()).setEphemeral(true).queue();
     }

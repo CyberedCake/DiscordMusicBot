@@ -1,5 +1,7 @@
 package net.cybercake.discordmusicbot.utilities;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
@@ -28,6 +30,14 @@ public class NumberUtils {
      */
     public static String formatDecimal(double value, int places) {
         return formatDecimal(value, places, RoundingMode.HALF_EVEN);
+    }
+
+    public static int asRoundedInt(double value) {
+        try {
+            return (int)new BigDecimal(value).round(new MathContext(2, RoundingMode.HALF_UP)).doubleValue();
+        } catch (Exception exception) {
+            return (int)value;
+        }
     }
 
 }

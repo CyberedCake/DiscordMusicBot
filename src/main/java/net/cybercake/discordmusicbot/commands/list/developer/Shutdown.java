@@ -3,6 +3,7 @@ package net.cybercake.discordmusicbot.commands.list.developer;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
@@ -36,7 +37,7 @@ public class Shutdown extends Command {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle("⚠️ The bot is restarting! ⚠️");
             builder.setDescription("The bot is currently restarting. Try again in a few minutes. Disconnecting from the voice chat...");
-            builder.setColor(new Color(255, 152, 68));
+            builder.setColor(Colors.DISCONNECTED.get());
             builder.setTimestamp(new Date().toInstant());
             List<Guild> shutdownFor = new ArrayList<>();
             for(MusicPlayer musicPlayer : Main.musicPlayerManager.getAllMusicPlayers().values()) {
@@ -48,7 +49,7 @@ public class Shutdown extends Command {
             event.replyEmbeds(new EmbedBuilder().setTitle("Goodbye!").setDescription("Shutting down the bot..." +
                     "\n" +
                     "The bot was shutdown for (" + shutdownFor.size() + ") guilds: " + String.join(", ", shutdownFor.stream().map(Guild::getName).toArray(String[]::new))
-            ).setColor(new Color(62, 137, 255)).build()).setEphemeral(true).queue();
+            ).setColor(Colors.SHUTDOWN_FEEDBACK.get()).build()).setEphemeral(true).queue();
             Thread.sleep(1000L);
             Main.JDA.shutdown();
         } catch (Exception exception) {

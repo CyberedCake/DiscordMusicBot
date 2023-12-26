@@ -1,6 +1,9 @@
 package net.cybercake.discordmusicbot.utilities;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.entities.User;
+
+import javax.annotation.Nullable;
 
 public class TrackUtils {
 
@@ -32,6 +35,16 @@ public class TrackUtils {
             return new Pair<>(user, exception);
         }
         return null;
+    }
+
+    public static String getUrlOf(AudioTrackInfo info) {
+        return getUrlOf(info, null);
+    }
+
+    public static String getUrlOf(AudioTrackInfo info, @Nullable String timing) {
+        if (YouTubeUtils.isYouTube(info)) return "https://youtube.com/watch?v=" + info.identifier + (timing == null ? "" : timing);
+
+        return info.uri;
     }
 
 }

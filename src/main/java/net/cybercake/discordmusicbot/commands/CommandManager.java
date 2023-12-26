@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class CommandManager extends ListenerAdapter {
 
     public final static List<Long> BOT_DEVELOPERS = new ArrayList<>(
-            List.of(351410272256262145L)
+            List.of(351410272256262145L, 771098554600915004L)
     );
 
     @Override

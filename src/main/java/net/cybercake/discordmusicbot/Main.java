@@ -23,7 +23,7 @@ public class Main {
     public static String SPOTIFY_TOKEN = null;
     public static String SPOTIFY_CLIENT = "88b94b49a4af45b0bf80249d7f08479f";
 
-    public static final float SKIP_VOTE_PERCENTAGE = 0.5F;
+    public static final float QUEUE_SEEK_PERCENTAGE = 0.5F;
 
     public static JDA JDA;
     public static MusicPlayerManager musicPlayerManager;

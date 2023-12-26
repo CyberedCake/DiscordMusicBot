@@ -3,6 +3,7 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -44,7 +45,7 @@ public class LyricsCMD extends Command {
             builder.setTitle(lyrics.getTitle(), lyrics.getURL());
             builder.setDescription(lyrics.getContent().replace("  ", "\n"));
             builder.setFooter("Source: " + lyrics.getSource());
-            builder.setColor(new Color(186, 151, 255));
+            builder.setColor(Colors.LYRICS.get());
         } catch (Exception exception) {
             if(!exception.getClass().equals(NullPointerException.class))
                 builder = Embeds.getTechnicalErrorEmbed(event.getUser(), exception.toString());

@@ -1,6 +1,7 @@
 package net.cybercake.discordmusicbot.commands.settings;
 
 import net.cybercake.discordmusicbot.GuildSettings;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -36,7 +37,7 @@ public enum ShowSetting {
 
     public static MessageEmbed getEmbed(IReplyCallback event, GuildSettings settings, @Nullable ShowSetting... filter) {
         EmbedBuilder builder = new EmbedBuilder()
-                .setColor(new Color(43, 255, 180))
+                .setColor(Colors.LIST.get())
                 .setTitle("__Settings for your server:__")
                 .setTimestamp(new Date().toInstant());
         Guild guild = event.getGuild();

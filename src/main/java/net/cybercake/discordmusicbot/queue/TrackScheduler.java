@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.list.Resume;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.Pair;
@@ -73,12 +74,22 @@ public class TrackScheduler extends AudioEventAdapter {
         if(skipAmount > 0)
             this.queue.toIndex(this.queue.getCurrentIndex() + skipAmount);
 
+        this.postQueueSeek();
+    }
+
+    public void previousTrack() {
+        this.queue.toIndex(this.queue.getCurrentIndex() - 2);
+
+        this.postQueueSeek();
+    }
+
+    private void postQueueSeek() {
         try {
             this.queue.playNextTrack(true);
             this.trackExceptionRepeats = 0;
         } catch (IllegalStateException illegalStateException) {
-            Log.error("Failed in starting next track", illegalStateException);
-            if(!illegalStateException.getMessage().contains("Cannot play the same instance")) return;
+            Log.error("Failed in starting next track after queue seek", illegalStateException);
+            if (!illegalStateException.getMessage().contains("Cannot play the same instance")) return;
             endQueue(Main.musicPlayerManager.getGuildMusicPlayer(this.guild));
         }
     }
@@ -142,7 +153,7 @@ public class TrackScheduler extends AudioEventAdapter {
         deleteOldSongPlayingStatus();
         if(!Main.musicPlayerManager.checkMusicPlayerExists(this.guild)) return;
         MusicPlayer musicPlayerMain = Main.musicPlayerManager.getGuildMusicPlayer(this.guild);
-        musicPlayerMain.getSkipSongManager().clearSkipVoteQueue();
+        musicPlayerMain.getSeekManager().clear();
         if(queue.isEmpty()) {
             endQueue(musicPlayerMain); return;
         }
@@ -192,7 +203,7 @@ public class TrackScheduler extends AudioEventAdapter {
         builder.addField("Caused By", "||`" + exception.getCause().toString() + "`||", true);
         builder.addField("Time", "||<t:" + (System.currentTimeMillis()/1000L) + ":R>||", true);
         builder.setFooter("Please notify CyberedCake (@cyberedcake) or <@351410272256262145>");
-        builder.setColor(Embeds.ERROR_COLOR);
+        builder.setColor(Colors.ERROR.get());
         builder.setTimestamp(new Date().toInstant());
         channel.sendMessageEmbeds(builder.build()).queue();
     }
@@ -212,7 +223,7 @@ public class TrackScheduler extends AudioEventAdapter {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("No more songs.");
         builder.setDescription("All songs from the queue have been played and repeat mode is off. The bot is now leaving the voice chat.");
-        builder.setColor(new Color(255, 152, 68));
+        builder.setColor(Colors.DISCONNECTED.get());
         builder.setTimestamp(new Date().toInstant());
         channel.sendMessageEmbeds(builder.build()).queue();
     }

@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
@@ -36,7 +37,7 @@ public class QueueCMD extends Command {
         super(
                 "queue", "View the queue and upcoming songs."
         );
-        this.aliases = new String[]{"nextsong"};
+        this.aliases = new String[]{"viewsongs", "viewqueue"};
         this.optionData = new OptionData[]{
                 new OptionData(OptionType.INTEGER, "page", "Change the page that you're viewing", false, true)
         };
@@ -85,7 +86,7 @@ public class QueueCMD extends Command {
         if(!upNext.toString().isEmpty())
             builder.addField("Up Next", upNext.toString(), false);
 
-        builder.setColor(new Color(0, 65, 59));
+        builder.setColor(Colors.QUEUE.get());
 
         List<ItemComponent> buttons = new ArrayList<>();
         buttons.add(Button.secondary("queue-first-" + page, "⏪ First").withDisabled(page <= 1));
@@ -123,8 +124,8 @@ public class QueueCMD extends Command {
         int position = (int)(track.getPosition() / 1000);
         String positionQuery = position == 0 ? "" : "&t=" + position;
         return (trackNumber == 0 ? "\t" : trackNumber + ". ") +
-                "[" + track.getInfo().title + "](https://www.youtube.com/watch?v=" + track.getIdentifier() + positionQuery + ") " +
-                (user == null ? "" : "(Requested by **" + user.getName() + "**)");
+                "[" + track.getInfo().title + "](" + TrackUtils.getUrlOf(track.getInfo(), positionQuery) + ") " +
+                (user == null ? "" : "(Requested by " + user.getAsMention() + ")");
 //        return " " +
 //                (trackNumber == 0 ? "Playing" : trackNumber) + ") " +
 //                track.getInfo().title +

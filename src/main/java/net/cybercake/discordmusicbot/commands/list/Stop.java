@@ -2,6 +2,7 @@ package net.cybercake.discordmusicbot.commands.list;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -53,7 +54,7 @@ public class Stop extends Command {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Bot disconnected.");
         builder.setDescription(event.getMember().getAsMention() + " cleared the queue and disconnected the bot from the voice chat.");
-        builder.setColor(new Color(255, 152, 68));
+        builder.setColor(Colors.DISCONNECTED.get());
         builder.setTimestamp(new Date().toInstant());
         event.getHook().editOriginalEmbeds(builder.build()).queue();
     }

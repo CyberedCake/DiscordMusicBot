@@ -1,6 +1,7 @@
 package net.cybercake.discordmusicbot;
 
 import net.cybercake.discordmusicbot.commands.CommandManager;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
@@ -29,7 +30,7 @@ public class PresetExceptions {
             embed.setDescription("**Exact Exception**: ||`" + exception + "`||");
         }
         embed.setTimestamp(new Date().toInstant());
-        embed.setColor(new Color(186, 24, 19));
+        embed.setColor(Colors.ERROR.get());
         Log.error("A critical error occurred at " + new SimpleDateFormat("MMM d, yyyy HH:mm:ss z"), exception);
 
         if(event.isAcknowledged()) event.getHook().editOriginalEmbeds(embed.build()).queue();
@@ -58,7 +59,7 @@ public class PresetExceptions {
 
     public static boolean isNotBotDeveloper(IReplyCallback callback, Member member) { // returns true if no bot developer is found
         if(!CommandManager.BOT_DEVELOPERS.contains(member.getIdLong())) {
-            callback.replyEmbeds(new EmbedBuilder().setTitle("No permission!").setDescription("Only bot developers can execute this command.").setColor(new Color(255, 41, 41)).build()).setEphemeral(true).queue();
+            callback.replyEmbeds(new EmbedBuilder().setTitle("No permission!").setDescription("Only bot developers can execute this command.").setColor(Colors.ERROR.get()).build()).setEphemeral(true).queue();
             return true;
         }
         return false;

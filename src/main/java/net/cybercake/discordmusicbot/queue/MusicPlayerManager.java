@@ -40,7 +40,10 @@ public class MusicPlayerManager {
         return this.musicManagers.get(Long.parseLong(guild.getId())) != null;
     }
 
-    public synchronized MusicPlayer getGuildMusicPlayer(Guild guild, @Nullable AudioChannelUnion voiceChannel, @Nullable TextChannel textChannel) {
+    /**
+     * will not attempt to create if voiceChannel and textChannel are both null
+     */
+    public synchronized MusicPlayer getGuildMusicPlayerForChannelsElseCreate(Guild guild, @Nullable AudioChannelUnion voiceChannel, @Nullable TextChannel textChannel) {
         long guildId = Long.parseLong(guild.getId());
         MusicPlayer musicPlayer = this.musicManagers.get(guildId);
 
@@ -55,12 +58,12 @@ public class MusicPlayerManager {
     }
 
     public synchronized MusicPlayer getGuildMusicPlayer(Guild guild) {
-        return getGuildMusicPlayer(guild, null, null);
+        return getGuildMusicPlayerForChannelsElseCreate(guild, null, null);
     }
 
     public synchronized MusicPlayer createMusicPlayer(Guild guild, AudioChannelUnion voiceChannel, TextChannel textChannel) {
         Log.info("Created a new queue for guild " + guild.getId() + " (" + guild.getName() + ")" + " in voice channel " + voiceChannel.getId() + " (" + voiceChannel.getName() + ")");
-        MusicPlayer musicPlayer = new MusicPlayer(audioPlayerManager, guild, voiceChannel, textChannel);
+        MusicPlayer musicPlayer = new MusicPlayer(getAudioPlayerManager(), guild, voiceChannel, textChannel);
         musicManagers.put(Long.valueOf(guild.getId()), musicPlayer);
         return musicPlayer;
     }

@@ -14,7 +14,8 @@ public class YouTubeUtils {
         return image;
     }
 
-    public static String getThumbnailLinkFor(AudioTrack track){
-        return "https://img.youtube.com/vi/" + track.getIdentifier() + "/maxresdefault.jpg";
+    public static boolean isYouTube(AudioTrackInfo info) {
+        return info.uri.contains("youtube.com") || info.uri.contains("youtu.be");
     }
+
 }
