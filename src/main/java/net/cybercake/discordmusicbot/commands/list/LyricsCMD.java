@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class LyricsCMD extends Command {
@@ -32,7 +34,7 @@ public class LyricsCMD extends Command {
         }
 
         String songTitle = (event.getOption("song-title") != null
-                ? event.getOption("song-title").getAsString()
+                ? Objects.requireNonNull(event.getOption("song-title")).getAsString()
                 : Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild()).getAudioPlayer().getPlayingTrack().getInfo().title);
 
         EmbedBuilder builder = new EmbedBuilder();
@@ -43,8 +45,15 @@ public class LyricsCMD extends Command {
                 throw new NullPointerException("\"" + songTitle + "\" doesn't have lyrics associated with it");
             }
             builder.setTitle(lyrics.getTitle(), lyrics.getURL());
-            builder.setDescription(lyrics.getContent().replace("  ", "\n"));
-            builder.setFooter("Source: " + lyrics.getSource());
+
+            StringBuilder trueLyrics = new StringBuilder();
+            for (String lyric : lyrics.getContent().strip().split("\n")) {
+                if (lyric.isBlank()) continue;
+                trueLyrics.append(lyric).append("\n");
+            }
+
+            builder.setDescription(String.join(", ", trueLyrics));
+            builder.setFooter("Source: " + lyrics.getSource() + "\n" + lyrics.getURL());
             builder.setColor(Colors.LYRICS.get());
         } catch (Exception exception) {
             if(!exception.getClass().equals(NullPointerException.class))

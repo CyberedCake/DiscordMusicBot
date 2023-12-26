@@ -49,7 +49,7 @@ public class SeekQueueVoteFromCommand {
 
         VoteForTrack seekVote = seekManager.getVotesForTrack(type);
         TextChannel channel = (TextChannel) callback.getMessageChannel();
-        if (seekManager.getUsersWhoCanSeekQueue().size() > 1) {
+        if (seekManager.getMaxNeededToSeek() > 1) {
             // channel.sendMessage(member.getAsMention() + " has requested to skip `" + musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().title + "`. **[" + seekVote.getMembersWantingToSeek() + "/" + seekManager.getMaxNeededToSeek() + " - " + (seekVote.getMembersWantingToSeekPercentage()) + "%]**" + (seekVote.getMembersWantingToSeekPercentage() >= 100 ? "\n\n*Skipping this song...*" : "")).queue();
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle(type.title + ": " + seekVote.getMembersWantingToSeek() + "/" + seekManager.getMaxNeededToSeek() + " - " + seekVote.getMembersWantingToSeekPercentage() + "%");

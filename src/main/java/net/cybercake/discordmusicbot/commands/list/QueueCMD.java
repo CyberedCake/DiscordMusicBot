@@ -123,7 +123,7 @@ public class QueueCMD extends Command {
 
         int position = (int)(track.getPosition() / 1000);
         String positionQuery = position == 0 ? "" : "&t=" + position;
-        return (trackNumber == 0 ? "\t" : trackNumber + ". ") +
+        return trackNumber + ". " +
                 "[" + track.getInfo().title + "](" + TrackUtils.getUrlOf(track.getInfo(), positionQuery) + ") " +
                 (user == null ? "" : "(Requested by " + user.getAsMention() + ")");
 //        return " " +

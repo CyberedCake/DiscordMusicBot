@@ -17,6 +17,8 @@ public class Queue {
         this.currentIndex = 0;
     }
 
+    public TrackScheduler getScheduler() { return this.scheduler; }
+
     public LinkedList<AudioTrack> getLiteralQueue() { return this.literalQueue; }
     public int getCurrentIndex() { return this.currentIndex; }
     public AudioTrack getCurrentItem() { return this.getLiteralQueue().get(this.getCurrentIndex()); }

@@ -83,7 +83,7 @@ public class Embeds {
         if(image != null)
             builder.setThumbnail(image);
         builder.setColor(Colors.CURRENT_SONG_STATUS.get());
-        builder.setAuthor((musicPlayer.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB6 Now Playing"));
+        builder.setAuthor((musicPlayer.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB5 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.addField("Duration", TrackUtils.getFormattedDuration(track.getDuration()), true);
         if(!musicPlayer.getTrackScheduler().pause() && track.getUserData() != null)

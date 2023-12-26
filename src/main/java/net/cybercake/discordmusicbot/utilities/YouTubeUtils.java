@@ -10,7 +10,7 @@ public class YouTubeUtils {
     public static String extractImage(AudioTrackInfo info) {
         @Nullable String image = null;
         if(info.uri.contains("youtube.com"))
-            image = "https://i3.ytimg.com/vi/" + info.identifier + "/maxresdefault.jpg";
+            image = "https://i3.ytimg.com/vi/" + info.identifier + "/mqdefault.jpg";
         return image;
     }
 

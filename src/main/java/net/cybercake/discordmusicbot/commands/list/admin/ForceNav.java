@@ -38,8 +38,8 @@ public class ForceNav extends Command {
             Embeds.executeEmbed(event, Embeds.getTechnicalErrorEmbed(event.getUser(), "toPosition OptionMapping is null, yet is required"), true); return;
         }
 
-        musicPlayer.getTrackScheduler().getQueue().toIndex(toPosition.getAsInt() - 1);
+        musicPlayer.getTrackScheduler().getQueue().toIndex(toPosition.getAsInt());
         musicPlayer.getTrackScheduler().nextTrack();
-        event.reply("You forcibly navigated to the song at position `" + toPosition.getAsInt() + "`: **" + musicPlayer.getTrackScheduler().getQueue().getCurrentItem() + "**").queue();
+        event.reply("You forcibly navigated to the song at position `" + toPosition.getAsInt() + "` in the queue: **" + musicPlayer.getTrackScheduler().getQueue().getCurrentItem().getInfo().title + "**").queue();
     }
 }
