@@ -31,7 +31,7 @@ public class TrackLoadStatus implements com.sedmelluq.discord.lavaplayer.player.
 
         track.setUserData(settings.getRequestedBy());
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setThumbnail(YouTubeUtils.extractImage(track.getInfo()));
+        builder.setThumbnail(track.getInfo().artworkUrl);
         builder.setColor(Colors.SUCCESS.get());
         if (settings.shouldStartNow())
             builder.setDescription("*This track will start after the current one finishes.*");
@@ -58,7 +58,7 @@ public class TrackLoadStatus implements com.sedmelluq.discord.lavaplayer.player.
         });
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setThumbnail(YouTubeUtils.extractImage(tracks.get(0).getInfo()));
+        builder.setThumbnail(tracks.get(0).getInfo().artworkUrl);
         if(settings.shouldShuffle())
             builder.setDescription("*Added playlist tracks in a random order.*");
         builder.setColor(Colors.SUCCESS.get());

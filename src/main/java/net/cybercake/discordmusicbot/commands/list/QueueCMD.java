@@ -6,7 +6,9 @@ import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
+import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
+import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
 import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -46,8 +48,10 @@ public class QueueCMD extends Command {
 
     private static final int ITEMS_PER_PAGE = 6;
 
+    private int currentTrackIndex;
+
     public int getPageOf(int position) {
-        return (int) (double) ((position + ITEMS_PER_PAGE) / ITEMS_PER_PAGE);
+        return (int) ((double)(position + ITEMS_PER_PAGE) / (double)ITEMS_PER_PAGE);
         // simple algebra
         // \operatorname{floor}\left(\frac{v+6}{6}\right)
         // ^ paste into desmos
@@ -55,15 +59,15 @@ public class QueueCMD extends Command {
     }
 
     private void handleQueueCMD(IReplyCallback callback, int page) {
-        if(PresetExceptions.memberNull(callback)) return;
+        if (PresetExceptions.memberNull(callback)) return;
         assert callback.getMember() != null;
 
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(callback, callback.getMember(), true);
-        if(musicPlayer == null) return;
+        if (musicPlayer == null) return;
 
-        AudioTrack currentTrack = musicPlayer.getAudioPlayer().getPlayingTrack();
-        if(page == -1)
-            page = getPageOf(getTrackIndexOf(musicPlayer, currentTrack));
+        this.currentTrackIndex = musicPlayer.getTrackScheduler().getQueue().getCurrentIndex();
+        if (page == -1)
+            page = getPageOf(currentTrackIndex);
 
         int maxPages = getMaxPages(callback.getGuild());
         List<AudioTrack> items;
@@ -76,17 +80,15 @@ public class QueueCMD extends Command {
         }
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Queue Page " + page + " / " + maxPages);
-
-        builder.setThumbnail(YouTubeUtils.extractImage(currentTrack.getInfo()));
-        builder.addField("Currently Playing", nextLineFormatting(musicPlayer, currentTrack, checkUser(currentTrack)), false);
+        builder.setTitle("Queue");
 
         StringJoiner upNext = new StringJoiner("\n");
-        items.stream().map(track -> nextLineFormatting(musicPlayer, track, checkUser(track))).forEach(upNext::add);
+        items.stream().map(track -> nextLineFormatting(musicPlayer, track, checkUser(track))).filter(str -> !str.isBlank()).forEach(upNext::add);
         if(!upNext.toString().isEmpty())
-            builder.addField("Up Next", upNext.toString(), false);
+            builder.addField("Page " + page + " / " + maxPages, upNext.toString(), false);
 
         builder.setColor(Colors.QUEUE.get());
+        builder.setThumbnail(musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().artworkUrl);
 
         List<ItemComponent> buttons = new ArrayList<>();
         buttons.add(Button.secondary("queue-first-" + page, "⏪ First").withDisabled(page <= 1));
@@ -111,21 +113,17 @@ public class QueueCMD extends Command {
     }
 
     private int getTrackIndexOf(MusicPlayer musicPlayer, AudioTrack track) {
-        int trackNumber = musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().indexOf(track) + 1;
-        if(trackNumber > musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().size())
-            trackNumber = 0;
-        return trackNumber;
+        return musicPlayer.getTrackScheduler().getQueue().getIndexOf(track) + 1;
     }
 
     private String nextLineFormatting(MusicPlayer musicPlayer, AudioTrack track, @Nullable User user) {
         int trackNumber = getTrackIndexOf(musicPlayer, track);
-        boolean isPlaying = musicPlayer.getAudioPlayer().getPlayingTrack().getIdentifier().equalsIgnoreCase(track.getIdentifier());
 
         int position = (int)(track.getPosition() / 1000);
         String positionQuery = position == 0 ? "" : "&t=" + position;
         return trackNumber + ". " +
                 "[" + track.getInfo().title + "](" + TrackUtils.getUrlOf(track.getInfo(), positionQuery) + ") " +
-                (user == null ? "" : "(Requested by " + user.getAsMention() + ")");
+                (user == null ? "" : "(" + (trackNumber == this.currentTrackIndex ? "\uD83C\uDFB5 Currently Playing \uD83C\uDFB5" : "Requested by " + user.getAsMention()) + ")");
 //        return " " +
 //                (trackNumber == 0 ? "Playing" : trackNumber) + ") " +
 //                track.getInfo().title +

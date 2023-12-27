@@ -68,20 +68,11 @@ public class Embeds {
         return getErrorEmbed(user, "`" + technicalInformation + "` -- That's all we know, please contact a staff member");
     }
 
-    private static String imageOf(AudioTrackInfo info) {
-        String youtube = YouTubeUtils.extractImage(info);
-        if (youtube != null) return youtube;
-
-        return SpotifyUtils.extractImage(info);
-    }
-
     public static Pair<TextChannel, Long> sendSongPlayingStatus(AudioTrack track, Guild guild, long edit) {
-        String image = imageOf(track.getInfo());
         MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(guild);
 
         EmbedBuilder builder = new EmbedBuilder();
-        if(image != null)
-            builder.setThumbnail(image);
+        builder.setThumbnail(track.getInfo().artworkUrl);
         builder.setColor(Colors.CURRENT_SONG_STATUS.get());
         builder.setAuthor((musicPlayer.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB5 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
@@ -138,17 +129,12 @@ public class Embeds {
     }
 
     public static void sendNowPlayingStatus(IReplyCallback event, AudioTrack track, Guild guild) {
-        @Nullable String image = null;
-        if(track.getInfo().uri.contains("youtube.com"))
-            image = YouTubeUtils.extractImage(track.getInfo());
-
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Colors.NOW_PLAYING.get());
-        if(image != null)
-            builder.setThumbnail(image);
+        builder.setThumbnail(track.getInfo().artworkUrl);
         builder.setAuthor(track.getInfo().author);
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
-        builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()));
+        builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()) + "   (**" + NumberUtils.asRoundedInt((double) track.getPosition() / track.getDuration()) + "%**)");
         if(track.getUserData() != null)
             builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", false);
 
