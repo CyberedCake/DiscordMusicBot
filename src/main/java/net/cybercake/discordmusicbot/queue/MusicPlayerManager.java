@@ -1,6 +1,6 @@
 package net.cybercake.discordmusicbot.queue;
 
-import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
+import com.github.topi314.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
