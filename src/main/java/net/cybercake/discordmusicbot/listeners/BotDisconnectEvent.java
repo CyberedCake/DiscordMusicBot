@@ -1,6 +1,8 @@
 package net.cybercake.discordmusicbot.listeners;
 
 import net.cybercake.discordmusicbot.Main;
+import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.commands.list.admin.Summon;
 import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Date;
+import java.util.Objects;
 
 public class BotDisconnectEvent extends ListenerAdapter {
 
@@ -27,7 +30,7 @@ public class BotDisconnectEvent extends ListenerAdapter {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Bot disconnected or moved.");
         builder.setDescription("The bot has been disconnected or moved from the voice chat. The bot is now leaving the voice chat and clearing its queue.\n\n" +
-                "If you wish to move the bot to another channel, please use </summon:1082169015448907776>!");
+                "If you wish to move the bot to another channel, please use " + Command.getCommandClass(Summon.class).getJdaCommand().getAsMention() + "!");
         builder.setColor(Colors.DISCONNECTED.get());
         builder.setTimestamp(new Date().toInstant());
         textChannel.sendMessageEmbeds(builder.build()).queue();

@@ -48,9 +48,12 @@ public abstract class Command {
                 Log.error("An error occurred whilst registering commands: " + noSuchMethodException, noSuchMethodException);
             }
         }
-        Main.JDA.updateCommands().addCommands(
+        List<net.dv8tion.jda.api.interactions.commands.Command> jdaCommands = Main.JDA.updateCommands().addCommands(
                 commandsData
-        ).queueAfter(1, TimeUnit.SECONDS);
+        ).complete();
+        for (Command command : commands)
+            command.jdaCommand = jdaCommands.stream().filter(cmd -> cmd.getName().equalsIgnoreCase(command.name)).findFirst().orElseThrow(() -> new IllegalStateException("Failed to find corresponding JDA command for " + command.name));
+        Main.JDA.updateCommands().addCommands(commandsData).queueAfter(1, TimeUnit.SECONDS);
     }
 
     private static SlashCommandData addNewCommand(String name, Command command) { // require name because aliases exist
@@ -66,12 +69,12 @@ public abstract class Command {
 
     public static List<Command> getCommands() { return commands; }
     @SuppressWarnings({"unchecked"})
-    public static @Nullable <T extends Command> T getCommandClass(Class<T> clazz) {
+    public static <T extends Command> T getCommandClass(Class<T> clazz) {
         return (T) getCommands()
                 .stream()
                 .filter(command -> command.getClass().getCanonicalName().equalsIgnoreCase(clazz.getCanonicalName()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("Failed to find class that extends " + Command.class + ": " + clazz.getCanonicalName()));
     }
     public static @Nullable Command getCommandFromName(String name, boolean ignoreCase) {
         return getCommands()
@@ -113,6 +116,8 @@ public abstract class Command {
     protected @Nullable SubcommandData[] subCommands;
     protected @Nullable DefaultMemberPermissions permission;
 
+    net.dv8tion.jda.api.interactions.commands.Command jdaCommand;
+
     protected boolean registerButtonInteraction;
     protected boolean requireDjRole;
     protected boolean requireMaintenanceMode;
@@ -134,6 +139,8 @@ public abstract class Command {
     public boolean sendButtonInteractionEvent() { return this.registerButtonInteraction; }
     public boolean requiresDjRole() { return this.requireDjRole; }
     public boolean requireMaintenanceMode() { return this.requireMaintenanceMode;}
+
+    public net.dv8tion.jda.api.interactions.commands.Command getJdaCommand() { return this.jdaCommand; }
 
     public abstract void command(SlashCommandInteractionEvent event);
     public void tab(CommandAutoCompleteInteractionEvent event) { throw new UnsupportedOperationException("Not implemented"); }

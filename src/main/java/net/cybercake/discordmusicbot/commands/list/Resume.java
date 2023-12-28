@@ -39,12 +39,12 @@ public class Resume extends Command {
         }
 
         if(!musicPlayer.getTrackScheduler().pause()) {
-            Embeds.throwError(event, member.getUser(), "The queue is already playing, use </pause:1084986931986833530> to pause the song", true, null); return;
+            Embeds.throwError(event, member.getUser(), "The queue is already playing, use " + Command.getCommandClass(Pause.class).getJdaCommand().getAsMention() + " to pause the song", true, null); return;
         }
 
         musicPlayer.getTrackScheduler().pause(false);
         if(showMessage)
-            event.reply(":arrow_forward: You resumed the queue. Use </pause:1084986931986833530> to re-pause it!").queue();
+            event.reply(":arrow_forward: You resumed the queue. Use " + Command.getCommandClass(Pause.class).getJdaCommand().getAsMention() + " to re-pause it!").queue();
         else
             event.reply(":arrow_forward: You resumed the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
         removePauseNickname(member.getGuild());

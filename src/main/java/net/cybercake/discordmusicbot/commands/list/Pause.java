@@ -39,14 +39,12 @@ public class Pause extends Command {
         }
 
         if(musicPlayer.getTrackScheduler().pause()) {
-            Embeds.throwError(event, member.getUser(), "The queue is already paused, use </resume:1084986931986833531> to continue the song", true, null); return;
+            Embeds.throwError(event, member.getUser(), "The queue is already paused, use " + Command.getCommandClass(Resume.class).getJdaCommand().getAsMention() + " to continue the song", true, null); return;
         }
 
         musicPlayer.getTrackScheduler().pause(true);
         if(showMessage)
-            event.reply(":pause_button: You paused the queue. Use </resume:1084986931986833531> to unpause it!")
-                .setActionRow(Button.success("resume", "Resume the song"))
-                .queue();
+            event.reply(":pause_button: You paused the queue. Use " + Command.getCommandClass(Resume.class).getJdaCommand().getAsMention() + " to unpause it!").queue();
         else
             event.reply(":pause_button: You paused the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
         addPauseNickname(member.getGuild());
