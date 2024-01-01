@@ -136,4 +136,8 @@ public class GuildSettings implements Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        return GSON.toJson(this, GuildSettings.class).replace("\n", "").replace(" ", "");
+    }
 }

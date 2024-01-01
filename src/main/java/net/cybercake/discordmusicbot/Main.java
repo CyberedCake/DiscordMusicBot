@@ -65,6 +65,7 @@ public class Main {
                 .addEventListeners(new CommandManager(), new BotDisconnectEvent(), new ButtonInteraction())
                 .build()
                 .awaitReady();
+
         if(MAINTENANCE) {
             JDA.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
             JDA.getPresence().setActivity(Activity.playing("MAINTENANCE MODE"));
