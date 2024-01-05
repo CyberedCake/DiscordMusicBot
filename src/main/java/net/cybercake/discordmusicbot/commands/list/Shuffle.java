@@ -3,6 +3,7 @@ package net.cybercake.discordmusicbot.commands.list;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
+import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -42,7 +43,9 @@ public class Shuffle extends Command {
             Embeds.throwError(event, event.getUser(), "There aren't any items to shuffle.", true, null); return;
         }
 
+        Queue queue = musicPlayer.getTrackScheduler().getQueue();
+
         musicPlayer.getTrackScheduler().shuffle();
-        event.reply(":white_check_mark: Successfully shuffled the queue. The next song is now `" + musicPlayer.getTrackScheduler().getQueue().getLiteralQueue().get(0).getInfo().title + "`").queue();
+        event.reply(":white_check_mark: Successfully shuffled the queue. The next song is now `" + queue.getTrackAt(queue.getCurrentIndex()).getInfo().title + "`").queue();
     }
 }

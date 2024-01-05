@@ -56,10 +56,17 @@ public class Queue {
     }
 
     public void randomizeOrder() {
+        AudioTrack current = this.getCurrentItem();
         Collections.shuffle(literalQueue, new Random(System.currentTimeMillis()));
+        this.literalQueue.add(0, current);
+        this.currentIndex = 1;
     }
 
     public AudioTrack remove(int position) { return this.literalQueue.remove(position); }
+
+    public AudioTrack getTrackAt(int position) {
+        return this.literalQueue.get(position);
+    }
 
     public void destroy() {
         this.literalQueue.clear();
