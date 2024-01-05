@@ -27,6 +27,8 @@ public class Queue {
 
     public boolean isEmpty() { return this.getLiteralQueue().isEmpty(); }
 
+    public boolean isAtEnd() { return this.getCurrentIndex() >= this.getLiteralQueue().size(); }
+
     public boolean isCurrent(AudioTrack testTrack) { return testTrack == getCurrentItem(); }
 
     public int getIndexOf(AudioTrack searchTrack) {

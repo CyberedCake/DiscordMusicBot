@@ -67,7 +67,7 @@ public class TrackScheduler extends AudioEventAdapter {
      * @param skipAmount the amount of songs to skip (default is 0)
      */
     public void nextTrack(int skipAmount) {
-        if(this.queue.isEmpty()) {
+        if(this.queue.isAtEnd()) {
             endQueue(Main.musicPlayerManager.getGuildMusicPlayer(guild)); return;
         }
 
@@ -157,7 +157,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if(!Main.musicPlayerManager.checkMusicPlayerExists(this.guild)) return;
         MusicPlayer musicPlayerMain = Main.musicPlayerManager.getGuildMusicPlayer(this.guild);
         musicPlayerMain.getSeekManager().clear();
-        if(queue.isEmpty()) {
+        if(queue.isAtEnd()) {
             endQueue(musicPlayerMain); return;
         }
         if(endReason.mayStartNext) {

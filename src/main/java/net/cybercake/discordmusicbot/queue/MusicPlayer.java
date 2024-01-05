@@ -89,8 +89,6 @@ public class MusicPlayer implements Serializable {
 
     public void loadAndPlay(TrackLoadSettings settings) {
         if(settings.getParentCommand().requiresDjRole() && Command.requireDjRole(settings.getParentEvent(), settings.getParentEvent().getMember())) {
-            if(getTrackScheduler().queue.isEmpty())
-                destroy();
             return; // one last check for first usage reasons
         }
 
