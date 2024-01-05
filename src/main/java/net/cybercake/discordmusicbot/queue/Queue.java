@@ -23,16 +23,13 @@ public class Queue {
 
     public LinkedList<AudioTrack> getLiteralQueue() { return this.literalQueue; }
     public int getCurrentIndex() { return this.currentIndex; }
-    public AudioTrack getCurrentItem() { return this.getLiteralQueue().get(this.getCurrentIndex()); }
+    public AudioTrack getCurrentItem() { return this.getLiteralQueue().get(this.getCurrentIndex() - 1); }
 
     public boolean isEmpty() { return this.getLiteralQueue().isEmpty(); }
 
     public boolean isCurrent(AudioTrack testTrack) { return testTrack == getCurrentItem(); }
 
     public int getIndexOf(AudioTrack searchTrack) {
-        if (isCurrent(searchTrack))
-            return getCurrentIndex();
-
         int index = 0;
         for (AudioTrack track : this.getLiteralQueue()) {
             if (track == searchTrack) break;

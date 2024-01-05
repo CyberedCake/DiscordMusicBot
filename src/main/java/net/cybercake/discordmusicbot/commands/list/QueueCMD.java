@@ -7,10 +7,7 @@ import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.Queue;
-import net.cybercake.discordmusicbot.utilities.Embeds;
-import net.cybercake.discordmusicbot.utilities.Log;
-import net.cybercake.discordmusicbot.utilities.TrackUtils;
-import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
+import net.cybercake.discordmusicbot.utilities.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -22,6 +19,7 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
@@ -30,6 +28,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.LongStream;
 
@@ -123,7 +122,7 @@ public class QueueCMD extends Command {
         String positionQuery = position == 0 ? "" : "&t=" + position;
         return trackNumber + ". " +
                 "[" + track.getInfo().title + "](" + TrackUtils.getUrlOf(track.getInfo(), positionQuery) + ") " +
-                (user == null ? "" : "(" + (trackNumber == this.currentTrackIndex ? "\uD83C\uDFB5 Currently Playing \uD83C\uDFB5" : "Requested by " + user.getAsMention()) + ")");
+                (user == null ? "" : "(" + (trackNumber == this.currentTrackIndex ? "\uD83C\uDFB5 Currently Playing" + Asserts.doesNotThrow(String.class, () -> " - </nowplaying:" + Command.getCommandClass(NowPlaying.class).getJdaCommand().getId() + ">", "") + " \uD83C\uDFB5" : "Requested by " + user.getAsMention()) + ")");
 //        return " " +
 //                (trackNumber == 0 ? "Playing" : trackNumber) + ") " +
 //                track.getInfo().title +
