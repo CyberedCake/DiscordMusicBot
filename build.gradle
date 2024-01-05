@@ -12,7 +12,6 @@ sourceCompatibility = targetCompatibility = 17
 
 repositories {
     mavenCentral()
-    jcenter()
     maven {
         url 'https://m2.dv8tion.net/releases'
     }
