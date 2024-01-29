@@ -128,13 +128,15 @@ public class Embeds {
         return new Pair<>(message.getChannel().asTextChannel(), message.getIdLong());
     }
 
-    public static void sendNowPlayingStatus(IReplyCallback event, AudioTrack track, Guild guild) {
+    public static void sendNowPlayingStatus(IReplyCallback event, AudioTrack track) {
+        int percentage = NumberUtils.asRoundedInt((((double)track.getPosition() / (double)track.getDuration()) * 100D));
+
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Colors.NOW_PLAYING.get());
         builder.setThumbnail(track.getInfo().artworkUrl);
         builder.setAuthor(track.getInfo().author);
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
-        builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()) + "   (**" + NumberUtils.asRoundedInt((double) track.getPosition() / track.getDuration()) + "%**)");
+        builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()) + "   (**" + percentage + "%**)");
         if(track.getUserData() != null)
             builder.addField("Requested By", "<@" + TrackUtils.deserializeUserData(track.getUserData()).getFirstItem().getId() + ">", false);
 
