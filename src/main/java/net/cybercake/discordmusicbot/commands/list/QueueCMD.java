@@ -65,7 +65,7 @@ public class QueueCMD extends Command {
         if (musicPlayer == null) return;
 
         this.currentTrackIndex = musicPlayer.getTrackScheduler().getQueue().getCurrentIndex();
-        if (page != -1)
+        if (page == -1)
             page = getPageOf(currentTrackIndex);
 
         int maxPages = getMaxPages(callback.getGuild());
@@ -133,7 +133,7 @@ public class QueueCMD extends Command {
     public void viewQueue(ButtonInteractionEvent event) {
         event.deferReply().setEphemeral(true).queue();
 
-        handleQueueCMD(event, 1);
+        handleQueueCMD(event, -1);
     }
 
     @Override
