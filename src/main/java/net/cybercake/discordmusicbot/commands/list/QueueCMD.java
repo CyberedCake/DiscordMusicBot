@@ -50,9 +50,9 @@ public class QueueCMD extends Command {
     private int currentTrackIndex;
 
     public int getPageOf(int position) {
-        return (int) ((double)(position + ITEMS_PER_PAGE) / (double)ITEMS_PER_PAGE);
+        return (int) Math.floor((double) (position + (ITEMS_PER_PAGE - 1)) / ITEMS_PER_PAGE);
         // simple algebra
-        // \operatorname{floor}\left(\frac{v+6}{6}\right)
+        // \operatorname{floor}\left(\frac{v+5}{6}\right)
         // ^ paste into desmos
         // originated from the equation below: \left(i\cdot6\right)-6=p_{g} (where i is the index, like 7, and p_g is the page number)
     }
@@ -133,7 +133,7 @@ public class QueueCMD extends Command {
     public void viewQueue(ButtonInteractionEvent event) {
         event.deferReply().setEphemeral(true).queue();
 
-        handleQueueCMD(event, 1);
+        handleQueueCMD(event, -1);
     }
 
     @Override

@@ -15,7 +15,7 @@ public class TrackUtils {
                 bar.append(":radio_button:");
             else
                 bar.append("▬");
-            currentLoop += 0.1;
+            currentLoop += 0.1F;
         }
         return getFormattedDuration(current) + " " + bar + " " + getFormattedDuration(max);
     }

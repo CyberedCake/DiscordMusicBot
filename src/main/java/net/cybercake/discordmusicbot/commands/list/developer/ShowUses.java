@@ -14,14 +14,13 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
-public class ListAllActiveServers extends Command {
+public class ShowUses extends Command {
 
-    public ListAllActiveServers(){
-        super("listallactiveservers", "List all active servers");
+    public ShowUses(){
+        super("showuses", "List all active servers");
         this.permission = DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR);
     }
 

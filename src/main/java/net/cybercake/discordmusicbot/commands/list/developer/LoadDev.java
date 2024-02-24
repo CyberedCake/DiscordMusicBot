@@ -23,7 +23,7 @@ public class LoadDev extends Command {
     @Override
     public void command(SlashCommandInteractionEvent event) {
         try {
-            Command.getCommandClass(Play.class).handlePlay(event, "https://www.youtube.com/watch?v=X-nwU7fvUp4&list=PLQFF4PlpFPWUOAUyHHYrcI6PgP_5LBU19&index=1&pp=gAQBiAQB8AUB", false, true);
+            Command.getCommandClass(Play.class).handlePlay(event, "https://music.youtube.com/playlist?list=PLQFF4PlpFPWVkThOxHDoyyrsuzTuzwwW9", false, true);
         } catch (Exception exception) {
             Embeds.throwError(event, event.getUser(), "Error:" + exception.getMessage(), true, null);
         }

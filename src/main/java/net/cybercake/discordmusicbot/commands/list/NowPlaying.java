@@ -22,7 +22,7 @@ public class NowPlaying extends Command {
 
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(musicPlayer == null) return;
-        Embeds.sendNowPlayingStatus(event, musicPlayer.getAudioPlayer().getPlayingTrack(), event.getGuild());
+        Embeds.sendNowPlayingStatus(event, musicPlayer.getAudioPlayer().getPlayingTrack());
     }
 
     @Override
@@ -32,6 +32,6 @@ public class NowPlaying extends Command {
         assert event.getMember() != null;
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(musicPlayer == null) return;
-        Embeds.sendNowPlayingStatus(event, musicPlayer.getAudioPlayer().getPlayingTrack(), event.getGuild());
+        Embeds.sendNowPlayingStatus(event, musicPlayer.getAudioPlayer().getPlayingTrack());
     }
 }
