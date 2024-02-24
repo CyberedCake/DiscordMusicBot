@@ -14,7 +14,8 @@ public enum Colors {
     LIST(new Color(43, 255, 180)),
     QUEUE(new Color(0, 65, 59)),
     SHUTDOWN_FEEDBACK(new Color(62, 137, 255)),
-    ERROR(new Color(186, 24, 19));
+    ERROR(new Color(186, 24, 19)),
+    CONTACT(new Color(253, 204, 45));
 
 
     private final Color color;
