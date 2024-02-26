@@ -22,7 +22,7 @@ public class Resume extends Command {
         this.requireDjRole = true;
     }
 
-    public void handleResume(IReplyCallback event, boolean showMessage) {
+    public void handleResume(IReplyCallback event) {
         if(PresetExceptions.memberNull(event)) return;
         Member member = event.getMember();
         assert member != null;
@@ -43,10 +43,8 @@ public class Resume extends Command {
         }
 
         musicPlayer.getTrackScheduler().pause(false);
-        if(showMessage)
-            event.reply(":arrow_forward: You resumed the queue. Use " + Command.getCommandClass(Pause.class).getJdaCommand().getAsMention() + " to re-pause it!").queue();
-        else
-            event.reply(":arrow_forward: You resumed the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
+        event.reply(":arrow_forward: " + member.getEffectiveName() + " resumed the queue. Use " + Command.getCommandClass(Pause.class).getJdaCommand().getAsMention() + " to re-pause it!").queue();
+            // event.reply(":arrow_forward: You resumed the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
         removePauseNickname(member.getGuild());
 
         musicPlayer.getTrackScheduler().sendSongPlayingStatus(musicPlayer.getAudioPlayer().getPlayingTrack(), TrackScheduler.ToDoWithOld.EDIT);
@@ -54,7 +52,7 @@ public class Resume extends Command {
 
                              @Override
     public void command(SlashCommandInteractionEvent event) {
-        handleResume(event, true);
+        handleResume(event);
     }
 
     @Override
@@ -63,7 +61,7 @@ public class Resume extends Command {
         if(event.isAcknowledged()) return;
         MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild());
         if(buttonId.contains("pauseresume") && (musicPlayer != null && !musicPlayer.getTrackScheduler().pause())) return;
-        handleResume(event, !buttonId.contains("-nomsg"));
+        handleResume(event);
     }
 
     public static void removePauseNickname(Guild guild) {

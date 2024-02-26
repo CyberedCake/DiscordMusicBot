@@ -1,5 +1,6 @@
 package net.cybercake.discordmusicbot.commands.list;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
@@ -12,6 +13,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -27,6 +30,15 @@ public class Volume extends Command {
         );
         this.optionData = new OptionData[]{new OptionData(OptionType.NUMBER, "volume", "The new volume of the bot. 100% is the default.", false).setRequiredRange(0.0, 200.0).setMaxValue(200.0).setMinValue(0.0)};
         this.requireDjRole = true;
+        this.registerButtonInteraction = true;
+    }
+
+    public void handleVolume(IReplyCallback event, Member member, AudioPlayer player, int volume) {
+        player.setVolume(volume);
+        event.replyEmbeds(new EmbedBuilder()
+                .setColor(Colors.VOLUME.get())
+                .setDescription(member.getAsMention() + " set the server-side volume to " + volume + "%" + (volume == 100 ? " (default)" : ""))
+                .build()).queue();
     }
 
     @Override
@@ -58,10 +70,20 @@ public class Volume extends Command {
         }
 
         int volume = (int) option.getAsDouble();
-        musicPlayer.getAudioPlayer().setVolume(volume);
-        event.replyEmbeds(new EmbedBuilder()
-                .setColor(Colors.VOLUME.get())
-                .setDescription(member.getAsMention() + " set the server-side volume to " + volume + "%" + (volume == 100 ? " (default)" : ""))
-                .build()).queue();
+        handleVolume(event, member, musicPlayer.getAudioPlayer(), volume);
+    }
+
+    @Override
+    public void button(ButtonInteractionEvent event, String buttonId) {
+        if (!buttonId.startsWith("volume:")) return;
+        if(PresetExceptions.memberNull(event)) return;
+        Member member = event.getMember();
+        assert member != null;
+
+        MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
+        if(musicPlayer == null) return;
+
+        int newVolume = Integer.parseInt(buttonId.replace("volume:", ""));
+        handleVolume(event, member, musicPlayer.getAudioPlayer(), newVolume);
     }
 }

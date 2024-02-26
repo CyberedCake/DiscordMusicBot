@@ -99,13 +99,18 @@ public class Embeds {
             ItemComponent[][] buttons = new ItemComponent[][]{
                     new ItemComponent[]{
                             backButton,
-                            Button.secondary("pauseresume-nomsg", Emoji.fromFormatted("⏸")),
+                            Button.secondary("pauseresume", Emoji.fromFormatted("⏸")),
                             skipButton
                     },
                     new ItemComponent[]{
                             Button.secondary("loop-song", Emoji.fromFormatted("\uD83D\uDD02")),
                             Button.danger("stop-queue", Emoji.fromFormatted("\uD83D\uDED1")),
                             Button.secondary("shuffle-queue", Emoji.fromFormatted("\uD83D\uDD00"))
+                    },
+                    new ItemComponent[]{
+                            Button.secondary("volume:0", Emoji.fromFormatted("\uD83D\uDD07")),
+                            Button.secondary("volume:50", Emoji.fromFormatted("\uD83D\uDD09")),
+                            Button.secondary("volume:100", Emoji.fromFormatted("\uD83D\uDD0A"))
                     },
                     new ItemComponent[]{
                             Button.secondary("view-queue", "View Queue"),

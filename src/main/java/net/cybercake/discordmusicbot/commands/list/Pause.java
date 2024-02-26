@@ -26,7 +26,7 @@ public class Pause extends Command {
 
     public static User lastPauser;
 
-    public void handlePause(IReplyCallback event, boolean showMessage) {
+    public void handlePause(IReplyCallback event) {
         if(PresetExceptions.memberNull(event)) return;
         Member member = event.getMember();
         assert member != null;
@@ -43,10 +43,8 @@ public class Pause extends Command {
         }
 
         musicPlayer.getTrackScheduler().pause(true);
-        if(showMessage)
-            event.reply(":pause_button: You paused the queue. Use " + Command.getCommandClass(Resume.class).getJdaCommand().getAsMention() + " to unpause it!").queue();
-        else
-            event.reply(":pause_button: You paused the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
+        event.reply(":pause_button: " + member.getEffectiveName() + " paused the queue. Use " + Command.getCommandClass(Resume.class).getJdaCommand().getAsMention() + " to unpause it!").queue();
+            // event.reply(":pause_button: You paused the queue.").setEphemeral(true).complete().deleteOriginal().queueAfter(3L, TimeUnit.SECONDS);
         addPauseNickname(member.getGuild());
         lastPauser = member.getUser();
 
@@ -56,7 +54,7 @@ public class Pause extends Command {
 
     @Override
     public void command(SlashCommandInteractionEvent event) {
-        handlePause(event, true);
+        handlePause(event);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class Pause extends Command {
         if(event.isAcknowledged()) return;
         MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(event.getGuild());
         if(buttonId.contains("pauseresume") && (musicPlayer != null && musicPlayer.getTrackScheduler().pause())) return;
-        handlePause(event, !buttonId.contains("-nomsg"));
+        handlePause(event);
     }
 
     public static void addPauseNickname(Guild guild) {
