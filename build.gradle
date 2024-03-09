@@ -16,6 +16,7 @@ repositories {
         url 'https://m2.dv8tion.net/releases'
     }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
@@ -27,7 +28,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'org.reflections:reflections:0.10.2'
-    implementation 'dev.arbjerg:lavaplayer:2.1.0'
+    implementation 'dev.arbjerg:lavaplayer:6d14c5b2d96fd953c671cfae8f9b9ea11aa20d5a-SNAPSHOT'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
     implementation "com.github.TopiSenpai.LavaSrc:lavasrc:4.0.1"
     implementation 'com.google.code.gson:gson:2.10.1'

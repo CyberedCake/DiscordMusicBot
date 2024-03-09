@@ -72,7 +72,7 @@ public class Embeds {
         MusicPlayer musicPlayer = Main.musicPlayerManager.getGuildMusicPlayer(guild);
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setThumbnail(track.getInfo().artworkUrl);
+        builder.setThumbnail(YouTubeUtils.getArtwork(track.getInfo()));
         builder.setColor(Colors.CURRENT_SONG_STATUS.get());
         builder.setAuthor((musicPlayer.getTrackScheduler().pause() ? "⏸ **CURRENTLY PAUSED** ⏸" : "\uD83C\uDFB5 Now Playing"));
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
@@ -138,7 +138,7 @@ public class Embeds {
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Colors.NOW_PLAYING.get());
-        builder.setThumbnail(track.getInfo().artworkUrl);
+        builder.setThumbnail(YouTubeUtils.getArtwork(track.getInfo()));
         builder.setAuthor(track.getInfo().author);
         builder.setTitle(track.getInfo().title, track.getInfo().uri);
         builder.setDescription(TrackUtils.getDuration(track.getPosition(), track.getDuration()) + "   (**" + percentage + "%**)");

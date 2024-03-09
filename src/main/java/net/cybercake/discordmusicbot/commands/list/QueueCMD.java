@@ -87,7 +87,7 @@ public class QueueCMD extends Command {
             builder.addField("Page " + page + " / " + maxPages, upNext.toString(), false);
 
         builder.setColor(Colors.QUEUE.get());
-        builder.setThumbnail(musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().artworkUrl);
+        builder.setThumbnail(YouTubeUtils.getArtwork(musicPlayer.getAudioPlayer().getPlayingTrack().getInfo()));
 
         List<ItemComponent> buttons = new ArrayList<>();
         buttons.add(Button.secondary("queue-first-" + page, "⏪ First").withDisabled(page <= 1));
