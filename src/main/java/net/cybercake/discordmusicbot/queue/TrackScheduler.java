@@ -181,13 +181,15 @@ public class TrackScheduler extends AudioEventAdapter {
                     int delay = 5 * 1000;
                     Thread.sleep(delay);
                     AudioTrack newTrack = track.makeClone();
-                    newTrack.setUserData(new Pair<User, Exception>(TrackUtils.deserializeUserData(track.getUserData()).getFirstItem(), exception));
+                    Pair<User, Exception> userData = TrackUtils.deserializeUserData(track.getUserData());
+                    if (userData != null)
+                        newTrack.setUserData(new Pair<User, Exception>(userData.getFirstItem(), exception));
                     audioPlayer.startTrack(newTrack, false);
                     Log.info("Track failed, retrying in 5 seconds, tried " + trackExceptionRepeats + " out of " + TRACK_EXCEPTION_MAXIMUM_REPEATS);
                     if(this.message != null)
                         this.message.getFirstItem().editMessageById(this.message.getSecondItem(), "**Track failed.** Retrying <t:" + ((System.currentTimeMillis() + delay) / 1000) + ":R>. Tried " + trackExceptionRepeats + ", maximum " + TRACK_EXCEPTION_MAXIMUM_REPEATS + ".").queue();
                 } catch (Exception exception1) {
-                    throw new IllegalStateException("Failed to rate-limit self", exception1);
+                    throw new IllegalStateException("Failed to rate-limit self exceptions", exception1);
                 }
             });
             thread.start();
