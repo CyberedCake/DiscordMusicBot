@@ -23,7 +23,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     
-    implementation 'net.dv8tion:JDA:5.0.0-beta.20'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.22'
     implementation 'ch.qos.logback:logback-classic:1.5.3'
     implementation 'com.google.code.gson:gson:2.10.1'
 
