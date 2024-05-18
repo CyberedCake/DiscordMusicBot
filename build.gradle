@@ -32,7 +32,7 @@ dependencies {
     implementation 'dev.lavalink.youtube:v2:1.3.0'
     implementation 'dev.arbjerg:lavaplayer:2.1.2'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
-    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:4.0.1"
+    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:4.1.1"
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.github.thelinmichael:spotify-web-api-java:6.5.4'
 
