@@ -39,7 +39,6 @@ public class TrackScheduler extends AudioEventAdapter {
         Repeating(String emoji, String userFriendly, String text){ this.emoji = emoji; this.userFriendly = userFriendly; this.text = text; }
 
         public String emoji() { return Emoji.fromUnicode(this.emoji).getFormatted(); }
-        public String userFriendlyString() { return this.userFriendly; }
         public String text() { return this.text; }
     }
     private Repeating repeating;
