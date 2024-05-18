@@ -1,16 +1,11 @@
 package net.cybercake.discordmusicbot.commands.list.developer;
 
-import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.commands.Command;
-import net.cybercake.discordmusicbot.commands.list.Play;
+import net.cybercake.discordmusicbot.commands.list.user.Play;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 public class LoadDev extends Command {
 

@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.function.BiFunction;

@@ -1,11 +1,9 @@
 package net.cybercake.discordmusicbot.queue.seek;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
-import net.cybercake.discordmusicbot.utilities.Log;
 import net.cybercake.discordmusicbot.utilities.TrackUtils;
 import net.cybercake.discordmusicbot.utilities.YouTubeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;

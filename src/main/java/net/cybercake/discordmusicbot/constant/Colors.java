@@ -16,7 +16,7 @@ public enum Colors {
     SHUTDOWN_FEEDBACK(new Color(62, 137, 255)),
     ERROR(new Color(186, 24, 19)),
     CONTACT(new Color(253, 204, 45)),
-    VOLUME(new Color(205, 255, 104));
+    OTF_SETTINGS(new Color(205, 255, 104)); // "OTF" = On The Fly (settings that appear in the buttons menu or are really easy to change regardless of admin status), ex: volume, looping
 
 
     private final Color color;

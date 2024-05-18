@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.user;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

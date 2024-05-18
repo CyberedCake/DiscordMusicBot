@@ -14,9 +14,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.Date;
-import java.util.Objects;
 
 public class BotDisconnectEvent extends ListenerAdapter {
 

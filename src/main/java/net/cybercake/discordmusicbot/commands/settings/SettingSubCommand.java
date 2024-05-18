@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.Date;
 
 public abstract class SettingSubCommand {

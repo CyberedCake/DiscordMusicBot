@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.user;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.PresetExceptions;

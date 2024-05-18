@@ -1,4 +1,4 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.user;
 
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;

@@ -1,9 +1,8 @@
 package net.cybercake.discordmusicbot.utilities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.cybercake.discordmusicbot.Main;
-import net.cybercake.discordmusicbot.commands.list.Pause;
+import net.cybercake.discordmusicbot.commands.list.user.Pause;
 import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.Queue;
@@ -21,7 +20,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.Date;
 
 public class Embeds {

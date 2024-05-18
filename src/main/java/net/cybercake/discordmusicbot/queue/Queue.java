@@ -1,10 +1,10 @@
 package net.cybercake.discordmusicbot.queue;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import net.cybercake.discordmusicbot.utilities.Log;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class Queue {
 
@@ -27,7 +27,9 @@ public class Queue {
 
     public boolean isEmpty() { return this.getLiteralQueue().isEmpty(); }
 
-    public boolean isAtEnd() { return this.getCurrentIndex() >= this.getLiteralQueue().size(); }
+    public boolean isAtEnd() { return isIndexPastEnd(this.getCurrentIndex()); }
+    public boolean isIndexPastEnd(int index) { return index >= getQueueEndIndex(); }
+    public int getQueueEndIndex() { return this.getLiteralQueue().size(); }
 
     public boolean isCurrent(AudioTrack testTrack) { return testTrack == getCurrentItem(); }
 

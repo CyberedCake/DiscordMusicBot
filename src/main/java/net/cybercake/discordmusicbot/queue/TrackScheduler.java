@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.cybercake.discordmusicbot.Main;
-import net.cybercake.discordmusicbot.commands.list.Resume;
+import net.cybercake.discordmusicbot.commands.list.user.Resume;
 import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.utilities.Embeds;
 import net.cybercake.discordmusicbot.utilities.Log;
@@ -16,10 +16,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.*;
+import java.util.Date;
+import java.util.Objects;
 
 public class TrackScheduler extends AudioEventAdapter {
 
@@ -28,13 +29,18 @@ public class TrackScheduler extends AudioEventAdapter {
     final Queue queue;
 
     public enum Repeating {
-        FALSE("❌ Loop Disabled"),
-        REPEATING_SONG("\uD83D\uDD02 Song Looping"),
-        REPEATING_ALL("\uD83D\uDD01 Queue Looping");
+        FALSE("❌", "Loop Disabled", null),
+        REPEATING_SONG("\uD83D\uDD02", "Song Looping", "for the current song"),
+        REPEATING_ALL("\uD83D\uDD01", "Queue Looping", "for the whole queue");
 
+        private final String emoji;
         private final String userFriendly;
-        Repeating(String userFriendly){  this.userFriendly = userFriendly; }
+        private final String text;
+        Repeating(String emoji, String userFriendly, String text){ this.emoji = emoji; this.userFriendly = userFriendly; this.text = text; }
+
+        public String emoji() { return Emoji.fromUnicode(this.emoji).getFormatted(); }
         public String userFriendlyString() { return this.userFriendly; }
+        public String text() { return this.text; }
     }
     private Repeating repeating;
 
@@ -67,8 +73,14 @@ public class TrackScheduler extends AudioEventAdapter {
      * @param skipAmount the amount of songs to skip (default is 0)
      */
     public void nextTrack(int skipAmount) {
-        if(this.queue.isAtEnd()) {
-            endQueue(Main.musicPlayerManager.getGuildMusicPlayer(guild)); return;
+        if (this.queue.isAtEnd() || this.queue.isIndexPastEnd(this.queue.getCurrentIndex() + skipAmount)) {
+            if (repeating() == Repeating.REPEATING_ALL) {
+                this.queue.toIndex(0);
+                skipAmount = skipAmount - (this.queue.getQueueEndIndex() - this.queue.getCurrentIndex());
+            } else {
+                endQueue(Main.musicPlayerManager.getGuildMusicPlayer(guild));
+                return;
+            }
         }
 
         if(skipAmount > 0)
@@ -157,16 +169,17 @@ public class TrackScheduler extends AudioEventAdapter {
         if(!Main.musicPlayerManager.checkMusicPlayerExists(this.guild)) return;
         MusicPlayer musicPlayerMain = Main.musicPlayerManager.getGuildMusicPlayer(this.guild);
         musicPlayerMain.getSeekManager().clear();
-        if(queue.isAtEnd()) {
+        if(queue.isAtEnd() && this.repeating() == Repeating.FALSE) {
             endQueue(musicPlayerMain); return;
         }
         if(endReason.mayStartNext) {
-            switch(this.repeating) {
-                case REPEATING_SONG -> {
-                    player.startTrack(track.makeClone(), false);
-                    this.trackExceptionRepeats = 0;
-                }
-                case REPEATING_ALL, FALSE -> nextTrack();
+            if (this.repeating() == Repeating.REPEATING_SONG) {
+                player.startTrack(track.makeClone(), false);
+                this.trackExceptionRepeats = 0;
+            } else {
+                if (this.repeating() == Repeating.REPEATING_ALL && queue.isAtEnd())
+                    this.queue.toIndex(0);
+                nextTrack();
             }
         }
     }

@@ -1,10 +1,13 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.user;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.Queue;
 import net.cybercake.discordmusicbot.utilities.Embeds;
+import net.cybercake.discordmusicbot.utilities.Reply;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -46,6 +49,7 @@ public class Shuffle extends Command {
         Queue queue = musicPlayer.getTrackScheduler().getQueue();
 
         musicPlayer.getTrackScheduler().shuffle();
-        event.reply(":white_check_mark: Successfully shuffled the queue. The next song is now `" + queue.getTrackAt(queue.getCurrentIndex()).getInfo().title + "`").queue();
+        Reply.standardEmbed(event, Colors.OTF_SETTINGS,
+                event.getUser().getAsMention() + " shuffled the queue. " + Emoji.fromFormatted("✅").getFormatted() + "\nThe next song is now `" + queue.getTrackAt(queue.getCurrentIndex()).getInfo().title + "`");
     }
 }

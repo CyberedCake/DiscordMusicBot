@@ -1,7 +1,8 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.user;
 
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
+import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.queue.TrackScheduler;
 import net.cybercake.discordmusicbot.utilities.Embeds;
@@ -17,12 +18,12 @@ import java.util.Arrays;
 public class Loop extends Command {
 
     public Loop() {
-        super("loop", "Loops the song or playlist. **PLAYLIST LOOP COMING SOON.**");
+        super("loop", "Loops the current song or the entire queue.");
         this.requireDjRole = true;
         this.aliases = new String[]{"repeat"};
         this.subCommands = new SubcommandData[]{
                 new SubcommandData("song", "Loops the current song."),
-                new SubcommandData("queue", "Loops the queue. **COMING SOON!**")
+                new SubcommandData("queue", "Loops the entire queue.")
         };
         this.registerButtonInteraction = true;
     }
@@ -46,9 +47,9 @@ public class Loop extends Command {
         }
 
         if(subCommand.equalsIgnoreCase("song"))
-            handleLoopSong(event, musicPlayer);
+            handleLoop(event, musicPlayer, TrackScheduler.Repeating.REPEATING_SONG);
         else if(subCommand.equalsIgnoreCase("queue"))
-            handleLoopQueue(event, musicPlayer);
+            handleLoop(event, musicPlayer, TrackScheduler.Repeating.REPEATING_ALL);
         else
             Embeds.throwError(event, event.getUser(), "Invalid sub-command: " + subCommand, true, null);
     }
@@ -63,26 +64,24 @@ public class Loop extends Command {
         MusicPlayer musicPlayer = PresetExceptions.trackIsNotPlaying(event, event.getMember(), true);
         if(musicPlayer == null) return;
 
-        if(buttonId.contains("song")) handleLoopSong(event, musicPlayer);
-        else if(buttonId.contains("queue")) handleLoopQueue(event, musicPlayer);
+        if(buttonId.contains("song")) handleLoop(event, musicPlayer, TrackScheduler.Repeating.REPEATING_SONG);
+        else if(buttonId.contains("queue")) handleLoop(event, musicPlayer, TrackScheduler.Repeating.REPEATING_ALL);
     }
 
-    private void handleLoopSong(IReplyCallback event, MusicPlayer musicPlayer) {
+    private void handleLoop(IReplyCallback event, MusicPlayer musicPlayer, TrackScheduler.Repeating repeatingType) {
         TrackScheduler scheduler = musicPlayer.getTrackScheduler();
-        TrackScheduler.Repeating repeatingNew = scheduler.repeating() == TrackScheduler.Repeating.REPEATING_SONG
+
+        TrackScheduler.Repeating old = scheduler.repeating();
+        TrackScheduler.Repeating repeating = scheduler.repeating() == repeatingType
                 ? TrackScheduler.Repeating.FALSE
-                : TrackScheduler.Repeating.REPEATING_SONG;
-        scheduler.repeating(repeatingNew);
+                : repeatingType;
+        scheduler.repeating(repeating);
 
-        if(repeatingNew == TrackScheduler.Repeating.REPEATING_SONG)
-            Reply.message(event, Emoji.fromUnicode("✅").getFormatted() + Emoji.fromUnicode("\uDD02").getFormatted() +
-                    " Loop *for this song* is now **enabled**", true);
+        if(repeating == repeatingType)
+            Reply.standardEmbed(event, Colors.OTF_SETTINGS,
+                    event.getUser().getAsMention() + " enabled looping " + repeating.text() + " " + Emoji.fromUnicode("✅").getFormatted() + " " + repeating.emoji());
         else
-            Reply.message(event, Emoji.fromUnicode("❌").getFormatted() + Emoji.fromUnicode("\uDD02").getFormatted() +
-                    " Loop *for this song* is now **disabled**", true);
-    }
-
-    private void handleLoopQueue(IReplyCallback event, MusicPlayer musicPlayer) {
-        Embeds.throwError(event, event.getUser(), "This feature is **coming soon**, try again later!", true, null);
+            Reply.standardEmbed(event, Colors.OTF_SETTINGS,
+                    event.getUser().getAsMention() + " disabled looping " + old.text() + " " + Emoji.fromUnicode("❌").getFormatted() + " " + old.emoji());
     }
 }

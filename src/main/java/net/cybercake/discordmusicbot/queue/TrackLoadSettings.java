@@ -1,6 +1,5 @@
 package net.cybercake.discordmusicbot.queue;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.entities.Message;

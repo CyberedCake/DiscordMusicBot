@@ -1,26 +1,20 @@
-package net.cybercake.discordmusicbot.commands.list;
+package net.cybercake.discordmusicbot.commands.list.user;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
 import net.cybercake.discordmusicbot.commands.Command;
 import net.cybercake.discordmusicbot.constant.Colors;
 import net.cybercake.discordmusicbot.queue.MusicPlayer;
 import net.cybercake.discordmusicbot.utilities.Embeds;
-import net.cybercake.discordmusicbot.utilities.Log;
+import net.cybercake.discordmusicbot.utilities.Reply;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import javax.swing.text.html.Option;
-import java.util.List;
 
 public class Volume extends Command {
 
@@ -35,10 +29,7 @@ public class Volume extends Command {
 
     public void handleVolume(IReplyCallback event, Member member, AudioPlayer player, int volume) {
         player.setVolume(volume);
-        event.replyEmbeds(new EmbedBuilder()
-                .setColor(Colors.VOLUME.get())
-                .setDescription(member.getAsMention() + " set the server-side volume to " + volume + "%" + (volume == 100 ? " (default)" : ""))
-                .build()).queue();
+        Reply.standardEmbed(event, Colors.OTF_SETTINGS, member.getAsMention() + " set the server-side volume to " + volume + "%" + (volume == 100 ? " (default)" : ""));
     }
 
     @Override
@@ -62,7 +53,7 @@ public class Volume extends Command {
         if (option == null) {
             int volume = musicPlayer.getAudioPlayer().getVolume();
             event.replyEmbeds(new EmbedBuilder()
-                            .setColor(Colors.VOLUME.get())
+                            .setColor(Colors.OTF_SETTINGS.get())
                             .setTitle("The server-side volume is currently " + volume + "%" + (volume == 100 ? " (default)" : ""))
                             .build()
             ).queue();

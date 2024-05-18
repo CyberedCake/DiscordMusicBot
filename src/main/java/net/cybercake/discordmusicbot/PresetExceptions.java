@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

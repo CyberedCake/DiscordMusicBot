@@ -15,10 +15,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.apache.commons.collections4.map.LinkedMap;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -142,5 +144,17 @@ public class MusicPlayer implements Serializable {
                 ", trackScheduler=" + trackScheduler +
                 ", skipVotes=" + this.seekManager +
                 '}';
+    }
+
+    public Map<String, ?> data() {
+        return new LinkedMap<>()
+        {{
+            put("hash", getGuild().getName().hashCode()); // 0
+            put("id", getAudioPlayer().getPlayingTrack().getInfo().identifier); // 1
+            put("song_at", getAudioPlayer().getPlayingTrack().getPosition()); // 2
+            put("song_duration", getAudioPlayer().getPlayingTrack().getDuration()); // 3
+            put("queue_size", getTrackScheduler().getQueue().getLiteralQueue().size()); // 4
+            put("active_users", getVoiceChannel().getMembers().stream().filter(member -> !member.getUser().isBot()).toList().size()); // 5
+        }};
     }
 }
