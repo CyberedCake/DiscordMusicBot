@@ -24,15 +24,15 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     
-    implementation 'net.dv8tion:JDA:5.0.0-beta.20'
-    implementation 'ch.qos.logback:logback-classic:1.5.3'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.24'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'dev.lavalink.youtube:v2:1.3.0'
     implementation 'dev.arbjerg:lavaplayer:2.1.2'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
-    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:4.0.1"
+    implementation "com.github.TopiSenpai.LavaSrc:lavasrc:4.1.1"
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.github.thelinmichael:spotify-web-api-java:6.5.4'
 
