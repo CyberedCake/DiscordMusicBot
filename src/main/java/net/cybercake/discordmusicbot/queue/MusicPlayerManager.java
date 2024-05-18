@@ -4,6 +4,7 @@ import com.github.topi314.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.utilities.Log;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,6 +25,7 @@ public class MusicPlayerManager {
 
         this.audioPlayerManager = new DefaultAudioPlayerManager();
         this.audioPlayerManager.registerSourceManager(new SpotifySourceManager(null, Main.SPOTIFY_CLIENT, Main.SPOTIFY_TOKEN, "US", this.audioPlayerManager));
+        this.audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager(true, true, true));
 
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);

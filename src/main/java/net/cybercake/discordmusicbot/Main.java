@@ -71,13 +71,6 @@ public class Main {
             JDA.getPresence().setActivity(Activity.playing("MAINTENANCE MODE"));
         }
 
-
-        JDA.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-        JDA.getPresence().setActivity(Activity.customStatus("* CURRENTLY BROKE *, type /help for info!"));
-
-
-
-
         Log.info("Setting needed variables...");
         try {
             musicPlayerManager = new MusicPlayerManager();

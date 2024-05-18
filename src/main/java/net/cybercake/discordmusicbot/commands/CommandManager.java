@@ -37,13 +37,6 @@ public class CommandManager extends ListenerAdapter {
             if(command.requiresDjRole() && Command.requireDjRole(event, event.getMember()))
                 return;
 
-
-            if (2 > 1) {
-                Embeds.throwError(event, event.getUser(), "YouTube recently updated their system and changed around their API. This is a really painful change and it seems as though Lavaplayer, the library we use to play music, is taking their time on updating their system.\n\nUntil Lavaplayer has updated, which can be anywhere from a few days to a few weeks from now (<t:1712030400:D>), the bot is unable to play any music or audio from any clip, including YouTube, Spotify, and mp3 files.\n\nThe bot will be updated whenever this occurs, check the status of the bot to see if it is fixed or not!", false, null);
-                return;
-            }
-
-
             if(command.requireMaintenanceMode() && !Main.MAINTENANCE) {
                 Embeds.throwError(event, event.getUser(), "You are not a bot developer and maintenance mode is set to false. Contact @cyberedcake if you need any help!", true, null);
                 return;
