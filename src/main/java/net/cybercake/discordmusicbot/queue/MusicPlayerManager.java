@@ -4,6 +4,7 @@ import com.github.topi314.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.utilities.Log;

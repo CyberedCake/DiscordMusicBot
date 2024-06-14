@@ -74,7 +74,7 @@ public class TrackLoadStatus implements com.sedmelluq.discord.lavaplayer.player.
         if(settings.getTrackUrl().equalsIgnoreCase(MusicPlayer.FILE_IDENTIFIER) && settings.getFile() != null) {
             try {
                 InputStream input = settings.getFile().getProxy().download().join();
-                AudioTrack decodedTrack = ((DefaultAudioPlayerManager) this.player.audioPlayerManager).decodeTrack(new MessageInput(input)).decodedTrack;
+                AudioTrack decodedTrack = this.player.audioPlayerManager.decodeTrack(new MessageInput(input)).decodedTrack;
                 Log.warn(decodedTrack.getInfo().title + " at " + decodedTrack.getInfo().isStream + " with " + decodedTrack.getInfo().length);
                 this.trackLoaded(decodedTrack);
                 input.close();

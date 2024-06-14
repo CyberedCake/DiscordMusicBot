@@ -40,8 +40,7 @@ public class ShowUses extends Command {
         for(Guild guild : activeGuilds) {
             try {
                 List<?> data = new LinkedList<>(Main.musicPlayerManager.getGuildMusicPlayer(guild).data().values());
-                Log.info(data.toString());
-                builder.addField("Hash #**" + data.get(0) + "** (" + guild.getId() + ")", // this is simply so I can guage whether or not I can restart the bot or if it may be a while before I can
+                builder.addField(guild.getId(), // this is simply so I can guage whether or not I can restart the bot or if it may be a while before I can
                         "id: `" + data.get(1) + "`" + "\n" +
                                 "times: `" + TrackUtils.getFormattedDuration((long)data.get(2)) + "/" + TrackUtils.getFormattedDuration((long)data.get(3)) + "`" + "\n" +
                                 "queue_size: `" + data.get(4) + "`" + "\n" +
