@@ -1,6 +1,5 @@
 package net.cybercake.discordmusicbot.commands.list.user;
 
-import com.github.scribejava.apis.GeniusApi;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.cybercake.discordmusicbot.Main;
 import net.cybercake.discordmusicbot.PresetExceptions;
