@@ -29,14 +29,14 @@ dependencies {
     
     implementation 'net.dv8tion:JDA:5.2.1'
     implementation 'ch.qos.logback:logback-classic:1.5.16'
-    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.google.code.gson:gson:2.12.0'
 
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'dev.lavalink.youtube:v2:1.11.3'
     implementation 'dev.arbjerg:lavaplayer:2.2.2'
     implementation 'com.github.jagrosh:JLyrics:master-SNAPSHOT'
     implementation "com.github.TopiSenpai.LavaSrc:lavasrc:4.1.1"
-    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.google.code.gson:gson:2.12.0'
     implementation 'com.github.thelinmichael:spotify-web-api-java:6.5.4'
 
 
